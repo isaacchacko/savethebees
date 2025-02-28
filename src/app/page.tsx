@@ -8,66 +8,66 @@ export default function Home() {
   const [boid, setBoid] = useState(null);
 
   const waypoints = [
-    { x: 50, y: 50 },
-    { x: 200, y: 100 },
-    { x: 300, y: 250 },
-    { x: 150, y: 300 },
+    // { x: 50, y: 50 },
+    // { x: 200, y: 100 },
+    // { x: 300, y: 250 },
+    // { x: 150, y: 300 },
   ];
 
+  const spawnPosition = { x: 100, y: 100 };
+  const numBees = 100;
+  const spawnRadius = 50;
 
-useEffect(() => {
-  const canvas = canvasRef.current;
-  if (!canvas) return;
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
 
-  let animationFrameId: number; // Store the animation frame ID
+    let animationFrameId: number;
 
-  // Animation loop
-  const animate = () => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Draw waypoints
-    ctx.fillStyle = 'red';
-    waypoints.forEach((waypoint, index) => {
-      ctx.beginPath();
-      ctx.arc(waypoint.x, waypoint.y, 5, 0, 2 * Math.PI);
-      ctx.fill();
-        ctx.fillStyle = (index === (boid?.currentWaypointIndex % waypoints.length)) ? 'green' : 'red';
-    });
+      // Draw waypoints
+      if (waypoints.length > 0) {
+        ctx.fillStyle = 'red';
+        waypoints.forEach((waypoint, index) => {
+          ctx.beginPath();
+          ctx.arc(waypoint.x, waypoint.y, 5, 0, 2 * Math.PI);
+          ctx.fill();
+        });
+      }
 
-    // Move and draw boid
-    if (boid) {
-      if (boid.moveTowardsWaypoint(waypoints[boid.currentWaypointIndex])) {
-          boid.currentWaypointIndex = (boid.currentWaypointIndex + 1) % waypoints.length;
-          console.log(boid.currentWaypointIndex);
-        }
-      boid.draw(ctx);
+      // Update and draw boid (swarm)
+      if (boid) {
+        boid.update(waypoints);
+        boid.draw(ctx);
+      }
+
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    // Initialize boid (swarm) only once
+    if (!boid) {
+      setBoid(new Boid(spawnPosition, numBees, spawnRadius, canvas.width, canvas.height));
+    } else {
+      // Start animation if boid exists
+      animate();
     }
 
-    animationFrameId = requestAnimationFrame(animate);
-  };
-
-  // Initialize boid (only once)
-  if (!boid) {
-    setBoid(new Boid(waypoints[0].x, waypoints[0].y));
-  } else {
-    // Start animation if boid exists
-    animate();
-  }
-
-  // Cleanup function
-  return () => {
-    if (animationFrameId) {
-      cancelAnimationFrame(animationFrameId); // Correctly cancel the animation frame
-    }
-  };
-}, [boid, waypoints]); // Re-run when boid or waypoints change
+    // Cleanup function
+    return () => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+    };
+  }, [boid, waypoints]);
 
   return (
     <div>
-      <h1>Boids and Waypoints</h1>
+      <h1>Bees and Waypoints</h1>
       <canvas ref={canvasRef} width={500} height={400} style={{ border: '1px solid black' }} />
     </div>
   );
