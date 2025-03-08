@@ -1,0 +1,119 @@
+'use client';
+import { useEffect, useRef } from 'react';
+import Boid from './Boid';
+
+export default function CanvasBackground({
+  spawnPosition,
+  numBees,
+  spawnRadius,
+}: {
+  spawnPosition: { x: number; y: number };
+  numBees: number;
+  spawnRadius: number;
+}) {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const boidRef = useRef<Boid | null>(null);
+  const mouseWaypointRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+
+  const isMouseDownRef = useRef(false);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const handleMouseDown = () => {
+      console.log('Mouse DOWN');
+      isMouseDownRef.current = true;
+      boidRef.current?.updateWaypointWeight(-100);
+    };
+
+    const handleMouseUp = () => {
+      console.log('Mouse UP');
+      isMouseDownRef.current = false;
+      boidRef.current?.updateWaypointWeight(1);
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      mouseWaypointRef.current = { x: e.clientX, y: e.clientY };
+    };
+
+    canvas.addEventListener('mousedown', handleMouseDown);
+    canvas.addEventListener('mouseup', handleMouseUp);
+    canvas.addEventListener('mousemove', handleMouseMove);
+
+    const resizeCanvas = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (boidRef.current) {
+        boidRef.current.updateCanvasDimensions(canvas.width, canvas.height);
+      }
+    };
+
+
+    // Initialize Boid
+    boidRef.current = new Boid(
+      spawnPosition,
+      numBees,
+      spawnRadius,
+      canvas.width,
+      canvas.height
+    );
+
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    let animationFrameId: number;
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw waypoint (mouse position)
+      ctx.fillStyle = isMouseDownRef.current ? '#3B82F6' : '#EF4444';
+      ctx.beginPath();
+      ctx.arc(mouseWaypointRef.current.x, mouseWaypointRef.current.y, 5, 0, Math.PI * 2);
+      ctx.fill();
+
+      if (isMouseDownRef.current) {
+        ctx.strokeStyle = '#3B82F680';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(
+          mouseWaypointRef.current.x,
+          mouseWaypointRef.current.y,
+          10, // Outer circle radius
+          0,
+          Math.PI * 2
+        );
+      ctx.stroke();
+      }
+      // Update and draw boid
+      if (boidRef.current) {
+        boidRef.current.update([mouseWaypointRef.current]); // Pass mouse position as the waypoint
+        boidRef.current.draw(ctx);
+      }
+
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    return () => {
+      canvas.removeEventListener('mousedown', handleMouseDown);
+      canvas.removeEventListener('mouseup', handleMouseUp);
+      canvas.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('resize', resizeCanvas);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, [spawnPosition, numBees, spawnRadius]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="fixed top-0 left-0 w-full h-full -z-0 cursor-none"
+    />
+  );
+}

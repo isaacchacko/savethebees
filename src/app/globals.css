@@ -1,5 +1,15 @@
 @import "tailwindcss";
 
+/* Hide cursor over canvas */
+canvas.cursor-none {
+  cursor: none;
+}
+
+/* Allow pointer events through overlays */
+nav, .overlay-element {
+  pointer-events: none;
+}
+
 @theme {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
