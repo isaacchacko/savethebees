@@ -1,8 +1,5 @@
-
-// components/TextCycler.tsx
 "use client";
-
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function TextCycler({ 
   texts, 
@@ -15,33 +12,66 @@ export default function TextCycler({
 }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isExiting, setIsExiting] = useState(false);
+  const [containerWidth, setContainerWidth] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const textRef = useRef<HTMLDivElement>(null);
+  const initialCycles = useRef(0);
+  const resizeObserverRef = useRef<ResizeObserver>();
+
+  const updateWidth = () => {
+    if (textRef.current) {
+      setContainerWidth(textRef.current.scrollWidth);
+    }
+  };
 
   useEffect(() => {
-    const cycle = setInterval(() => {
+    let timeout2: NodeJS.Timeout, intervalId: NodeJS.Timeout;
+
+    const cycle = () => {
       setIsExiting(true);
       setTimeout(() => {
-        setActiveIndex((prev) => (prev + 1) % texts.length);
+        setActiveIndex(prev => (prev + 1) % texts.length);
         setIsExiting(false);
-      }, 500); // Match animation duration
+        initialCycles.current++;
+      }, 500);
+    };
+
+    cycle();
+    updateWidth();
+
+    // Regular interval after initial cycles
+    timeout2 = setTimeout(() => {
+      intervalId = setInterval(cycle, interval);
     }, interval);
 
-    return () => clearInterval(cycle);
+    return () => {
+      clearTimeout(timeout2);
+      clearInterval(intervalId);
+    };
   }, [texts.length, interval]);
 
   return (
-    <div className={`relative h-16 overflow-hidden ${className}`}>
-      {/* Exiting text */}
-      <div className={`absolute ${isExiting ? 'animate-drop-out' : ''}`}>
-        <h1 className="font-sans text-4xl">
-          {texts[activeIndex]}
-        </h1>
+    <div 
+      ref={containerRef}
+      className={`relative h-[1.2em] whitespace-nowrap transition-all duration-300 ${className}`}
+      style={{ width: containerWidth }}
+    >
+      {/* Hidden measurer */}
+      <div 
+        ref={textRef}
+        className="absolute invisible whitespace-nowrap"
+      >
+        {texts[activeIndex]}
+      </div>
+
+      {/* Active text */}
+      <div className={`absolute w-full ${isExiting ? 'animate-drop-out' : ''}`}>
+        {texts[activeIndex]}
       </div>
       
-      {/* Entering text */}
-      <div className={`absolute ${isExiting ? 'animate-drop-in' : ''}`}>
-        <h1 className="font-sans text-4xl">
-          {texts[(activeIndex + 1) % texts.length]}
-        </h1>
+      {/* Next text */}
+      <div className={`absolute w-full ${isExiting ? 'animate-drop-in' : 'invisible'}`}>
+        {texts[(activeIndex + 1) % texts.length]}
       </div>
     </div>
   );

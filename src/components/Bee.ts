@@ -5,7 +5,7 @@ export class Bee {
   static readonly DETECTION_CELL_RADIUS: number = 100;
   static readonly MAX_AVOIDANCE_FORCE: number = 60;
   static readonly MAX_ALIGNMENT_FORCE: number = 10;
-  static readonly MAX_COHESION_FORCE: number = 5;
+  static readonly MAX_COHESION_FORCE: number = 10;
 
   x: number;
   y: number;

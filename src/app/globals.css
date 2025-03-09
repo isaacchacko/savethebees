@@ -40,3 +40,25 @@ h1 {
 p {
   color: var(--paragraph-color);
 }
+
+@keyframes drop-out {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(1.5rem); opacity: 0; }
+}
+
+@keyframes drop-in {
+  0% { transform: translateY(-1.5rem); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+.animate-drop-out {
+  animation: drop-out 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-drop-in {
+  animation: drop-in 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.invisible {
+  visibility: hidden;
+}
