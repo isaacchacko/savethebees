@@ -1,45 +1,50 @@
 'use client';
+import ColorPaletteEditor from '../components/ColorPaletteEditor';
 import CanvasBackground from '../components/CanvasBackground';
 
 export default function Home() {
-  const spawnPosition = { x: 100, y: 100 };
-  const numBees = 500;
+  const numBees = 400;
   const spawnRadius = 50;
 
   return (
-    <div className="relative min-h-screen">
+    <div className="relative font-sans">
       <CanvasBackground
-        spawnPosition={spawnPosition}
         numBees={numBees}
         spawnRadius={spawnRadius}
-        
       />
 
-      {/* Navigation Bar */}
-      <nav className="fixed w-full top-0 z-50 bg-white/80 backdrop-blur-sm border-b border-gray-200" style={{ pointerEvents: 'none' }}>
-        <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-          <h1 className="text-xl font-bold text-gray-800">John Doe</h1>
-          <div className="flex space-x-6">
-            <a href="#about" className="text-gray-600 hover:text-gray-900 transition-colors">About</a>
-            <a href="#projects" className="text-gray-600 hover:text-gray-900 transition-colors">Projects</a>
-            <a href="#contact" className="text-gray-600 hover:text-gray-900 transition-colors">Contact</a>
+      <div className="relative flex flex-col z-20 cursor-none min-h-screen" style={{ pointerEvents: 'none' }}>
+        {/* Navigation Bar */}
+        {/*
+        items-center : center vertically
+
+        */}
+        <nav className="cursor-pointer flex justify-between items-center p-4 bg-gray/80 backdrop-blur-sm border-b border-gray-200" style={{ pointerEvents: 'auto' }}>
+          <div className="flex flex-row items-center space-x-4 relative">
+            <h1 className="text-4xl font-bold">Isaac Chacko</h1>
+            <ColorPaletteEditor />
           </div>
-        </div>
-      </nav>
+          <div className="flex justify-end gap-10">
+            <a href="#about" className="hover:text-gray-900 transition-colors">About</a>
+            <a href="#projects" className="hover:text-gray-900 transition-colors">Projects</a>
+            <a href="#contact" className="hover:text-gray-900 transition-colors">Contact</a>
+          </div>
+        </nav>
 
-      {/* Main Content */}
-      <main className="relative z-10 pt-32 px-6" style={{ pointerEvents: 'none' }}>
-        <div className="container mx-auto max-w-4xl text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
-            Full Stack Developer &<br />AI Enthusiast
-          </h1>
+        {/* Main Content Area - Centered using flexbox */}
+        <main className="flex-1 flex items-center justify-center p-6">
+          <div className="text-center flex flex-col gap-6">
+            <h1 className="text-9xl font-bold">
+              Full Stack Developer
+            </h1>
+            <p className="text-lg max-w-2xl mx-auto">
+              Building digital solutions that bridge creativity and technology.
+              Passionate about open-source development and machine learning.
+            </p>
+          </div>
+        </main>
 
-          <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-            Building digital solutions that bridge creativity and technology.
-            Passionate about open-source development and machine learning.
-          </p>
-        </div>
-      </main>
+      </div>
     </div>
   );
 }

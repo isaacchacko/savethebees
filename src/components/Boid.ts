@@ -1,6 +1,6 @@
 // src/components/Boid.ts
 
-import Bee from './Bee';
+import { Bee } from './Bee';
 
 export class Boid {
   bees: Bee[];
@@ -32,7 +32,6 @@ export class Boid {
       bee.waypointWeight = newWeight;
     });
   }
-
   updateCanvasDimensions(newWidth: number, newHeight: number) {
     this.canvasWidth = newWidth;
     this.canvasHeight = newHeight;
@@ -46,10 +45,7 @@ export class Boid {
 
   update(waypoints: { x: number, y: number }[]) {
     this.bees.forEach(bee => {
-      const currentWaypoint = waypoints.length > 0 ? waypoints[bee.currentWaypointIndex] : null;
-      if (bee.update(currentWaypoint, this.bees)) {
-        bee.currentWaypointIndex = (bee.currentWaypointIndex + 1) % waypoints.length;
-      }
+      bee.update(waypoints[bee.currentWaypointIndex], this.bees);
     });
   }
 

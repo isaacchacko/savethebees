@@ -3,19 +3,22 @@ import { useEffect, useRef } from 'react';
 import Boid from './Boid';
 
 export default function CanvasBackground({
-  spawnPosition,
   numBees,
   spawnRadius,
 }: {
-  spawnPosition: { x: number; y: number };
   numBees: number;
   spawnRadius: number;
 }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const boidRef = useRef<Boid | null>(null);
   const mouseWaypointRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
-
   const isMouseDownRef = useRef(false);
+  const isMouseToggledRef = useRef(false);
+  const isBoidSpawned = useRef(false); // Track if the boid has been spawned
+
+  // FPS tracking variables
+  const lastFrameTimeRef = useRef(performance.now());
+  const frameCountRef = useRef(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -25,19 +28,36 @@ export default function CanvasBackground({
     if (!ctx) return;
 
     const handleMouseDown = () => {
-      console.log('Mouse DOWN');
       isMouseDownRef.current = true;
-      boidRef.current?.updateWaypointWeight(-100);
+      if (isMouseToggledRef.current === false) {
+        isMouseToggledRef.current = true;
+        boidRef.current?.updateWaypointWeight(100);
+      } else {
+        isMouseToggledRef.current = false;
+        boidRef.current?.updateWaypointWeight(0);
+      }
     };
 
     const handleMouseUp = () => {
-      console.log('Mouse UP');
       isMouseDownRef.current = false;
-      boidRef.current?.updateWaypointWeight(1);
     };
 
     const handleMouseMove = (e: MouseEvent) => {
       mouseWaypointRef.current = { x: e.clientX, y: e.clientY };
+
+      // Spawn the boid only on the first mouse move
+      if (!isBoidSpawned.current) {
+        isBoidSpawned.current = true; // Mark as spawned
+        const spawnPosition = { x: e.clientX, y: e.clientY }; // Spawn at mouse position
+        boidRef.current = new Boid(
+          spawnPosition,
+          numBees,
+          spawnRadius,
+          canvas.width,
+          canvas.height
+        );
+        console.log('Boid spawned at:', spawnPosition); // Debug log
+      }
     };
 
     canvas.addEventListener('mousedown', handleMouseDown);
@@ -54,16 +74,6 @@ export default function CanvasBackground({
       }
     };
 
-
-    // Initialize Boid
-    boidRef.current = new Boid(
-      spawnPosition,
-      numBees,
-      spawnRadius,
-      canvas.width,
-      canvas.height
-    );
-
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
@@ -77,23 +87,18 @@ export default function CanvasBackground({
       ctx.arc(mouseWaypointRef.current.x, mouseWaypointRef.current.y, 5, 0, Math.PI * 2);
       ctx.fill();
 
-      if (isMouseDownRef.current) {
-        ctx.strokeStyle = '#3B82F680';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.arc(
-          mouseWaypointRef.current.x,
-          mouseWaypointRef.current.y,
-          10, // Outer circle radius
-          0,
-          Math.PI * 2
-        );
-      ctx.stroke();
-      }
-      // Update and draw boid
       if (boidRef.current) {
         boidRef.current.update([mouseWaypointRef.current]); // Pass mouse position as the waypoint
         boidRef.current.draw(ctx);
+      }
+
+      // FPS calculation
+      frameCountRef.current++;
+      const now = performance.now();
+      if (now - lastFrameTimeRef.current >= 1000) {
+        console.log(`FPS: ${frameCountRef.current}`);
+        frameCountRef.current = 0;
+        lastFrameTimeRef.current = now;
       }
 
       animationFrameId = requestAnimationFrame(animate);
@@ -108,12 +113,13 @@ export default function CanvasBackground({
       window.removeEventListener('resize', resizeCanvas);
       cancelAnimationFrame(animationFrameId);
     };
-  }, [spawnPosition, numBees, spawnRadius]);
+  }, [numBees, spawnRadius]);
 
   return (
     <canvas
       ref={canvasRef}
-      className="fixed top-0 left-0 w-full h-full -z-0 cursor-none"
+      className="fixed top-0 left-0 w-full h-full"
+      style={{ pointerEvents: 'auto' }}
     />
   );
 }

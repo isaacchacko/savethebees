@@ -2,10 +2,10 @@ export class Bee {
   static readonly SPEED: number = 5;
   static readonly TURN_SPEED: number = 0.05;
   static readonly PROXIMITY_THRESHOLD: number = 15;
-  static readonly DETECTION_RADIUS: number = 100;
-  static readonly MAX_AVOIDANCE_FORCE: number = 30;
+  static readonly DETECTION_CELL_RADIUS: number = 100;
+  static readonly MAX_AVOIDANCE_FORCE: number = 60;
   static readonly MAX_ALIGNMENT_FORCE: number = 10;
-  static readonly MAX_COHESION_FORCE: number = 10;
+  static readonly MAX_COHESION_FORCE: number = 5;
 
   x: number;
   y: number;
@@ -22,7 +22,7 @@ export class Bee {
     this.currentWaypointIndex = 0;
     this.canvasWidth = canvasWidth;
     this.canvasHeight = canvasHeight;
-    this.waypointWeight = 1;
+    this.waypointWeight = 0;
   }
 
   move() {
@@ -39,7 +39,7 @@ export class Bee {
   update(waypoint: {x: number, y: number} | null, otherBees: Bee[]) {
     let totalX = 0;
     let totalY = 0;
-
+    
     // Waypoint vector
     if (waypoint) {
       const dx = waypoint.x - this.x;
@@ -72,28 +72,36 @@ export class Bee {
     this.angle = this.angle % (2 * Math.PI);
 
     this.move();
-
-    // Waypoint check
-    if (waypoint) {
-      const dx = waypoint.x - this.x;
-      const dy = waypoint.y - this.y;
-      return Math.sqrt(dx*dx + dy*dy) < Bee.PROXIMITY_THRESHOLD;
-    }
-    return false;
   }
+  
+  checkValidBee(b: Bee): boolean {
+    if (b === this) return false;
 
+    // Check if the other bee is in the same detection cell
+    const thisCellX = Math.floor(this.x / Bee.DETECTION_CELL_RADIUS);
+    const thisCellY = Math.floor(this.y / Bee.DETECTION_CELL_RADIUS);
+    const bCellX = Math.floor(b.x / Bee.DETECTION_CELL_RADIUS);
+    const bCellY = Math.floor(b.y / Bee.DETECTION_CELL_RADIUS);
+
+    if (thisCellX !== bCellX || thisCellY !== bCellY) {
+      return false; // Skip bees not in the same cell
+    }
+
+    return true;
+  }
   calculateAvoidanceVector(otherBees: Bee[]): {x: number, y: number} {
     let totalX = 0;
     let totalY = 0;
     
     otherBees.forEach(other => {
-      if (other === this) return;
+      if (!this.checkValidBee(other)) {return;}
+
       const dx = this.x - other.x;
       const dy = this.y - other.y;
       const distance = Math.sqrt(dx*dx + dy*dy);
       
-      if (distance < Bee.DETECTION_RADIUS) {
-        const force = (Bee.DETECTION_RADIUS - distance)/Bee.DETECTION_RADIUS;
+      if (distance < Bee.DETECTION_CELL_RADIUS) {
+        const force = (Bee.DETECTION_CELL_RADIUS - distance)/Bee.DETECTION_CELL_RADIUS;
         totalX += (dx/distance) * force;
         totalY += (dy/distance) * force;
       }
@@ -114,12 +122,13 @@ export class Bee {
     let count = 0;
 
     otherBees.forEach(other => {
-      if (other === this) return;
+      if (!this.checkValidBee(other)) {return;}
+
       const dx = other.x - this.x;
       const dy = other.y - this.y;
       const distance = Math.sqrt(dx*dx + dy*dy);
-      
-      if (distance < Bee.DETECTION_RADIUS) {
+
+      if (distance < Bee.DETECTION_CELL_RADIUS) {
         avgX += Math.cos(other.angle);
         avgY += Math.sin(other.angle);
         count++;
@@ -139,17 +148,19 @@ export class Bee {
   }
 
   calculateCohesionVector(otherBees: Bee[]): {x: number, y: number} {
+
     let avgX = 0;
     let avgY = 0;
     let count = 0;
 
     otherBees.forEach(other => {
-      if (other === this) return;
+      if (!this.checkValidBee(other)) {return;}
+
       const dx = other.x - this.x;
       const dy = other.y - this.y;
       const distance = Math.sqrt(dx*dx + dy*dy);
       
-      if (distance < Bee.DETECTION_RADIUS) {
+      if (distance < Bee.DETECTION_CELL_RADIUS) {
         avgX += other.x;
         avgY += other.y;
         count++;
@@ -177,7 +188,8 @@ export class Bee {
     ctx.lineTo(-10, 5);
     ctx.lineTo(-10, -5);
     ctx.closePath();
-    ctx.fillStyle = 'blue';
+    const boidColor = getComputedStyle(document.documentElement).getPropertyValue('--boid-color').trim();
+    ctx.fillStyle = boidColor || 'blue';
     ctx.fill();
     ctx.restore();
   }
