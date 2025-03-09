@@ -27,37 +27,34 @@ export default function CanvasBackground({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const handleMouseDown = () => {
-      isMouseDownRef.current = true;
-      if (isMouseToggledRef.current === false) {
-        isMouseToggledRef.current = true;
+    const spawnPosition = { x: canvas.width, y: canvas.height }; // Spawn at mouse position
+    boidRef.current = new Boid(
+      spawnPosition,
+      numBees,
+      spawnRadius,
+      canvas.width,
+      canvas.height
+    );
+
+    const handleMouseDown = (e: MouseEvent) => {
+      if (isMouseDownRef.current === false) {
+        isMouseDownRef.current = true;
         boidRef.current?.updateWaypointWeight(100);
-      } else {
-        isMouseToggledRef.current = false;
+        mouseWaypointRef.current = { x: e.clientX, y: e.clientY };
+      } 
+    };
+
+    const handleMouseUp = () => {
+      if (isMouseDownRef.current === true) {
+        isMouseDownRef.current = false;
         boidRef.current?.updateWaypointWeight(0);
       }
     };
 
-    const handleMouseUp = () => {
-      isMouseDownRef.current = false;
-    };
-
     const handleMouseMove = (e: MouseEvent) => {
+      if (isMouseDownRef.current === false) {return;}
       mouseWaypointRef.current = { x: e.clientX, y: e.clientY };
 
-      // Spawn the boid only on the first mouse move
-      if (!isBoidSpawned.current) {
-        isBoidSpawned.current = true; // Mark as spawned
-        const spawnPosition = { x: e.clientX, y: e.clientY }; // Spawn at mouse position
-        boidRef.current = new Boid(
-          spawnPosition,
-          numBees,
-          spawnRadius,
-          canvas.width,
-          canvas.height
-        );
-        console.log('Boid spawned at:', spawnPosition); // Debug log
-      }
     };
 
     canvas.addEventListener('mousedown', handleMouseDown);
@@ -82,10 +79,10 @@ export default function CanvasBackground({
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // Draw waypoint (mouse position)
-      ctx.fillStyle = isMouseDownRef.current ? '#3B82F6' : '#EF4444';
-      ctx.beginPath();
-      ctx.arc(mouseWaypointRef.current.x, mouseWaypointRef.current.y, 5, 0, Math.PI * 2);
-      ctx.fill();
+      // ctx.fillStyle = isMouseDownRef.current ? '#3B82F6' : '#EF4444';
+      // ctx.beginPath();
+      // ctx.arc(mouseWaypointRef.current.x, mouseWaypointRef.current.y, 5, 0, Math.PI * 2);
+      // ctx.fill();
 
       if (boidRef.current) {
         boidRef.current.update([mouseWaypointRef.current]); // Pass mouse position as the waypoint

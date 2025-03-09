@@ -1,8 +1,8 @@
 export class Bee {
-  static readonly SPEED: number = 5;
+  static readonly SPEED: number = 3;
   static readonly TURN_SPEED: number = 0.05;
   static readonly PROXIMITY_THRESHOLD: number = 15;
-  static readonly DETECTION_CELL_RADIUS: number = 100;
+  static readonly DETECTION_CELL_RADIUS: number = 200;
   static readonly MAX_AVOIDANCE_FORCE: number = 60;
   static readonly MAX_ALIGNMENT_FORCE: number = 10;
   static readonly MAX_COHESION_FORCE: number = 10;

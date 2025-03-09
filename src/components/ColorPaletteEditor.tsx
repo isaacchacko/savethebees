@@ -1,38 +1,46 @@
-
-import React, { useState, useEffect } from 'react'; // Added useEffect
+import React, { useState, useEffect } from 'react';
 import Wheel from '@uiw/react-color-wheel';
 import { hsvaToHex, hexToHsva } from '@uiw/color-convert';
+import Reset from './Reset';
 
-const DEFAULT_HEADER_COLOR = "#10B981"; // Tailwind green-500
+const DEFAULT_HEADER_COLOR = "#10B981";
 
 export default function ColorPaletteEditor() {
-  const [headerColorHSVA, setHeaderColorHSVA] = useState({ h: 0, s: 100, v: 100, a: 1 }); // More vibrant initial color
+  const [headerColorHSVA, setHeaderColorHSVA] = useState({ h: 214, s: 0, v: 100, a: 1 });
   const [isPickerVisible, setIsPickerVisible] = useState(false);
 
   useEffect(() => {
-    // Delay retrieval until after component mounts
     const timeoutId = setTimeout(() => {
-      const headerHex =
-        getComputedStyle(document.documentElement)
-          .getPropertyValue("--header-color")
-          .trim() || DEFAULT_HEADER_COLOR; // Fallback if variable is not set
-
+      const headerHex = getComputedStyle(document.documentElement)
+        .getPropertyValue("--header-color")
+        .trim() || DEFAULT_HEADER_COLOR;
       setHeaderColorHSVA(hexToHsva(headerHex));
-    }, 0); // Delay execution to ensure DOM is ready
+    }, 0);
 
-    return () => clearTimeout(timeoutId); // Cleanup timeout
+    return () => clearTimeout(timeoutId);
   }, []);
+  
+  const resetColorHSVA = () => {
+    const defaultColorHex = getComputedStyle(document.documentElement).getPropertyValue("--default-header-color").trim();
+    document.documentElement.style.setProperty('--header-color', defaultColorHex);
+    setHeaderColorHSVA(hexToHsva(defaultColorHex));
+    
+    // Update derived colors
+    const dimmedColor = dimColor(defaultColorHex, 0.8);
+    const dimmestColor = dimColor(defaultColorHex, 0.6);
+    document.documentElement.style.setProperty('--paragraph-color', dimmedColor);
+    document.documentElement.style.setProperty('--boid-color', dimmestColor);
+  }
 
   const handleHeaderColorChange = (color: { hsva: any }) => {
-    setHeaderColorHSVA(color.hsva);
     const headerColorHex = hsvaToHex(color.hsva);
     document.documentElement.style.setProperty('--header-color', headerColorHex);
-
-    const dimmedColor = dimColor(headerColorHex, 0.8);
-    document.documentElement.style.setProperty('--paragraph-color', headerColorHex);
+    setHeaderColorHSVA(color.hsva);
     
-    // Set boid color to dimmer version
+    // Update derived colors
+    const dimmedColor = dimColor(headerColorHex, 0.8);
     const dimmestColor = dimColor(headerColorHex, 0.6);
+    document.documentElement.style.setProperty('--paragraph-color', dimmedColor);
     document.documentElement.style.setProperty('--boid-color', dimmestColor);
   };
 
@@ -43,10 +51,16 @@ export default function ColorPaletteEditor() {
     return `rgb(${r}, ${g}, ${b})`;
   };
 
+  const [isHovered, setIsHovered] = useState(false);
+
   return (
-    <div>
+    <div className="relative flex flex-row p-3 pl-0 items-center overflow-hidden">
+      {/* Color Swatch Trigger */}
       <div
-        className="cursor-pointer border-2 border-gray-300 rounded shadow-md"
+
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        className={`scale-90 z-20 cursor-pointer border-2 border-gray-300 rounded shadow-md transition-transform duration-300 hover:scale-100 transition-all duration-300 ${isHovered ? 'drop-shadow-glow' : 'drop-shadow-none'}`}
         style={{
           width: '40px',
           height: '40px',
@@ -54,18 +68,21 @@ export default function ColorPaletteEditor() {
         }}
         onClick={() => setIsPickerVisible(!isPickerVisible)}
       />
-      
-      {/* Color picker dropdown */}
-      {isPickerVisible && (
-        <div className="absolute top-full">
+      {/* Controls Container */}
+      <div className={`flex items-center transition-transform duration-300 z-0 ${
+        isPickerVisible ? 'translate-x-0' : '-translate-x-80'
+      }`}>
+        <Reset onReset={resetColorHSVA}/>
+        <div className="">
           <Wheel
             color={headerColorHSVA}
             onChange={handleHeaderColorChange}
-            width={160}
-            height={160}
+            width={40}
+            height={40}
           />
         </div>
-      )}
+      </div>
+
     </div>
   );
 }
