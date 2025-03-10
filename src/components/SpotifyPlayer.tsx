@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import SpotifyLogo from './SpotifyLogo';
 
-const BASE_CLASS_NAME = "w-full relative m-10 p-4 bg-(--spotify-background) rounded-lg shadow";
+const BASE_CLASS_NAME = "relative m-10 p-4 bg-(--spotify-background) rounded-lg shadow";
 const Header = ({
   className = "font-bold text-lg 2xl:text-2xl text-white cursor-pointer pb-2",
   text
@@ -148,6 +148,7 @@ export default function SpotifyPlayer() {
         <button
           onClick={() => window.location.href = '/api/spotify/auth'}
           className={`${BASE_CLASS_NAME} ${shouldAnimate ? 'slide-down-fade-in' : 'opacity-0'}`}
+          style={{ pointerEvents: 'auto'}}
         >
           Connect Spotify
         </button>
@@ -158,9 +159,9 @@ export default function SpotifyPlayer() {
   // Error state
   if (status === 'error') {
     return (
-      <div className={`${BASE_CLASS_NAME} ${shouldAnimate ? 'slide-down-fade-in' : 'opacity-0'}`}>
+      <div className={`${BASE_CLASS_NAME} ${shouldAnimate ? 'slide-down-fade-in' : 'opacity-0'}`} style={{ pointerEvents: 'auto'}}>
         <button onClick={() => window.location.reload()}>
-          Try Again
+          Press to Reload
         </button>
       </div>
     );
@@ -169,7 +170,7 @@ export default function SpotifyPlayer() {
   // No current playback or playback is null
   if (!playback || !playback.is_playing) {
     return (
-      <div className={`${BASE_CLASS_NAME} max-w-xl ${shouldAnimate ? 'slide-down-fade-in' : 'opacity-0'}`}>
+      <div className={`${BASE_CLASS_NAME} ${shouldAnimate ? 'slide-down-fade-in' : 'opacity-0'}`}>
         <Header text="I'm not listening to anything..."/>
       </div>
     );
@@ -188,7 +189,7 @@ export default function SpotifyPlayer() {
     : 0;
 
   return (
-    <div className={`${BASE_CLASS_NAME} ${shouldAnimate ? 'slide-down-fade-in' : 'opacity-0'}`} style={{ pointerEvents: 'auto' }}>
+    <div className={`${BASE_CLASS_NAME} w-full ${shouldAnimate ? 'slide-down-fade-in' : 'opacity-0'}`} style={{ pointerEvents: 'auto' }}>
 
       <Header text="I'm currently listening to:"/>
       <div className="flex flex-row gap-4">
