@@ -60,7 +60,7 @@ export default function ColorPaletteEditor() {
 
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className={`scale-90 z-20 cursor-pointer border-2 border-gray-300 rounded shadow-md transition-transform duration-300 hover:scale-100 transition-all duration-300 ${isHovered ? 'drop-shadow-glow' : 'drop-shadow-none'}`}
+        className={`flex-none scale-90 z-20 cursor-pointer border-2 border-gray-300 rounded shadow-md transition-transform duration-300 hover:scale-100 transition-all duration-300 ${isHovered ? 'drop-shadow-glow' : 'drop-shadow-none'}`}
         style={{
           width: '40px',
           height: '40px',

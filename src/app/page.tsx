@@ -5,6 +5,7 @@ import CanvasBackground from '../components/CanvasBackground';
 import TextCycler from '../components/TextCycler';
 import useResponsiveBees from '../hooks/useResponsiveBees';
 import Hero from '../components/Hero';
+import SpotifyPlayer from '../components/SpotifyPlayer';
 
 export default function Home() {
   const numBees = useResponsiveBees();
@@ -22,6 +23,8 @@ export default function Home() {
             <ColorPaletteEditor />
           </div>
           <div className="flex justify-end gap-10">
+
+          <SpotifyPlayer />
             <a href="#about" className="hover:text-gray-900 font-bold text-xl transition-colors">About</a>
             <a href="#projects" className="hover:text-gray-900 font-bold text-xl transition-colors">Projects</a>
             <a href="#tracking" className="hover:text-gray-900 font-bold text-xl transition-colors">Tracking</a>

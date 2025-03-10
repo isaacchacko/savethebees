@@ -10,7 +10,8 @@
     --paragraph-color: #059669;
     --boid-color: #047857;
     --default-header-color: #10B981;
-    --spotify: #25d865;
+    --spotify-foreground: #25d865;
+    --spotify-background: #201b1b;
   }
 }
 
@@ -63,4 +64,19 @@ p {
 
 .invisible {
   visibility: hidden;
+}
+
+/* spotify progress bar */
+.progress-bar-thumb {
+  width: 12px;
+  height: 12px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.progress-bar-container:hover .progress-bar-thumb {
+  opacity: 1;
 }
