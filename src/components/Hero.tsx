@@ -9,7 +9,7 @@ export default function Home() {
       <div className="flex flex-col max-w-[50%] justify-center items-center">
         <div className="grid grid-row 2xl:grid-flow-col 2xl:auto-cols-max justify-center items-center gap-3">
           <span className="text-2xl 2xl:text-4xl font-light text-gray-500 whitespace-nowrap">
-            Howdy! I'm a
+            Howdy! I&apos;m a
           </span>
 
           {/* TextCycler Container */}
