@@ -10,8 +10,8 @@
     --paragraph-color: #059669;
     --boid-color: #047857;
     --default-header-color: #10B981;
-    --spotify-foreground: #25d865;
-    --spotify-background: #201b1b;
+    --spotify-foreground: #1ED760;
+    --spotify-background: #121212;
   }
 }
 
@@ -80,3 +80,28 @@ p {
 .progress-bar-container:hover .progress-bar-thumb {
   opacity: 1;
 }
+
+
+/* Define the keyframes */
+@keyframes slideDownFadeIn {
+  0% {
+    transform: translateY(-20px); /* Start slightly above */
+    opacity: 0; /* Fully transparent */
+  }
+  100% {
+    transform: translateY(0); /* End at original position */
+    opacity: 1; /* Fully visible */
+  }
+}
+
+/* Create the animation class */
+.slide-down-fade-in {
+  animation: slideDownFadeIn 1.5s ease-out forwards;
+  opacity: 0; /* Start invisible */
+  animation-delay: 500ms; /* Match the JS delay */
+}
+
+.wait-longer {
+  animation-delay: 800ms;
+}
+

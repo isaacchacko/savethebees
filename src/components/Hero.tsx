@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import TextCycler from './TextCycler'
 import SpotifyPlayer from '../components/SpotifyPlayer';
+import Glyphs from '../components/Glyphs'
 
 export default function Home() {
   return (
     <div className="flex-1 flex flex-col items-center justify-center">
-      <div className="max-w-[50%] justify-center items-center">
+      <div className="flex flex-col max-w-[50%] justify-center items-center">
         <div className="grid grid-row 2xl:grid-flow-col 2xl:auto-cols-max justify-center items-center gap-3">
           <span className="text-2xl 2xl:text-4xl font-light text-gray-500 whitespace-nowrap">
             Howdy! I'm a
@@ -31,12 +32,13 @@ export default function Home() {
 
           {/* Wrapping text container */}
           <div className="text-2xl 2xl:text-4xl font-light text-gray-500 max-w">
-            from Texas A&amp;M University.
+            from Texas A&amp;M University and
           </div>
 
         </div>
 
           <SpotifyPlayer />
+        <Glyphs />
       </div>
     </div>
   );

@@ -24,7 +24,9 @@ export async function GET(request: Request) {
       duration: data.item.duration_ms,
       explicit: data.item.explicit,
       popularity: data.item.popularity,
-      track_url: data.item.external_urls.spotify
+      track_url: data.item.external_urls.spotify,
+      external_url: data.item.external_urls.spotify,
+
     });
   } catch (error) {
     return NextResponse.json(
