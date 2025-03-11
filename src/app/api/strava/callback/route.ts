@@ -10,15 +10,21 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Authorization code is missing' }, { status: 400 });
   }
 
+  if (!process.env.STRAVA_CLIENT_ID || !process.env.STRAVA_CLIENT_SECRET) {
+    return NextResponse.json({ error: 'Missing client ID or secret' }, { status: 500 });
+  }
+
   try {
     // Exchange authorization code for tokens
-    const response = await axios.post('https://www.strava.com/oauth/token', new URLSearchParams({
+    const params = new URLSearchParams({
       client_id: process.env.STRAVA_CLIENT_ID,
       client_secret: process.env.STRAVA_CLIENT_SECRET,
       code, // Use extracted authorization code
       grant_type: 'authorization_code',
       redirect_uri: 'http://localhost:3000/api/strava/callback', // Must match redirect URI used in auth
-    }));
+    });
+
+    const response = await axios.post('https://www.strava.com/oauth/token', params);
 
     if (response.status !== 200) {
       throw new Error(`Failed to exchange authorization code for tokens: ${response.status} ${response.statusText}`);
