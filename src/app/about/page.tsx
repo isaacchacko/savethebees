@@ -1,3 +1,4 @@
+
 'use client';
 
 import ColorPaletteEditor from '@/components/ColorPaletteEditor';
@@ -5,6 +6,7 @@ import CanvasBackground from '@/components/CanvasBackground';
 import TextCycler from '@/components/TextCycler';
 import useResponsiveBees from '@/hooks/useResponsiveBees';
 import Hero from '@/components/Hero';
+import SpotifyPlayer from '@/components/SpotifyPlayer';
 import Navbar from "@/components/Navbar";
 
 export default function Home() {
@@ -17,8 +19,7 @@ export default function Home() {
 
       <div className="relative flex flex-col z-20 min-h-screen" style={{ pointerEvents: 'none' }}>
         {/* Navigation Bar */}
-        <Navbar spotifyStatus={false} learnMorePath="/about" />
-
+        <Navbar showColorPalette={false} learnMorePath="/projects" />
         {/* Main Content Area */}
         <Hero />
       </div>

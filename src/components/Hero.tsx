@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import TextCycler from './TextCycler'
-import SpotifyPlayer from '../components/SpotifyPlayer';
+import SpotifyStatus from '../components/SpotifyStatus';
 import Glyphs from '../components/Glyphs'
 
 export default function Home() {
@@ -37,7 +37,7 @@ export default function Home() {
 
         </div>
 
-          <SpotifyPlayer />
+          <SpotifyStatus className="m-10"/>
         <Glyphs />
       </div>
     </div>

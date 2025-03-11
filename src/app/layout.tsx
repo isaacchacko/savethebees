@@ -13,7 +13,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={manrope.className}>
-      <body>{children}</body>
+      <body>
+        {/* Shared base for all layouts */}
+        {children}
+      </body>
     </html>
   );
 }

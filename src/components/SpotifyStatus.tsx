@@ -2,19 +2,30 @@
 import { useState, useEffect } from 'react';
 import SpotifyLogo from './SpotifyLogo';
 
-const BASE_CLASS_NAME = "relative m-10 p-4 bg-(--spotify-background) rounded-lg shadow";
 const Header = ({
   className = "font-bold text-lg 2xl:text-2xl text-white cursor-pointer pb-2",
-  text
+  text,
+  href = ""
 }: HeaderProps): JSX.Element => (
-    <div>
-      <div className="float-right">
-        <SpotifyLogo />
-      </div>
+  <div className="flex flex-row justify-between items-center gap-4">
+    {href !== "" ? (
       <div className={className}>
-        {text}
+        <a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-black text-white sm:hover:underline cursor-pointer"
+        >
+          {text}
+        </a>
       </div>
-    </div>
+    ) : (
+      <div className={className}>
+        <span>{text}</span>
+      </div>
+    )}
+    <SpotifyLogo />
+  </div>
 );
 
 type PlaybackState = {
@@ -28,7 +39,8 @@ type PlaybackState = {
   external_url?: string;
 };
 
-export default function SpotifyPlayer() {
+export default function SpotifyStatus({condensed, className}: {condensed?: boolean, className?: string } ) {
+  const BASE_CLASS_NAME = `relative p-4 bg-(--spotify-background) rounded-lg shadow ${className}`;
   const [playback, setPlayback] = useState<PlaybackState | null>(null);
   const [status, setStatus] = useState<'loading' | 'authenticated' | 'unauthenticated' | 'error'>('loading');
   const [error, setError] = useState('');
@@ -147,7 +159,7 @@ export default function SpotifyPlayer() {
       <div className="p-4 bg-blue-50 rounded-lg text-center">
         <button
           onClick={() => window.location.href = '/api/spotify/auth'}
-          className={`${BASE_CLASS_NAME} ${shouldAnimate ? 'slide-down-fade-in' : 'opacity-0'}`}
+          className={`${BASE_CLASS_NAME} whitespace-nowrap pr-10 ${shouldAnimate ? 'slide-down-fade-in' : 'opacity-0'}`}
           style={{ pointerEvents: 'auto'}}
         >
           Connect Spotify
@@ -169,9 +181,16 @@ export default function SpotifyPlayer() {
 
   // No current playback or playback is null
   if (!playback || !playback.is_playing) {
+    if (condensed) {
+      return (
+        <div className={`${BASE_CLASS_NAME} ${shouldAnimate ? 'slide-down-fade-in' : 'opacity-0'}`}>
+          <Header text="Not playing" />
+        </div>
+      );
+    }
     return (
       <div className={`${BASE_CLASS_NAME} ${shouldAnimate ? 'slide-down-fade-in' : 'opacity-0'}`}>
-        <Header text="I'm not listening to anything..."/>
+        <Header text="I'm not listening to anything..." />
       </div>
     );
   }
@@ -187,7 +206,30 @@ export default function SpotifyPlayer() {
   const progressPercentage = localDuration > 0 
     ? (localProgress / localDuration) * 100 
     : 0;
+  
+  if (condensed) {
 
+  return (
+      <div className={`${BASE_CLASS_NAME} flex flex-row gap-2 items-center ${shouldAnimate ? 'slide-down-fade-in' : 'opacity-0'}`} style={{ pointerEvents: 'auto' }}>
+
+
+          {playback?.image && (
+            <img 
+              src={playback.image} 
+              alt="Album cover"
+              className="hidden 2xl:block w-10 h-10 rounded-lg object-cover"
+            />
+          )}
+          <a href={playback.external_url} target="_blank" rel="noopener noreferrer" className="font-black text-base md:text-xl 2xl:text-2xl text-white sm:hover:underline cursor-pointer">
+            {playback.track}
+          </a>
+
+          <p className="text-md font-black 2xl:text-xl">by {playback.artist}</p>
+          <SpotifyLogo />
+
+      </div>
+    );
+  }
   return (
     <div className={`${BASE_CLASS_NAME} w-full ${shouldAnimate ? 'slide-down-fade-in' : 'opacity-0'}`} style={{ pointerEvents: 'auto' }}>
 
