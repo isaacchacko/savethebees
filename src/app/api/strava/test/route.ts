@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getAccessToken, getRefreshToken } from '@/app/api/strava/cache';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const accessToken = getAccessToken();
     const refreshToken = getRefreshToken();

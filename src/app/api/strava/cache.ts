@@ -1,10 +1,6 @@
 import NodeCache from 'node-cache';
 
-let cache;
-if (!global.cache) {
-  global.cache = new NodeCache({ stdTTL: 21600 }); // Cache expires in 6 hours
-}
-cache = global.cache;
+const cache = global.cache || (global.cache = new NodeCache({ stdTTL: 21600 })); // Cache expires in 6 hours
 
 export function setAccessToken(token) {
   console.log('Saving access token...');

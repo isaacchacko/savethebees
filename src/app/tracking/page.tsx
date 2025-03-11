@@ -3,7 +3,6 @@
 import CanvasBackground from '@/components/CanvasBackground';
 import useResponsiveBees from '@/hooks/useResponsiveBees';
 import Navbar from "@/components/Navbar";
-import Card from "@/components/Card";
 import RunningStats from '@/components/RunningStats';
 
 export default function Home() {

@@ -13,8 +13,6 @@ export default function CanvasBackground({
   const boidRef = useRef<Boid | null>(null);
   const mouseWaypointRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const isMouseDownRef = useRef(false);
-  const isMouseToggledRef = useRef(false);
-  const isBoidSpawned = useRef(false); // Track if the boid has been spawned
 
   // FPS tracking variables
   const lastFrameTimeRef = useRef(performance.now());

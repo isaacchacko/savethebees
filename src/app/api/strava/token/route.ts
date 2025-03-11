@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import axios from 'axios';
 import { getRefreshToken, setAccessToken, setRefreshToken } from '@/app/api/strava/cache';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Retrieve the current refresh token from cache
     const currentRefreshToken = getRefreshToken();

@@ -2,7 +2,12 @@ import { NextResponse } from 'next/server';
 import axios from 'axios';
 import { getAccessToken } from '@/app/api/strava/cache';
 
-export async function GET(request: NextRequest) {
+interface StravaActivity {
+  type: string;
+  // Add other properties as needed
+}
+
+export async function GET() {
   try {
     const accessToken = getAccessToken();
 
@@ -27,7 +32,7 @@ export async function GET(request: NextRequest) {
     const data = response.data;
 
     // Filter only running activities
-    const runs = data.filter((activity: any) => activity.type === 'Run');
+    const runs = data.filter((activity: StravaActivity) => activity.type === 'Run');
 
     return NextResponse.json(runs);
   } catch (error) {

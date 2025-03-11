@@ -1,8 +1,6 @@
 'use client';
 
-import ColorPaletteEditor from '@/components/ColorPaletteEditor';
 import CanvasBackground from '@/components/CanvasBackground';
-import TextCycler from '@/components/TextCycler';
 import useResponsiveBees from '@/hooks/useResponsiveBees';
 import Hero from '@/components/Hero';
 import Navbar from "@/components/Navbar";

@@ -17,7 +17,7 @@ export async function GET(request: Request) {
     return NextResponse.json({
       is_playing: data.is_playing,
       track: data.item.name,
-      artist: data.item.artists.map((a: any) => a.name).join(', '),
+      artist: data.item.artists.map((a: { name: string }) => a.name).join(', '),
       album: data.item.album.name,
       image: data.item.album.images[0]?.url,
       progress: data.progress_ms,
@@ -26,9 +26,9 @@ export async function GET(request: Request) {
       popularity: data.item.popularity,
       track_url: data.item.external_urls.spotify,
       external_url: data.item.external_urls.spotify,
-
     });
-  } catch (error) {
+  } catch (err) {
+    console.error('Error fetching playback:', err);
     return NextResponse.json(
       { error: 'Failed to fetch playback' },
       { status: 500 }
