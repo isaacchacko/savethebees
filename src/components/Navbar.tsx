@@ -1,4 +1,3 @@
-
 'use client'; // Required for client-side interactivity
 
 import Link from 'next/link';
@@ -17,7 +16,6 @@ export default function Navbar({
   showColorPalette = true,
   spotifyStatus = true,
   learnMorePath
-  
 }: NavbarProps) {
   return (
     <nav 
@@ -26,12 +24,12 @@ export default function Navbar({
     >
       <div className="flex flex-row items-center relative">
         <div className="hover:text-(--tertiary-color) transition-colors">
-          <a href="/" className="hidden xl:block text-4xl font-bold">
+          <Link href="/" className="hidden xl:block text-4xl font-bold">
             <h1>Isaac Chacko</h1>
-          </a>
-          <a href="/" className="block xl:hidden text-4xl font-bold">
+          </Link>
+          <Link href="/" className="block xl:hidden text-4xl font-bold">
             <h1>IC</h1>
-          </a>
+          </Link>
         </div>
         {showColorPalette && <ColorPaletteEditor />}
       </div>
@@ -56,7 +54,7 @@ export default function Navbar({
           <Link href="#arch" className={BASE_CLASS_NAME}>
             Arch
           </Link>
-          <Link href={"/about"} className={BASE_CLASS_NAME}>
+          <Link href="/about" className={BASE_CLASS_NAME}>
             About
           </Link>
         </div>

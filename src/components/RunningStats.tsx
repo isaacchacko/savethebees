@@ -86,7 +86,6 @@ const RunningStats = () => {
       setTotalMileage(totalMiles);
 
       // Calculate weekly mileage with week labels
-      const weeks: { [key: string]: number } = {};
       const weekLabels: { [key: string]: string } = {};
 
       // Determine start and end dates for activities
@@ -95,7 +94,7 @@ const RunningStats = () => {
 
       // Generate all weeks in the range
       const allWeeks: { [key: string]: number } = {};
-      let currentWeekStart = new Date(startDate);
+      const currentWeekStart = new Date(startDate);
       currentWeekStart.setDate(currentWeekStart.getDate() - currentWeekStart.getDay()); // Start of the week (Sunday)
       while (currentWeekStart <= endDate) {
         const currentWeekEnd = new Date(currentWeekStart);

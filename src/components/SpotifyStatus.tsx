@@ -1,6 +1,14 @@
 'use client';
-import { useState, useEffect } from 'react';
+
+import Image from 'next/image';
+import { useState, useEffect, useRef } from 'react';
 import SpotifyLogo from './SpotifyLogo';
+
+interface HeaderProps {
+  className?: string;
+  text: string;
+  href?: string;
+}
 
 const Header = ({
   className = "font-bold text-lg 2xl:text-2xl text-white cursor-pointer pb-2",
@@ -24,7 +32,7 @@ const Header = ({
         <span>{text}</span>
       </div>
     )}
-    <SpotifyLogo />
+    <SpotifyLogo className="shrink-0"/>
   </div>
 );
 
@@ -39,7 +47,13 @@ type PlaybackState = {
   external_url?: string;
 };
 
-export default function SpotifyStatus({condensed, className}: {condensed?: boolean, className?: string } ) {
+interface SpotifyStatusProps {
+    condensed?: boolean;
+    className?: string;
+    navRef?: React.RefObject<HTMLElement>
+}
+
+export default function SpotifyStatus({ condensed, className, navRef }: SpotifyStatusProps) {
   const BASE_CLASS_NAME = `relative p-4 bg-(--spotify-background) rounded-lg shadow ${className}`;
   const [playback, setPlayback] = useState<PlaybackState | null>(null);
   const [status, setStatus] = useState<'loading' | 'authenticated' | 'unauthenticated' | 'error'>('loading');
@@ -47,6 +61,8 @@ export default function SpotifyStatus({condensed, className}: {condensed?: boole
   const [localProgress, setLocalProgress] = useState(0);
   const [localDuration, setLocalDuration] = useState(0);
   const [shouldAnimate, setShouldAnimate] = useState(false);
+  const [truncate, setTruncate] = useState(false);
+  const spotifyStatusRef = useRef<HTMLDivElement>(null);
 
   const checkAuth = async (): Promise<string> => {
     try {
@@ -119,7 +135,6 @@ export default function SpotifyStatus({condensed, className}: {condensed?: boole
       });
 
       if (res.status === 401) {
-        const newToken = await checkAuth();
         return fetchPlaybackData();
       }
 
@@ -131,6 +146,7 @@ export default function SpotifyStatus({condensed, className}: {condensed?: boole
       setLocalDuration(data.duration || 0);
 
     } catch (err) {
+      console.error('Error fetching playback:', error);
       setError(err instanceof Error ? err.message : 'Unknown error');
       setStatus('error');
     }
@@ -148,6 +164,16 @@ export default function SpotifyStatus({condensed, className}: {condensed?: boole
     }
   }, [status]);
 
+  // Check for overflow
+  useEffect(() => {
+    if (condensed && navRef?.current && spotifyStatusRef.current && playback?.is_playing) {
+      const navWidth = navRef.current.offsetWidth;
+      const spotifyStatusWidth = spotifyStatusRef.current.offsetWidth;
+      const spotifyStatusLeft = spotifyStatusRef.current.offsetLeft;
+      setTruncate(spotifyStatusWidth + spotifyStatusLeft > navWidth);
+    }
+  }, [condensed, playback, navRef]);
+
   // Loading state
   if (status === 'loading') {
     return <div></div>;
@@ -160,7 +186,7 @@ export default function SpotifyStatus({condensed, className}: {condensed?: boole
         <button
           onClick={() => window.location.href = '/api/spotify/auth'}
           className={`${BASE_CLASS_NAME} whitespace-nowrap pr-10 ${shouldAnimate ? 'slide-down-fade-in' : 'opacity-0'}`}
-          style={{ pointerEvents: 'auto'}}
+          style={{ pointerEvents: 'auto' }}
         >
           Connect Spotify
         </button>
@@ -171,7 +197,7 @@ export default function SpotifyStatus({condensed, className}: {condensed?: boole
   // Error state
   if (status === 'error') {
     return (
-      <div className={`${BASE_CLASS_NAME} ${shouldAnimate ? 'slide-down-fade-in' : 'opacity-0'}`} style={{ pointerEvents: 'auto'}}>
+      <div className={`${BASE_CLASS_NAME} ${shouldAnimate ? 'slide-down-fade-in' : 'opacity-0'}`} style={{ pointerEvents: 'auto' }}>
         <button onClick={() => window.location.reload()}>
           Press to Reload
         </button>
@@ -183,7 +209,7 @@ export default function SpotifyStatus({condensed, className}: {condensed?: boole
   if (!playback || !playback.is_playing) {
     if (condensed) {
       return (
-        <div className={`${BASE_CLASS_NAME} ${shouldAnimate ? 'slide-down-fade-in' : 'opacity-0'}`}>
+        <div className={`${BASE_CLASS_NAME} ${shouldAnimate ? 'slide-down-fade-in' : 'opacity-0'}`} ref={spotifyStatusRef}>
           <Header text="Not playing" />
         </div>
       );
@@ -203,29 +229,31 @@ export default function SpotifyStatus({condensed, className}: {condensed?: boole
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
 
-  const progressPercentage = localDuration > 0 
-    ? (localProgress / localDuration) * 100 
+  const progressPercentage = localDuration > 0
+    ? (localProgress / localDuration) * 100
     : 0;
   
   if (condensed) {
 
   return (
-<div className={`${BASE_CLASS_NAME} mx-10 flex flex-row gap-2 items-center ${shouldAnimate ? 'slide-down-fade-in' : 'opacity-0'} sm:flex sm:flex-row sm:gap-2 sm:items-center hidden sm:block flex-shrink`} style={{ pointerEvents: 'auto' }}>
-
-
-          {playback?.image && (
-            <img 
-              src={playback.image} 
-              alt="Album cover"
-              className="hidden 2xl:block w-10 h-10 rounded-lg object-cover"
-            />
-          )}
-          <a href={playback.external_url} target="_blank" rel="noopener noreferrer" className="font-black text-base md:text-xl 2xl:text-2xl text-white sm:hover:underline cursor-pointer truncate">
+    <div className={`${BASE_CLASS_NAME} overflow-hidden max-w-2/3 mx-10 flex flex-row gap-2 items-center ${shouldAnimate ? 'slide-down-fade-in' : 'opacity-0'} sm:flex sm:flex-row sm:gap-2 sm:items-center hidden sm:block flex-shrink overflow-hidden whitespace-nowrap`} style={{ pointerEvents: 'auto' }} ref={spotifyStatusRef}>
+        {playback?.image && (
+          <Image
+            src={playback.image}
+            alt="Album cover"
+            width={40}
+            height={40}
+            className="hidden 2xl:block rounded-lg object-cover"
+          />
+        )}
+        <div className="min-w-0 flex-1">
+          <a href={playback.external_url} target="_blank" rel="noopener noreferrer" className={`font-black text-base md:text-xl 2xl:text-2xl text-white sm:hover:underline cursor-pointer ${truncate ? 'truncate' : ''}`}>
             {playback.track}
           </a>
 
-          <p className="text-md font-black 2xl:text-xl">by {playback.artist}</p>
-          <SpotifyLogo />
+          <p className={`text-md font-black 2xl:text-xl ${truncate ? 'truncate' : ''}`}>by {playback.artist}</p>
+          <SpotifyLogo className="shrink-0"/>
+        </div>
 
       </div>
     );
@@ -233,15 +261,17 @@ export default function SpotifyStatus({condensed, className}: {condensed?: boole
   return (
     <div className={`${BASE_CLASS_NAME} w-full ${shouldAnimate ? 'slide-down-fade-in' : 'opacity-0'}`} style={{ pointerEvents: 'auto' }}>
 
-      <Header text="I'm currently listening to:"/>
+      <Header text="I'm currently listening to:" />
       <div className="flex flex-row gap-4">
 
         {/* Album art */}
         {playback?.image && (
-          <img 
-            src={playback.image} 
+          <Image
+            src={playback.image}
             alt="Album cover"
-            className="hidden 2xl:block w-64 h-64 rounded-lg object-cover"
+            width={256}
+            height={256}
+            className="hidden 2xl:block rounded-lg object-cover"
           />
         )}
 
@@ -249,28 +279,28 @@ export default function SpotifyStatus({condensed, className}: {condensed?: boole
 
           <div>
 
-          {/* Track info */}
-          <div className="flex-1 space-y-2 overflow-ellipsis text-white">
-            <div>
-              <a
-                href={playback.external_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-black text-xl md:text-4xl 2xl:text-4xl text-white sm:hover:underline cursor-pointer"
-              >
-                {playback.track}
-              </a>
-              <p className="text-md font-black 2xl:text-xl text-white">{playback.artist}</p>
-              <p className="text-md 2xl:text-xl text-gray-500">{playback.album}</p>
-            </div>
+            {/* Track info */}
+            <div className="flex-1 space-y-2 overflow-ellipsis text-white">
+              <div>
+                <a
+                  href={playback.external_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-black text-xl md:text-4xl 2xl:text-4xl text-white sm:hover:underline cursor-pointer"
+                >
+                  {playback.track}
+                </a>
+                <p className="text-md font-black 2xl:text-xl text-white">{playback.artist}</p>
+                <p className="text-md 2xl:text-xl text-gray-500">{playback.album}</p>
+              </div>
 
-          </div>
+            </div>
           </div>
 
           {/* Progress bar */}
           <div className="space-y-1">
             <div className="w-full h-1 bg-gray-200 rounded-full">
-              <div 
+              <div
                 className="h-full bg-(--spotify-foreground) rounded-full transition-all duration-1000"
                 style={{ width: `${progressPercentage}%` }}
               />

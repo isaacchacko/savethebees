@@ -10,9 +10,15 @@ const DEFAULT_HEADER_COLOR = "#10B981";
 const DEFAULT_SECONDARY_COLOR = "#059669";
 const DEFAULT_TERTIARY_COLOR = "#047857";
 
+interface HSVColor {
+  h: number;
+  s: number;
+  v: number;
+  a: number;
+}
+
 export default function ColorPaletteEditor() {
   const [isPickerVisible, setIsPickerVisible] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
 
   const [colors, setColors] = useLocalStorageMulti(
     ['primary-color', 'secondary-color', 'tertiary-color'],
@@ -37,7 +43,7 @@ export default function ColorPaletteEditor() {
     setColors('tertiary-color', dimColor(defaultColorHex, 0.6));
   };
 
-  const handleHeaderColorChange = (color: { hsva: any }) => {
+  const handleHeaderColorChange = (color: { hsva: HSVColor }) => {
     const newColorHex = hsvaToHex(color.hsva);
     setColors('primary-color', newColorHex);
     setColors('secondary-color', dimColor(newColorHex, 0.8));
@@ -55,8 +61,6 @@ export default function ColorPaletteEditor() {
     <div className="slide-down-fade-in ml-3 relative flex flex-row p-3 pl-0 items-center overflow-hidden">
       {/* Color Swatch Trigger */}
       <div
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
         className={`flex-none scale-90 z-20 cursor-pointer border-2 border-gray-300 rounded shadow-md transition-transform duration-300 hover:scale-100 transition-all duration-300`}
         style={{
           width: '40px',

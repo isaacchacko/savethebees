@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import TextCycler from './TextCycler'
 import SpotifyStatus from '../components/SpotifyStatus';
 import Glyphs from '../components/Glyphs'

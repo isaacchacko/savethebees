@@ -9,6 +9,7 @@ const useLocalStorageMulti = (keys, defaultValues) => {
       });
       return Object.fromEntries(keys.map((key, index) => [key, storedValues[index]]));
     } catch (error) {
+      console.error('Error initializing local storage:', error);
       return Object.fromEntries(keys.map((key, index) => [key, defaultValues[index]]));
     }
   });
