@@ -24,7 +24,7 @@ export default function Home() {
           <div className="flex flex-col-reverse md:flex-row items-center justify-between gap-8">
             {/* About Me Text */}
             <div className="text-base leading-relaxed text-center md:text-left">
-              <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl text-(--primary-color) font-black pb-8 md:pb-16">
+              <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl text-(--primary-color) font-black pb-1 md:pb-6">
                 About Me
               </h2>
               <p className="text-sm sm:text-base md:text-lg lg:text-xl">

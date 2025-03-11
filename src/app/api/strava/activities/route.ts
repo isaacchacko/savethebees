@@ -1,0 +1,37 @@
+import { NextResponse } from 'next/server';
+import axios from 'axios';
+import { getAccessToken } from '@/app/api/strava/cache';
+
+export async function GET(request: NextRequest) {
+  try {
+    const accessToken = getAccessToken();
+
+    if (!accessToken) {
+      // If no cached token, redirect to fetch a new one
+      return NextResponse.redirect('/api/strava/token');
+    }
+
+    const currentYear = new Date().getFullYear();
+    const startOfYear = Math.floor(new Date(`${currentYear}-01-01`).getTime() / 1000); // UNIX timestamp
+
+    const response = await axios.get(`https://www.strava.com/api/v3/activities?after=${startOfYear}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (response.status !== 200) {
+      throw new Error(`Failed to fetch activities: ${response.status} ${response.statusText}`);
+    }
+
+    const data = response.data;
+
+    // Filter only running activities
+    const runs = data.filter((activity: any) => activity.type === 'Run');
+
+    return NextResponse.json(runs);
+  } catch (error) {
+    console.error('Error in /api/strava/activities:', error.message);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
