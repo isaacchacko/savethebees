@@ -28,7 +28,7 @@ export default function Home() {
                 About Me
               </h2>
               <p className="text-sm sm:text-base md:text-lg lg:text-xl">
-                I'm Isaac. I'm CS/Applied Math Engineering Honors @ TAMU. Currently, I'm developing for Dreamweavers, an indie puzzle platformer. For fun, I queue up LoL, read fantasy, run, and eat lots of Blue Bell.
+                I&apos;m Isaac. I&apos;m CS/Applied Math Engineering Honors @ TAMU. Currently, I&apos;m developing for Dreamweavers, an indie puzzle platformer. For fun, I queue up LoL, read fantasy, run, and eat lots of Blue Bell.
               </p>
             </div>
 
