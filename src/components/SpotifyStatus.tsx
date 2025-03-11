@@ -146,7 +146,7 @@ export default function SpotifyStatus({ condensed, className, navRef }: SpotifyS
       setLocalDuration(data.duration || 0);
 
     } catch (err) {
-      console.error('Error fetching playback:', error);
+      console.log('Error fetching playback:', error);
       setError(err instanceof Error ? err.message : 'Unknown error');
       setStatus('error');
     }

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
     const refreshToken = request.cookies.get('spotify_refresh')?.value;
     
@@ -27,7 +28,7 @@ export async function GET(request: Request) {
       }),
     });
 
-    const { access_token, expires_in, refresh_token } = await response.json();
+    const { access_token, expires_in, refresh_token: newRefreshToken } = await response.json();
     
     const res = NextResponse.json({
       access_token,
@@ -35,8 +36,8 @@ export async function GET(request: Request) {
     });
 
     // Update refresh token if rotated
-    if (refresh_token) {
-      res.cookies.set('spotify_refresh', refresh_token, {
+    if (newRefreshToken) {
+      res.cookies.set('spotify_refresh', newRefreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         maxAge: 60 * 60 * 24 * 365,
