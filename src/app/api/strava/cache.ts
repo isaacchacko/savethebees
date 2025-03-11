@@ -6,7 +6,7 @@ interface Cache {
 }
 
 declare global {
-  var cache: Cache | undefined;
+  let cache: Cache | undefined;
 }
 
 const cache = (globalThis as any).cache || ((globalThis as any).cache = new NodeCache({ stdTTL: 21600 })); // Cache expires in 6 hours
