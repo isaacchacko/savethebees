@@ -5,6 +5,8 @@ import { Bee } from './Bee';
 export class Boid {
   bees: Bee[];
   currentWaypointWeight: number;  
+  canvasWidth: number; 
+  canvasHeight: number; 
 
   constructor(spawnPosition: { x: number, y: number },
     numBees: number,
