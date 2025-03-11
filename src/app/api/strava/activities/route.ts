@@ -35,8 +35,13 @@ export async function GET() {
     const runs = data.filter((activity: StravaActivity) => activity.type === 'Run');
 
     return NextResponse.json(runs);
-  } catch (error) {
-    console.error('Error in /api/strava/activities:', error.message);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error('Error in /api/strava/activities:', error.message);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    } else {
+      console.error('Unknown error:', error);
+      return NextResponse.json({ error: 'Unknown error occurred' }, { status: 500 });
+    }
   }
-}
+
