@@ -1,8 +1,8 @@
 import { Manrope } from 'next/font/google';
-import "./globals.css";
+import './globals.css';
 
 const manrope = Manrope({
-  weight: '400', // Specify weight if not using variable font
+  weight: '400',
   subsets: ['latin'],
 });
 

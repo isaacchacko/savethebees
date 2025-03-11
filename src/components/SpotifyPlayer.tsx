@@ -208,17 +208,17 @@ export default function SpotifyPlayer() {
           <div>
 
           {/* Track info */}
-          <div className="flex-1 space-y-2 text-white">
+          <div className="flex-1 space-y-2 overflow-ellipsis text-white">
             <div>
               <a
                 href={playback.external_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-semibold text-xl 2xl:text-5xl text-white sm:hover:underline cursor-pointer"
+                className="font-black text-xl md:text-4xl 2xl:text-4xl text-white sm:hover:underline cursor-pointer"
               >
-                <i>{playback.track}</i>
+                {playback.track}
               </a>
-              <p className="text-md 2xl:text-xl text-white">{playback.artist}</p>
+              <p className="text-md font-black 2xl:text-xl text-white">{playback.artist}</p>
               <p className="text-md 2xl:text-xl text-gray-500">{playback.album}</p>
             </div>
 

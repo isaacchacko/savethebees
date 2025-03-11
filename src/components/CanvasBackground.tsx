@@ -79,10 +79,14 @@ export default function CanvasBackground({
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // Draw waypoint (mouse position)
-      // ctx.fillStyle = isMouseDownRef.current ? '#3B82F6' : '#EF4444';
-      // ctx.beginPath();
-      // ctx.arc(mouseWaypointRef.current.x, mouseWaypointRef.current.y, 5, 0, Math.PI * 2);
-      // ctx.fill();
+      if (isMouseDownRef.current) {
+        // ctx.fillStyle = isMouseDownRef.current ? '#3B82F6' : '#EF4444';
+        ctx.fillStyle = '#3B82F6';
+        ctx.beginPath();
+        ctx.arc(mouseWaypointRef.current.x, mouseWaypointRef.current.y, 5, 0, Math.PI * 2);
+        ctx.fill();
+
+      }
 
       if (boidRef.current) {
         boidRef.current.update([mouseWaypointRef.current]); // Pass mouse position as the waypoint
