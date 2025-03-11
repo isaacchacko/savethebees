@@ -39,7 +39,6 @@ export async function GET(request: NextRequest) {
     // Return success response
     return NextResponse.json({ message: 'Tokens saved successfully', access_token: data.access_token });
   } catch (error) {
-    console.error('Error exchanging authorization code:', error.message);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
