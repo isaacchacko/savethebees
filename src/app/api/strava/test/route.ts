@@ -23,8 +23,13 @@ export async function GET() {
 
     console.log('Tokens retrieved successfully:', { accessToken, refreshToken });
     return NextResponse.json({ accessToken, refreshToken });
-  } catch (error) {
-    console.error('Error fetching tokens:', error.message);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error('Error fetching tokens:', error.message);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    } else {
+      console.error('Unknown error occurred:', error);
+      return NextResponse.json({ error: 'Unknown error occurred' }, { status: 500 });
+    }
   }
 }
