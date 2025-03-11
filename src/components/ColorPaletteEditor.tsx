@@ -1,47 +1,47 @@
 import React, { useState, useEffect } from 'react';
-import Wheel from '@uiw/react-color-wheel';
+import dynamic from 'next/dynamic';
 import { hsvaToHex, hexToHsva } from '@uiw/color-convert';
 import Reset from './Reset';
+import useLocalStorageMulti from '@/hooks/useLocalStorageMulti';
+
+const Wheel = dynamic(() => import('@uiw/react-color-wheel'), { ssr: false });
 
 const DEFAULT_HEADER_COLOR = "#10B981";
+const DEFAULT_SECONDARY_COLOR = "#059669";
+const DEFAULT_TERTIARY_COLOR = "#047857";
 
 export default function ColorPaletteEditor() {
-  const [headerColorHSVA, setHeaderColorHSVA] = useState({ h: 214, s: 0, v: 100, a: 1 });
   const [isPickerVisible, setIsPickerVisible] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
+  const [colors, setColors] = useLocalStorageMulti(
+    ['primary-color', 'secondary-color', 'tertiary-color'],
+    [DEFAULT_HEADER_COLOR, DEFAULT_SECONDARY_COLOR, DEFAULT_TERTIARY_COLOR]
+  );
+
+  const headerColorHSVA = hexToHsva(colors['primary-color']);
+  const [swatchColor, setSwatchColor] = useState(DEFAULT_HEADER_COLOR); // Separate state for swatch color
+
+  // Set dynamic styles after hydration
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      const headerHex = getComputedStyle(document.documentElement)
-        .getPropertyValue("--primary-color")
-        .trim() || DEFAULT_HEADER_COLOR;
-      setHeaderColorHSVA(hexToHsva(headerHex));
-    }, 0);
+    document.documentElement.style.setProperty('--primary-color', colors['primary-color']);
+    document.documentElement.style.setProperty('--secondary-color', colors['secondary-color']);
+    document.documentElement.style.setProperty('--tertiary-color', colors['tertiary-color']);
+    setSwatchColor(colors['primary-color']); // Update swatch color after hydration
+  }, [colors]);
 
-    return () => clearTimeout(timeoutId);
-  }, []);
-  
   const resetColorHSVA = () => {
     const defaultColorHex = getComputedStyle(document.documentElement).getPropertyValue("--default-primary-color").trim();
-    document.documentElement.style.setProperty('--primary-color', defaultColorHex);
-    setHeaderColorHSVA(hexToHsva(defaultColorHex));
-    
-    // Update derived colors
-    const dimmedColor = dimColor(defaultColorHex, 0.8);
-    const dimmestColor = dimColor(defaultColorHex, 0.6);
-    document.documentElement.style.setProperty('--secondary-color', dimmedColor);
-    document.documentElement.style.setProperty('--tertiary-color', dimmestColor);
-  }
+    setColors('primary-color', defaultColorHex);
+    setColors('secondary-color', dimColor(defaultColorHex, 0.8));
+    setColors('tertiary-color', dimColor(defaultColorHex, 0.6));
+  };
 
   const handleHeaderColorChange = (color: { hsva: any }) => {
-    const headerColorHex = hsvaToHex(color.hsva);
-    document.documentElement.style.setProperty('--primary-color', headerColorHex);
-    setHeaderColorHSVA(color.hsva);
-    
-    // Update derived colors
-    const dimmedColor = dimColor(headerColorHex, 0.8);
-    const dimmestColor = dimColor(headerColorHex, 0.6);
-    document.documentElement.style.setProperty('--secondary-color', dimmedColor);
-    document.documentElement.style.setProperty('--tertiary-color', dimmestColor);
+    const newColorHex = hsvaToHex(color.hsva);
+    setColors('primary-color', newColorHex);
+    setColors('secondary-color', dimColor(newColorHex, 0.8));
+    setColors('tertiary-color', dimColor(newColorHex, 0.6));
   };
 
   const dimColor = (hex: string, factor: number): string => {
@@ -51,20 +51,17 @@ export default function ColorPaletteEditor() {
     return `rgb(${r}, ${g}, ${b})`;
   };
 
-  const [isHovered, setIsHovered] = useState(false);
-
   return (
-    <div className=" ml-3 relative flex flex-row p-3 pl-0 items-center overflow-hidden">
+    <div className="slide-down-fade-in ml-3 relative flex flex-row p-3 pl-0 items-center overflow-hidden">
       {/* Color Swatch Trigger */}
       <div
-
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         className={`flex-none scale-90 z-20 cursor-pointer border-2 border-gray-300 rounded shadow-md transition-transform duration-300 hover:scale-100 transition-all duration-300`}
         style={{
           width: '40px',
           height: '40px',
-          backgroundColor: hsvaToHex(headerColorHSVA),
+          backgroundColor: swatchColor, // Use hydrated swatch color
         }}
         onClick={() => setIsPickerVisible(!isPickerVisible)}
       />

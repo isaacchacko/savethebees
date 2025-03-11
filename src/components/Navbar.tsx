@@ -21,16 +21,18 @@ export default function Navbar({
 }: NavbarProps) {
   return (
     <nav 
-      className="cursor-pointer flex justify-start lg:justify-between items-center p-4 bg-gray/80 backdrop-blur-sm border-b border-gray-500" 
+      className="cursor-pointer flex justify-between items-center p-4 bg-(--spotify-background)/80 backdrop-blur-sm border-b border-gray-500" 
       style={{ pointerEvents: 'auto' }}
     >
       <div className="flex flex-row items-center relative">
-        <a href="/" className="hidden xl:block text-4xl font-bold">
-          <h1>Isaac Chacko</h1>
-        </a>
-        <a href="/" className="block xl:hidden text-4xl font-bold">
-          <h1>IC</h1>
-        </a>
+        <div className="hover:text-(--tertiary-color) transition-colors">
+          <a href="/" className="hidden xl:block text-4xl font-bold">
+            <h1>Isaac Chacko</h1>
+          </a>
+          <a href="/" className="block xl:hidden text-4xl font-bold">
+            <h1>IC</h1>
+          </a>
+        </div>
         {showColorPalette && <ColorPaletteEditor />}
       </div>
       
@@ -48,16 +50,13 @@ export default function Navbar({
           <Link href="#projects" className={BASE_CLASS_NAME}>
             Projects
           </Link>
-          <Link href="#tracking" className={BASE_CLASS_NAME}>
+          <Link href="/tracking" className={BASE_CLASS_NAME}>
             Tracking
           </Link>
           <Link href="#arch" className={BASE_CLASS_NAME}>
             Arch
           </Link>
-          <Link 
-            href={learnMorePath}
-            className={BASE_CLASS_NAME}
-          >
+          <Link href={"/about"} className={BASE_CLASS_NAME}>
             About
           </Link>
         </div>
