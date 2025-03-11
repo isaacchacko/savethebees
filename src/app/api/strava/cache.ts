@@ -6,10 +6,10 @@ interface Cache {
 }
 
 declare global {
-  let cache: Cache | undefined;
+  var cache: Cache | undefined;
 }
 
-const cache = globalThis.cache || (globalThis.cache = new NodeCache({ stdTTL: 21600 })); // Cache expires in 6 hours
+const cache = (globalThis as any).cache || ((globalThis as any).cache = new NodeCache({ stdTTL: 21600 })); // Cache expires in 6 hours
 
 export function setAccessToken(token: string) {
   console.log('Saving access token...');
