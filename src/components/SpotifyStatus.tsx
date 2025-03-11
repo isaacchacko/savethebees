@@ -210,7 +210,7 @@ export default function SpotifyStatus({condensed, className}: {condensed?: boole
   if (condensed) {
 
   return (
-      <div className={`${BASE_CLASS_NAME} flex flex-row gap-2 items-center ${shouldAnimate ? 'slide-down-fade-in' : 'opacity-0'}`} style={{ pointerEvents: 'auto' }}>
+<div className={`${BASE_CLASS_NAME} mx-10 flex flex-row gap-2 items-center ${shouldAnimate ? 'slide-down-fade-in' : 'opacity-0'} sm:flex sm:flex-row sm:gap-2 sm:items-center hidden sm:block flex-shrink`} style={{ pointerEvents: 'auto' }}>
 
 
           {playback?.image && (
@@ -220,7 +220,7 @@ export default function SpotifyStatus({condensed, className}: {condensed?: boole
               className="hidden 2xl:block w-10 h-10 rounded-lg object-cover"
             />
           )}
-          <a href={playback.external_url} target="_blank" rel="noopener noreferrer" className="font-black text-base md:text-xl 2xl:text-2xl text-white sm:hover:underline cursor-pointer">
+          <a href={playback.external_url} target="_blank" rel="noopener noreferrer" className="font-black text-base md:text-xl 2xl:text-2xl text-white sm:hover:underline cursor-pointer truncate">
             {playback.track}
           </a>
 

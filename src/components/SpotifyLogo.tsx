@@ -1,10 +1,10 @@
 
-export default function SpotifyLogo() {
+export default function SpotifyLogo({className}:{className?:string}) {
   return (
     <svg 
       role="img" 
       viewBox="0 0 496 496" 
-      className="w-6 h-6"
+      className={"w-6 h-6" + className}
       xmlns="http://www.w3.org/2000/svg"
     >
       <path fill="var(--spotify-foreground)" d="M248 8C111.1 8 0 119.1 0 256s111.1 248 248 248 248-111.1 248-248S384.9 8 248 8Z"/>

@@ -4,12 +4,12 @@
 
 @layer theme {
   :root {
-    --foreground: #e2b714;
+    --foreground: #ffffff;
     --background: #323437;
-    --header-color: #10B981;
-    --paragraph-color: #059669;
-    --boid-color: #047857;
-    --default-header-color: #10B981;
+    --primary-color: #10B981;
+    --secondary-color: #059669;
+    --tertiary-color: #047857;
+    --default-primary-color: #10B981;
     --spotify-foreground: #1ED760;
     --spotify-background: #121212;
   }
@@ -36,13 +36,6 @@ nav, .overlay-element {
   pointer-events: none;
 }
 
-h1 {
-  color: var(--header-color);
-}
-
-p {
-  color: var(--paragraph-color);
-}
 
 @keyframes drop-out {
   0% { transform: translateY(0); opacity: 1; }
@@ -99,9 +92,27 @@ p {
   animation: slideDownFadeIn 1.5s ease-out forwards;
   opacity: 0; /* Start invisible */
   animation-delay: 500ms; /* Match the JS delay */
+  
 }
 
 .wait-longer {
   animation-delay: 800ms;
+}
+
+/* Add these styles globally or via @layer */
+.perspective {
+  perspective: 1000px;
+}
+
+.transform-style-preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.rotate-y-180 {
+transform: rotateY(180deg);
 }
 

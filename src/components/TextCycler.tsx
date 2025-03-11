@@ -100,7 +100,7 @@ export default function TextCycler({
 
   return (
     <div
-      className={`relative h-[1.2em] items-center whitespace-nowrap transition-[width] duration-300 ${className}`}
+      className={`relative h-[1.2em] text-(--primary-color) items-center whitespace-nowrap transition-[width] duration-300 ${className}`}
       style={{ width: containerWidth }}
     >
       <div 

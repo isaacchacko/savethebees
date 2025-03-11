@@ -12,7 +12,7 @@ export default function ColorPaletteEditor() {
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       const headerHex = getComputedStyle(document.documentElement)
-        .getPropertyValue("--header-color")
+        .getPropertyValue("--primary-color")
         .trim() || DEFAULT_HEADER_COLOR;
       setHeaderColorHSVA(hexToHsva(headerHex));
     }, 0);
@@ -21,27 +21,27 @@ export default function ColorPaletteEditor() {
   }, []);
   
   const resetColorHSVA = () => {
-    const defaultColorHex = getComputedStyle(document.documentElement).getPropertyValue("--default-header-color").trim();
-    document.documentElement.style.setProperty('--header-color', defaultColorHex);
+    const defaultColorHex = getComputedStyle(document.documentElement).getPropertyValue("--default-primary-color").trim();
+    document.documentElement.style.setProperty('--primary-color', defaultColorHex);
     setHeaderColorHSVA(hexToHsva(defaultColorHex));
     
     // Update derived colors
     const dimmedColor = dimColor(defaultColorHex, 0.8);
     const dimmestColor = dimColor(defaultColorHex, 0.6);
-    document.documentElement.style.setProperty('--paragraph-color', dimmedColor);
-    document.documentElement.style.setProperty('--boid-color', dimmestColor);
+    document.documentElement.style.setProperty('--secondary-color', dimmedColor);
+    document.documentElement.style.setProperty('--tertiary-color', dimmestColor);
   }
 
   const handleHeaderColorChange = (color: { hsva: any }) => {
     const headerColorHex = hsvaToHex(color.hsva);
-    document.documentElement.style.setProperty('--header-color', headerColorHex);
+    document.documentElement.style.setProperty('--primary-color', headerColorHex);
     setHeaderColorHSVA(color.hsva);
     
     // Update derived colors
     const dimmedColor = dimColor(headerColorHex, 0.8);
     const dimmestColor = dimColor(headerColorHex, 0.6);
-    document.documentElement.style.setProperty('--paragraph-color', dimmedColor);
-    document.documentElement.style.setProperty('--boid-color', dimmestColor);
+    document.documentElement.style.setProperty('--secondary-color', dimmedColor);
+    document.documentElement.style.setProperty('--tertiary-color', dimmestColor);
   };
 
   const dimColor = (hex: string, factor: number): string => {
@@ -54,7 +54,7 @@ export default function ColorPaletteEditor() {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <div className="relative flex flex-row p-3 pl-0 items-center overflow-hidden">
+    <div className=" ml-3 relative flex flex-row p-3 pl-0 items-center overflow-hidden">
       {/* Color Swatch Trigger */}
       <div
 

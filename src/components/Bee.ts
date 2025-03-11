@@ -188,7 +188,7 @@ export class Bee {
     ctx.lineTo(-10, 5);
     ctx.lineTo(-10, -5);
     ctx.closePath();
-    const boidColor = getComputedStyle(document.documentElement).getPropertyValue('--boid-color').trim();
+    const boidColor = getComputedStyle(document.documentElement).getPropertyValue('--tertiary-color').trim();
     ctx.fillStyle = boidColor || 'blue';
     ctx.fill();
     ctx.restore();
