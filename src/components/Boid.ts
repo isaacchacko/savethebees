@@ -13,6 +13,8 @@ export class Boid {
     canvasHeight: number) {
     this.bees = [];
     this.currentWaypointWeight = 1;
+    this.canvasWidth = canvasWidth;
+    this.canvasHeight = canvasHeight;
 
     for (let i = 0; i < numBees; i++) {
       const angle = Math.random() * 2 * Math.PI;
