@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 import { setAccessToken, setRefreshToken } from '@/app/api/strava/cache';
 
