@@ -35,7 +35,7 @@ export async function GET(request: Request) {
       }),
     });
 
-    const { access_token, refresh_token, expires_in } = await response.json();
+    const { refresh_token, expires_in } = await response.json();
     
     const redirect = NextResponse.redirect(`${process.env.NEXTAUTH_URL}/`);
     
