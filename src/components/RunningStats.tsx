@@ -42,10 +42,8 @@ const RunningStats = () => {
   const [error, setError] = useState<string | null>(null);
   const [primaryColorRgba, setPrimaryColorRgba] = useState<string>('rgba(0, 123, 255, 1)'); // Default color
   const [primaryColorRgbaFill, setPrimaryColorRgbaFill] = useState<string>('rgba(0, 123, 255, 0.6)'); // Default fill color
-  const [isSmallScreen, setIsSmallScreen] = useState(false);
+  const [isSmallScreen, setIsSmallScreen] = useState(false); // small screen stuff
 
-
-  // small screen stuff
   useEffect(() => {
     const handleResize = () => {
       setIsSmallScreen(window.innerWidth < 768); // Assuming md breakpoint is 768px
@@ -71,95 +69,93 @@ const RunningStats = () => {
     return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`;
   }
 
-  // Function to fetch activities
-  const fetchActivities = async (accessToken: string) => {
-    try {
-      const response = await fetch(`/api/strava/activities?access_token=${accessToken}`);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch activities: ${response.status} ${response.statusText}`);
+  // Function to fetch activities from the API endpoint
+  const fetchActivities = async () => {
+    let retryCount = 0;
+    const maxRetries = 1; // Retry once
+
+    while (retryCount <= maxRetries) {
+      try {
+        const response = await fetch('/api/strava/activities');
+        if (!response.ok) {
+          if (response.status === 429 && retryCount < maxRetries) {
+            retryCount++;
+            await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait 1 second before retrying
+            continue;
+          }
+
+          throw new Error(`Failed to fetch activities: ${response.status} ${response.statusText}`);
+        }
+
+        const data: Activity[] = await response.json();
+
+        // Calculate total mileage
+        const totalMiles = data.reduce((sum, activity) => sum + activity.distance / 1609.34, 0); // Convert meters to miles
+        setTotalMileage(totalMiles);
+
+        // Calculate weekly mileage with week labels
+        const weekLabels: { [key: string]: string } = {};
+
+        // Determine start and end dates for activities
+        const startDate = new Date(Math.min(...data.map((activity) => new Date(activity.start_date).getTime())));
+        const endDate = new Date(Math.max(...data.map((activity) => new Date(activity.start_date).getTime())));
+
+        // Generate all weeks in the range
+        const allWeeks: { [key: string]: number } = {};
+        const currentWeekStart = new Date(startDate);
+        currentWeekStart.setDate(currentWeekStart.getDate() - currentWeekStart.getDay()); // Start of the week (Sunday)
+        while (currentWeekStart <= endDate) {
+          const currentWeekEnd = new Date(currentWeekStart);
+          currentWeekEnd.setDate(currentWeekStart.getDate() + 6); // End of the week (Saturday)
+
+          const weekKey = `${currentWeekStart.toISOString().split('T')[0]}_${currentWeekEnd.toISOString().split('T')[0]}`;
+          allWeeks[weekKey] = 0; // Initialize mileage for each week to 0
+
+          // Generate label without year
+          const startWeekLabel = currentWeekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+          const endWeekLabel = currentWeekEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+          weekLabels[weekKey] = `${startWeekLabel} - ${endWeekLabel}`;
+
+          // Move to the next week
+          currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+        }
+
+        // Update mileage for weeks with activities
+        data.forEach((activity) => {
+          const date = new Date(activity.start_date);
+          const startOfWeek = new Date(date);
+          startOfWeek.setDate(date.getDate() - date.getDay()); // Start of the week (Sunday)
+          const endOfWeek = new Date(startOfWeek);
+          endOfWeek.setDate(startOfWeek.getDate() + 6); // End of the week (Saturday)
+
+          const weekKey = `${startOfWeek.toISOString().split('T')[0]}_${endOfWeek.toISOString().split('T')[0]}`;
+          allWeeks[weekKey] = (allWeeks[weekKey] || 0) + activity.distance / 1609.34; // Convert meters to miles
+        });
+
+        // Prepare weekly mileage data with labels
+        const weeklyData = Object.keys(allWeeks).map((weekKey) => ({
+          weekLabel: weekLabels[weekKey],
+          mileage: allWeeks[weekKey],
+        }));
+
+        setWeeklyMileage(weeklyData);
+        break; // Exit loop if successful
+      } catch (err) {
+        console.error('Error fetching activities:', err);
+        setError(err.message);
+        break; // Exit loop if failed after retries
       }
-
-      const data: Activity[] = await response.json();
-
-      // Calculate total mileage
-      const totalMiles = data.reduce((sum, activity) => sum + activity.distance / 1609.34, 0); // Convert meters to miles
-      setTotalMileage(totalMiles);
-
-      // Calculate weekly mileage with week labels
-      const weekLabels: { [key: string]: string } = {};
-
-      // Determine start and end dates for activities
-      const startDate = new Date(Math.min(...data.map((activity) => new Date(activity.start_date).getTime())));
-      const endDate = new Date(Math.max(...data.map((activity) => new Date(activity.start_date).getTime())));
-
-      // Generate all weeks in the range
-      const allWeeks: { [key: string]: number } = {};
-      const currentWeekStart = new Date(startDate);
-      currentWeekStart.setDate(currentWeekStart.getDate() - currentWeekStart.getDay()); // Start of the week (Sunday)
-      while (currentWeekStart <= endDate) {
-        const currentWeekEnd = new Date(currentWeekStart);
-        currentWeekEnd.setDate(currentWeekStart.getDate() + 6); // End of the week (Saturday)
-
-        const weekKey = `${currentWeekStart.toISOString().split('T')[0]}_${currentWeekEnd.toISOString().split('T')[0]}`;
-        allWeeks[weekKey] = 0; // Initialize mileage for each week to 0
-
-        // Generate label without year
-        const startWeekLabel = currentWeekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-        const endWeekLabel = currentWeekEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-        weekLabels[weekKey] = `${startWeekLabel} - ${endWeekLabel}`;
-
-        // Move to the next week
-        currentWeekStart.setDate(currentWeekStart.getDate() + 7);
-      }
-
-      // Update mileage for weeks with activities
-      data.forEach((activity) => {
-        const date = new Date(activity.start_date);
-        const startOfWeek = new Date(date);
-        startOfWeek.setDate(date.getDate() - date.getDay()); // Start of the week (Sunday)
-        const endOfWeek = new Date(startOfWeek);
-        endOfWeek.setDate(startOfWeek.getDate() + 6); // End of the week (Saturday)
-
-        const weekKey = `${startOfWeek.toISOString().split('T')[0]}_${endOfWeek.toISOString().split('T')[0]}`;
-        allWeeks[weekKey] = (allWeeks[weekKey] || 0) + activity.distance / 1609.34; // Convert meters to miles
-      });
-
-      // Prepare weekly mileage data with labels
-      const weeklyData = Object.keys(allWeeks).map((weekKey) => ({
-        weekLabel: weekLabels[weekKey],
-        mileage: allWeeks[weekKey],
-      }));
-
-      setWeeklyMileage(weeklyData);
-    } catch (err) {
-      console.error('Error fetching activities:', err);
-      setError(err.message);
     }
   };
 
   useEffect(() => {
     const initializeData = async () => {
       setError(null); // Clear previous errors
-
-      try {
-        // Step 1: Fetch a valid access token
-        const response = await fetch('/api/strava/token');
-        if (!response.ok) {
-          throw new Error(`Failed to fetch access token: ${response.status} ${response.statusText}`);
-        }
-        const data = await response.json();
-        const accessToken = data.access_token;
-
-        // Step 2: Fetch activities using the access token
-        await fetchActivities(accessToken);
-      } catch (err) {
-        console.error('Error initializing data:', err);
-        setError(err.message);
-      }
+      await fetchActivities();
     };
 
     initializeData();
-    
+
     // Extract CSS variables dynamically after component mounts
     if (typeof window !== 'undefined') {
       const primaryColorHex = getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim();
@@ -169,7 +165,6 @@ const RunningStats = () => {
         setPrimaryColorRgbaFill(hexToRgba(primaryColorHex, 0.6));
       }
     }
-    
   }, []);
 
   // Bar chart data and options

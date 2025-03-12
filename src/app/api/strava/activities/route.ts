@@ -1,47 +1,88 @@
 import { NextResponse } from 'next/server';
-import axios from 'axios';
-import { getAccessToken } from '@/app/api/strava/cache';
+import Redis from 'ioredis';
 
-interface StravaActivity {
-  type: string;
-  // Add other properties as needed
-}
+const redis = new Redis({
+  host: process.env.REDIS_HOSTNAME,
+  port: parseInt(process.env.REDIS_PORT || '6379', 10),
+  password: process.env.REDIS_PASSWORD,
+});
 
-export async function GET() {
+const STRAVA_API_URL = 'https://www.strava.com/api/v3/athlete/activities';
+
+export async function GET(request: Request) {
+  const lockKey = 'strava_token_lock';
+  const lockTTL = 10; // Lock expires after 10 seconds
+
   try {
-    const accessToken = getAccessToken();
-
-    if (!accessToken) {
-      // If no cached token, redirect to fetch a new one
-      return NextResponse.redirect('/api/strava/token');
+    // Acquire lock to prevent concurrent token refresh
+    const lockAcquired = await redis.set(lockKey, Date.now().toString(), 'NX', 'EX', lockTTL);
+    if (!lockAcquired) {
+      return NextResponse.json({ message: 'Token refresh in progress. Please try again later.' }, { status: 429 });
     }
 
-    const currentYear = new Date().getFullYear();
-    const startOfYear = Math.floor(new Date(`${currentYear}-01-01`).getTime() / 1000); // UNIX timestamp
+    // Check the expiration timestamp
+    const expirationTimestamp = await redis.get('strava_token_expiration');
+    const currentTime = new Date();
+    let accessToken = await redis.get('strava_access_token');
 
-    const response = await axios.get(`https://www.strava.com/api/v3/activities?after=${startOfYear}`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
+    if (!expirationTimestamp || new Date(expirationTimestamp) <= currentTime) {
+      // Refresh tokens
+      const refreshToken = await redis.get('strava_refresh_token');
+      if (!refreshToken) {
+        throw new Error('Refresh token not found.');
+      }
+
+      const tokenResponse = await fetch('https://www.strava.com/api/v3/oauth/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          client_id: process.env.STRAVA_CLIENT_ID!,
+          client_secret: process.env.STRAVA_CLIENT_SECRET!,
+          grant_type: 'refresh_token',
+          refresh_token: refreshToken,
+        }),
+      });
+
+      if (!tokenResponse.ok) {
+        throw new Error(`Failed to refresh tokens: ${tokenResponse.statusText}`);
+      }
+
+      const { access_token, refresh_token: newRefreshToken, expires_in } = await tokenResponse.json();
+
+      // Update Redis with new tokens and expiration time
+      await redis.set('strava_access_token', access_token);
+      await redis.set('strava_refresh_token', newRefreshToken);
+      const newExpirationTime = new Date(currentTime.getTime() + expires_in * 1000).toISOString();
+      await redis.set('strava_token_expiration', newExpirationTime);
+
+      accessToken = access_token; // Use the refreshed access token
+    }
+
+    // Fetch activities from Strava API
+    const startOfYear = Math.floor(new Date(currentTime.getFullYear(), 0, 1).getTime() / 1000); // Start of current year (Unix timestamp)
+    const activitiesResponse = await fetch(STRAVA_API_URL, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+      method: 'GET',
     });
 
-    if (response.status !== 200) {
-      throw new Error(`Failed to fetch activities: ${response.status} ${response.statusText}`);
+    if (!activitiesResponse.ok) {
+      throw new Error(`Failed to fetch activities: ${activitiesResponse.statusText}`);
     }
 
-    const data = response.data;
+    const activitiesData = await activitiesResponse.json();
 
-    // Filter only running activities
-    const runs = data.filter((activity: StravaActivity) => activity.type === 'Run');
+    // Filter activities for the current year
+    const filteredActivities = activitiesData.filter((activity: any) => {
+      const activityDate = new Date(activity.start_date);
+      return activityDate.getFullYear() === currentTime.getFullYear();
+    });
 
-    return NextResponse.json(runs);
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      console.error('Error in /api/strava/activities:', error.message);
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    } else {
-      console.error('Unknown error:', error);
-      return NextResponse.json({ error: 'Unknown error occurred' }, { status: 500 });
-    }
+    // Release the lock
+    await redis.del(lockKey);
+
+    return NextResponse.json(filteredActivities, { status: 200 });
+  } catch (error) {
+    console.error('Error in activities endpoint:', error);
+    return NextResponse.json({ message: error.message }, { status: 500 });
   }
 }
