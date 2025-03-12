@@ -37,7 +37,7 @@ export async function GET(request: Request) {
         console.log('Cached activities are valid. Returning cached data...');
         const cachedActivities = await redis.get('cached_activities');
         if (cachedActivities) {
-          await lock.release(lockKey); // Release lock
+          await lock.release(); // Release lock
           return NextResponse.json(JSON.parse(cachedActivities), { status: 200 });
         }
       }
@@ -90,13 +90,13 @@ export async function GET(request: Request) {
     }
 
     console.log('Releasing lock...');
-    await lock.release(lockKey);
+    await lock.release();
 
     return NextResponse.json(filteredActivities, { status: 200 });
   } catch (error) {
     console.error('Error in activities endpoint:', error);
     try {
-      await lock.release(lockKey); // Ensure lock is released on error
+      await lock.release(); // Ensure lock is released on error
     } catch (releaseError) {
       console.error('Error releasing lock:', releaseError);
     }
