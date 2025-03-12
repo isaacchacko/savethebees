@@ -17,12 +17,16 @@ interface HSVColor {
   a: number;
 }
 
+interface ColorObject {
+  [key: string]: string; // Define colors as an object with string keys
+}
+
 export default function ColorPaletteEditor() {
   const [isPickerVisible, setIsPickerVisible] = useState(false);
 
-  const [colors, setColors] = useLocalStorageMulti(
+  const [colors, setColors] = useLocalStorageMulti<ColorObject>(
     ['primary-color', 'secondary-color', 'tertiary-color'],
-    [DEFAULT_HEADER_COLOR, DEFAULT_SECONDARY_COLOR, DEFAULT_TERTIARY_COLOR]
+    { 'primary-color': DEFAULT_HEADER_COLOR, 'secondary-color': DEFAULT_SECONDARY_COLOR, 'tertiary-color': DEFAULT_TERTIARY_COLOR }
   );
 
   const headerColorHSVA = hexToHsva(colors['primary-color']);
