@@ -20,7 +20,7 @@ export default function Home() {
       <div className="relative flex flex-col min-h-screen justify-start">
         <Navbar showColorPalette={false} learnMorePath="/tracking" />
 
-        <div className="flex flex-col w-full max-w-4xl mx-auto p-4 md:p-8 my-8 backdrop-blur-sm relative bg-(--spotify-background) rounded-lg shadow">
+        <div className="slide-down-fade-in flex flex-col w-full max-w-4xl mx-auto p-4 md:p-8 my-8 backdrop-blur-sm relative bg-(--spotify-background) rounded-lg shadow">
           <div className="flex flex-col-reverse md:flex-row items-center justify-between gap-8">
             {/* About Me Text */}
             <div className="text-base leading-relaxed text-center md:text-left">

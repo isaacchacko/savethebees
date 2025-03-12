@@ -45,6 +45,8 @@ type PlaybackState = {
   progress?: number;
   duration?: number;
   external_url?: string;
+  artist_uri?: string;
+  album_uri?: string;
 };
 
 interface SpotifyStatusProps {
