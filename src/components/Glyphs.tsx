@@ -6,7 +6,7 @@ const Glyphs = ({ size = 40 }: { size?: number }) => {
     <div className="w-[130%] md:w-[80%] 2xl:w-[50%] p-4 bg-(--spotify-background) rounded-lg shadow slide-down-fade-in wait-longer flex flex-row justify-between px-6"
     style={{ pointerEvents: 'auto' }}>
       <a
-        tooltip="LinkedIn"
+        title="LinkedIn"
         href="https://www.linkedin.com/in/isaacchacko"
         target="_blank"
         rel="noopener noreferrer"
@@ -15,7 +15,7 @@ const Glyphs = ({ size = 40 }: { size?: number }) => {
         <FaLinkedin size={size} className={BASE_CLASS_NAME}/>
       </a>
       <a
-        tooltip="GitHub"
+        title="GitHub"
         href="https://github.com/isaacchacko"
         target="_blank"
         rel="noopener noreferrer"
@@ -24,14 +24,14 @@ const Glyphs = ({ size = 40 }: { size?: number }) => {
         <FaGithub size={size} className={BASE_CLASS_NAME}/>
       </a>
       <a
-        tooltip="Snail Mail"
+        title="Snail Mail"
         href="mailto:isaac.chacko05@tamu.edu"
         aria-label="Email"
       >
         <FaEnvelope size={size} className={BASE_CLASS_NAME}/>
       </a>
       <a
-        tooltip="Resume"
+        title="Resume"
         href="https://drive.google.com/file/d/1-NBdX32Opo2ajMpDpWgXaQkyOQ9KzdcP/view?usp=sharing"
         target="_blank"
         rel="noopener noreferrer"
