@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import { useState, useEffect, useRef } from "react";
 
 export default function TextCycler({
@@ -14,16 +14,7 @@ export default function TextCycler({
   const [isExiting, setIsExiting] = useState(false);
   const [containerWidth, setContainerWidth] = useState(566.167);
   const textRef = useRef<HTMLDivElement>(null);
-
-  // Initialize ResizeObserver with a callback
-  const resizeObserverRef = useRef<ResizeObserver>(
-    new ResizeObserver(entries => {
-      for (const entry of entries) {
-        const { width } = entry.contentRect;
-        setContainerWidth(width);
-      }
-    })
-  );
+  const resizeObserverRef = useRef<ResizeObserver | null>(null);
 
   const updateWidth = () => {
     if (textRef.current) {
@@ -36,6 +27,13 @@ export default function TextCycler({
     const handleResize = () => requestAnimationFrame(updateWidth);
     window.addEventListener("resize", handleResize);
 
+    resizeObserverRef.current = new ResizeObserver(entries => {
+      for (const entry of entries) {
+        const { width } = entry.contentRect;
+        setContainerWidth(width);
+      }
+    });
+
     if (textRef.current) {
       resizeObserverRef.current.observe(textRef.current);
     }
@@ -44,7 +42,7 @@ export default function TextCycler({
       window.removeEventListener("resize", handleResize);
       resizeObserverRef.current?.disconnect();
     };
-  }, [activeIndex]);
+  }, []);
 
   useEffect(() => {
     const measureNextWidth = (text: string) => {

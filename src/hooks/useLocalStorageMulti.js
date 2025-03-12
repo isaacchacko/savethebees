@@ -2,6 +2,10 @@ import { useState, useEffect } from 'react';
 
 const useLocalStorageMulti = (keys, defaultValues) => {
   const [values, setValues] = useState(() => {
+    if (typeof window === 'undefined') {
+      return Object.fromEntries(keys.map((key, index) => [key, defaultValues[index]]));
+    }
+
     try {
       const storedValues = keys.map((key) => {
         const storedValue = localStorage.getItem(key);
@@ -15,9 +19,11 @@ const useLocalStorageMulti = (keys, defaultValues) => {
   });
 
   useEffect(() => {
-    Object.keys(values).forEach((key) => {
-      localStorage.setItem(key, JSON.stringify(values[key]));
-    });
+    if (typeof window !== 'undefined') {
+      Object.keys(values).forEach((key) => {
+        localStorage.setItem(key, JSON.stringify(values[key]));
+      });
+    }
   }, [values]);
 
   const setValue = (key, value) => {
