@@ -9,6 +9,9 @@ const redis = new Redis({
 
 const STRAVA_API_URL = 'https://www.strava.com/api/v3/athlete/activities';
 
+// Toggle to use cached activities or fetch from Strava API every time
+const USE_CACHED_ACTIVITIES = true; // Set to false to always fetch from Strava API
+
 export async function GET(request: Request) {
   const lockKey = 'strava_token_lock';
   const lockTTL = 10; // Lock expires after 10 seconds
@@ -21,77 +24,60 @@ export async function GET(request: Request) {
     }
 
     // Check if cached activities are not expired
-    const expirationDate = await redis.get('cached_activities_expiration_date');
-    const currentTime = new Date();
-    if (expirationDate && new Date(expirationDate) > currentTime) {
-      // Return cached activities if not expired
-      const cachedActivities = await redis.get('cached_activities');
-      if (cachedActivities) {
-        await redis.del(lockKey); // Release lock
-        return NextResponse.json(JSON.parse(cachedActivities), { status: 200 });
+    if (USE_CACHED_ACTIVITIES) {
+      const expirationDate = await redis.get('cached_activities_expiration_date');
+      const currentTime = new Date();
+      if (expirationDate && new Date(expirationDate) > currentTime) {
+        // Return cached activities if not expired
+        const cachedActivities = await redis.get('cached_activities');
+        if (cachedActivities) {
+          await redis.del(lockKey); // Release lock
+          return NextResponse.json(JSON.parse(cachedActivities), { status: 200 });
+        }
       }
     }
 
-    // Check the expiration timestamp for tokens
-    const tokenExpirationTimestamp = await redis.get('strava_token_expiration');
+    // Fetch access token and refresh token
     let accessToken = await redis.get('strava_access_token');
+    const refreshToken = await redis.get('strava_refresh_token');
 
-    if (!tokenExpirationTimestamp || new Date(tokenExpirationTimestamp) <= currentTime) {
-      // Refresh tokens
-      const refreshToken = await redis.get('strava_refresh_token');
-      if (!refreshToken) {
-        throw new Error('Refresh token not found.');
+    // Attempt to fetch activities
+    let activitiesData;
+    let retry = true;
+    while (retry) {
+      try {
+        // Fetch activities from Strava API
+        const activitiesResponse = await fetch(STRAVA_API_URL, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+          method: 'GET',
+        });
+
+        if (!activitiesResponse.ok) {
+          throw new Error(`Failed to fetch activities: ${activitiesResponse.statusText}`);
+        }
+
+        activitiesData = await activitiesResponse.json();
+        retry = false; // Successful fetch, exit loop
+      } catch (error) {
+        console.error('Error fetching activities:', error);
+        // If failed, refresh access token and try again
+        await refreshAccessToken(redis, refreshToken);
+        accessToken = await redis.get('strava_access_token');
       }
-
-      const tokenResponse = await fetch('https://www.strava.com/api/v3/oauth/token', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-          client_id: process.env.STRAVA_CLIENT_ID!,
-          client_secret: process.env.STRAVA_CLIENT_SECRET!,
-          grant_type: 'refresh_token',
-          refresh_token: refreshToken,
-        }),
-      });
-
-      if (!tokenResponse.ok) {
-        throw new Error(`Failed to refresh tokens: ${tokenResponse.statusText}`);
-      }
-
-      const { access_token, refresh_token: newRefreshToken, expires_in } = await tokenResponse.json();
-
-      // Update Redis with new tokens and expiration time
-      await redis.set('strava_access_token', access_token);
-      await redis.set('strava_refresh_token', newRefreshToken);
-      const newTokenExpirationTime = new Date(currentTime.getTime() + expires_in * 1000).toISOString();
-      await redis.set('strava_token_expiration', newTokenExpirationTime);
-
-      accessToken = access_token; // Use the refreshed access token
     }
-
-    // Fetch activities from Strava API
-    const startOfYear = Math.floor(new Date(currentTime.getFullYear(), 0, 1).getTime() / 1000); // Start of current year (Unix timestamp)
-    const activitiesResponse = await fetch(STRAVA_API_URL, {
-      headers: { Authorization: `Bearer ${accessToken}` },
-      method: 'GET',
-    });
-
-    if (!activitiesResponse.ok) {
-      throw new Error(`Failed to fetch activities: ${activitiesResponse.statusText}`);
-    }
-
-    const activitiesData = await activitiesResponse.json();
 
     // Filter activities for the current year
     const filteredActivities = activitiesData.filter((activity: any) => {
       const activityDate = new Date(activity.start_date);
-      return activityDate.getFullYear() === currentTime.getFullYear();
+      return activityDate.getFullYear() === new Date().getFullYear();
     });
 
-    // Cache activities with expiration
-    const cacheExpirationTime = new Date(currentTime.getTime() + 15 * 60 * 1000).toISOString(); // Expire in 15 minutes
-    await redis.set('cached_activities', JSON.stringify(filteredActivities));
-    await redis.set('cached_activities_expiration_date', cacheExpirationTime);
+    // Cache activities with expiration if using cached activities
+    if (USE_CACHED_ACTIVITIES) {
+      const cacheExpirationTime = new Date(new Date().getTime() + 15 * 60 * 1000).toISOString(); // Expire in 15 minutes
+      await redis.set('cached_activities', JSON.stringify(filteredActivities));
+      await redis.set('cached_activities_expiration_date', cacheExpirationTime);
+    }
 
     // Release the lock
     await redis.del(lockKey);
@@ -99,6 +85,38 @@ export async function GET(request: Request) {
     return NextResponse.json(filteredActivities, { status: 200 });
   } catch (error) {
     console.error('Error in activities endpoint:', error);
+    await redis.del(lockKey); // Release lock on error
     return NextResponse.json({ message: error.message }, { status: 500 });
+  }
+}
+
+// Helper function to refresh access token
+async function refreshAccessToken(redis: Redis, refreshToken: string) {
+  try {
+    const tokenResponse = await fetch('https://www.strava.com/api/v3/oauth/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        client_id: process.env.STRAVA_CLIENT_ID!,
+        client_secret: process.env.STRAVA_CLIENT_SECRET!,
+        grant_type: 'refresh_token',
+        refresh_token: refreshToken,
+      }),
+    });
+
+    if (!tokenResponse.ok) {
+      throw new Error(`Failed to refresh tokens: ${tokenResponse.statusText}`);
+    }
+
+    const { access_token, refresh_token: newRefreshToken, expires_in } = await tokenResponse.json();
+
+    // Update Redis with new tokens and expiration time
+    await redis.set('strava_access_token', access_token);
+    await redis.set('strava_refresh_token', newRefreshToken);
+    const newTokenExpirationTime = new Date(new Date().getTime() + expires_in * 1000).toISOString();
+    await redis.set('strava_token_expiration', newTokenExpirationTime);
+  } catch (error) {
+    console.error('Error refreshing access token:', error);
+    throw error;
   }
 }
