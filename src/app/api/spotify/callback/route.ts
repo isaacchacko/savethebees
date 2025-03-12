@@ -69,13 +69,15 @@ export async function GET() {
         await redis.set('spotify_access_token', access_token);
         await redis.set('spotify_expiry', String(Date.now() + expires_in * 1000));
         accessToken = access_token; // Update local variable with new token
-      } catch (redisUpdateError) {
+      } catch (redisUpdateError: Error) {
         throw new Error(`Failed to update Redis with refreshed token: ${redisUpdateError.message}`);
       }
-    } catch (refreshError) {
-      console.error('Error refreshing token:', refreshError);
-      await lock.release(); // Ensure lock is released
-      return NextResponse.json({ error: 'Failed to refresh token' }, { status: 500 });
+    } catch (redisUpdateError: unknown) {
+      if (redisUpdateError instanceof Error) {
+        throw new Error(`Failed to update Redis with refreshed token: ${redisUpdateError.message}`);
+      } else {
+        throw new Error(`Failed to update Redis with refreshed token: Unknown error`);
+      }
     }
   }
 
