@@ -47,13 +47,13 @@ export default function Navbar({
         )}
         
         <div className="hidden sm:flex gap-10">
-          <Link href="#projects" className={BASE_CLASS_NAME}>
+          <Link href="/projects" className={BASE_CLASS_NAME}>
             Projects
           </Link>
           <Link href="/tracking" className={BASE_CLASS_NAME}>
             Tracking
           </Link>
-          <Link href="#arch" className={BASE_CLASS_NAME}>
+          <Link href="/arch" className={BASE_CLASS_NAME}>
             Arch
           </Link>
           <Link href="/about" className={BASE_CLASS_NAME}>
