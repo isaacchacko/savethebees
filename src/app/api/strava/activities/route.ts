@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import Redis from 'ioredis';
+import { createLock } from '@microfleet/ioredis-lock';
 
 const redis = new Redis({
   host: process.env.REDIS_HOSTNAME,
@@ -14,28 +15,35 @@ const USE_CACHED_ACTIVITIES = true; // Set to false to always fetch from Strava 
 
 export async function GET(request: Request) {
   const lockKey = 'strava_token_lock';
-  const lockTTL = 10; // Lock expires after 10 seconds
+  const lockOptions = {
+    timeout: 10000, // Lock timeout in milliseconds
+    retries: 3, // Number of retries if lock acquisition fails
+    delay: 100, // Delay between retries in milliseconds
+  };
+
+  const lock = createLock(redis, lockOptions);
 
   try {
-    // Acquire lock to prevent concurrent token refresh
-    const lockAcquired = await redis.set(lockKey, Date.now().toString(), 'NX', 'EX', lockTTL);
-    if (!lockAcquired) {
-      return NextResponse.json({ message: 'Token refresh in progress. Please try again later.' }, { status: 429 });
-    }
+    console.log('Attempting to acquire lock...');
+    await lock.acquire(lockKey);
+
+    console.log('Lock acquired successfully.');
 
     // Check if cached activities are not expired
     if (USE_CACHED_ACTIVITIES) {
       const expirationDate = await redis.get('cached_activities_expiration_date');
       const currentTime = new Date();
       if (expirationDate && new Date(expirationDate) > currentTime) {
-        // Return cached activities if not expired
+        console.log('Cached activities are valid. Returning cached data...');
         const cachedActivities = await redis.get('cached_activities');
         if (cachedActivities) {
-          await redis.del(lockKey); // Release lock
+          await lock.release(lockKey); // Release lock
           return NextResponse.json(JSON.parse(cachedActivities), { status: 200 });
         }
       }
     }
+
+    console.log('Cached activities are expired or caching is disabled. Proceeding with API call...');
 
     // Fetch access token and refresh token
     let accessToken = await redis.get('strava_access_token');
@@ -46,7 +54,7 @@ export async function GET(request: Request) {
     let retry = true;
     while (retry) {
       try {
-        // Fetch activities from Strava API
+        console.log('Fetching activities from Strava API...');
         const activitiesResponse = await fetch(STRAVA_API_URL, {
           headers: { Authorization: `Bearer ${accessToken}` },
           method: 'GET',
@@ -60,12 +68,13 @@ export async function GET(request: Request) {
         retry = false; // Successful fetch, exit loop
       } catch (error) {
         console.error('Error fetching activities:', error);
-        // If failed, refresh access token and try again
+        console.log('Refreshing access token...');
         await refreshAccessToken(redis, refreshToken);
         accessToken = await redis.get('strava_access_token');
       }
     }
 
+    console.log('Filtering activities for the current year...');
     // Filter activities for the current year
     const filteredActivities = activitiesData.filter((activity: any) => {
       const activityDate = new Date(activity.start_date);
@@ -77,15 +86,20 @@ export async function GET(request: Request) {
       const cacheExpirationTime = new Date(new Date().getTime() + 15 * 60 * 1000).toISOString(); // Expire in 15 minutes
       await redis.set('cached_activities', JSON.stringify(filteredActivities));
       await redis.set('cached_activities_expiration_date', cacheExpirationTime);
+      console.log('Cached filtered activities.');
     }
 
-    // Release the lock
-    await redis.del(lockKey);
+    console.log('Releasing lock...');
+    await lock.release(lockKey);
 
     return NextResponse.json(filteredActivities, { status: 200 });
   } catch (error) {
     console.error('Error in activities endpoint:', error);
-    await redis.del(lockKey); // Release lock on error
+    try {
+      await lock.release(lockKey); // Ensure lock is released on error
+    } catch (releaseError) {
+      console.error('Error releasing lock:', releaseError);
+    }
     return NextResponse.json({ message: error.message }, { status: 500 });
   }
 }
