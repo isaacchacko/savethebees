@@ -79,7 +79,7 @@ const RunningStats = () => {
   // Function to fetch activities from the API endpoint
   const fetchActivities = async () => {
     let retryCount = 0;
-    const maxRetries = 1; // Retry once
+    const maxRetries = 2; // Retry once
 
     while (retryCount <= maxRetries) {
       try {
@@ -225,7 +225,7 @@ const RunningStats = () => {
 
   return (
     <div className="relative font-sans bg-(--spotify-background) rounded-lg shadow">
-      <Header text="Running Statistics"/>
+      <Header text="Running"/>
       <p>I love to run! I&apos;ve ran two half-marathons so in the past, once in SF and a second time in Houston. Although my next goal is to run a marathon, I&apos;ve definitely fallen off. I will have to make up some ground before I&apos;m marathon ready. My goal for 2025 is to run 365 miles.</p>
       <hr className="mt-5 mb-5"></hr>
       {error ? (

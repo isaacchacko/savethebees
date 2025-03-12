@@ -32,7 +32,7 @@ const Glyphs = ({ size = 40 }: { size?: number }) => {
       </a>
       <a
         title="Resume"
-        href="https://drive.google.com/file/d/1-NBdX32Opo2ajMpDpWgXaQkyOQ9KzdcP/view?usp=sharing"
+        href="/Isaac_Chacko.pdf"
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Résumé"

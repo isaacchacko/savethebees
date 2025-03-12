@@ -25,12 +25,6 @@ body {
   background: var(--background);
 }
 
-/* Hide cursor over canvas */
-canvas.cursor-none {
-  cursor: none;
-  z-index: 0;
-}
-
 /* Allow pointer events through overlays */
 nav, .overlay-element {
   pointer-events: none;
@@ -116,3 +110,16 @@ nav, .overlay-element {
 transform: rotateY(180deg);
 }
 
+.scroll {
+  scroll-snap-type: x mandatory;
+  scroll-behavior: auto; /* Default behavior */
+}
+
+.scroll:hover {
+  scroll-behavior: smooth; /* Smooth behavior on hover */
+  cursor: grab; /* Change cursor to indicate dragging */
+}
+
+.scroll:active {
+  cursor: grabbing; /* Change cursor while dragging */
+}
