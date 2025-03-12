@@ -23,7 +23,7 @@ const Header = ({
   text,
   href = "",
   id = ""
-}: HeaderProps) => (
+}) => (
     <div className="flex flex-row justify-between items-center gap-4">
       {href !== "" ? (
         <div className={className + "cursor-pointer"}>
