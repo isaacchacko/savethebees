@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import SpotifyLogo from './SpotifyLogo';
 
 interface HeaderProps {
@@ -50,71 +50,44 @@ type PlaybackState = {
 interface SpotifyStatusProps {
     condensed?: boolean;
     className?: string;
-    navRef?: React.RefObject<HTMLElement>
+    navRef?: React.RefObject<HTMLElement>;
 }
 
 export default function SpotifyStatus({ condensed, className, navRef }: SpotifyStatusProps) {
   const BASE_CLASS_NAME = `relative p-4 bg-(--spotify-background) rounded-lg shadow ${className}`;
   const [playback, setPlayback] = useState<PlaybackState | null>(null);
-  const [status, setStatus] = useState<'loading' | 'authenticated' | 'unauthenticated' | 'error'>('loading');
-  const [error, setError] = useState('');
   const [localProgress, setLocalProgress] = useState(0);
   const [localDuration, setLocalDuration] = useState(0);
   const [shouldAnimate, setShouldAnimate] = useState(false);
-  const [truncate, setTruncate] = useState(false);
-  const spotifyStatusRef = useRef<HTMLDivElement>(null);
-
-  const checkAuth = async (): Promise<string> => {
-    try {
-      const res = await fetch('/api/spotify/refresh-token', { credentials: 'include' });
-
-      if (!res.ok) {
-        throw new Error('Token refresh failed');
-      }
-
-      const { access_token } = await res.json();
-      return access_token;
-    } catch (err) {
-      setStatus('unauthenticated');
-      throw err;
-    }
-  };
 
   useEffect(() => {
-    const initializeAuth = async () => {
+    let interval: NodeJS.Timeout;
+    const fetchPlaybackData = async () => {
       try {
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('error')) {
-          throw new Error(urlParams.get('error')!);
-        }
+        const res = await fetch('/api/spotify/now-playing');
 
-        // Check existing session
-        const expiry = document.cookie.split('; ')
-          .find(row => row.startsWith('spotify_expiry='))
-          ?.split('=')[1];
+        if (!res.ok) throw new Error('Failed to fetch playback');
 
-        if (expiry && Date.now() < parseInt(expiry)) {
-          setStatus('authenticated');
-          return;
-        }
-
-        // Get new token if expired
-        await checkAuth();
-        setStatus('authenticated');
-        
-        if (status !== 'loading') {
-          setTimeout(() => setShouldAnimate(true), 300);
-        }
-
+        const data = await res.json();
+        setPlayback(data);
+        setLocalProgress(data.progress || 0);
+        setLocalDuration(data.duration || 0);
       } catch (err) {
-        console.error('Auth initialization failed:', err);
-        setStatus('unauthenticated');
-        setTimeout(() => setShouldAnimate(true), 300);
+        console.error('Error fetching playback:', err);
+        setPlayback(null);
       }
     };
 
-    initializeAuth();
+    fetchPlaybackData(); // Initial fetch
+    interval = setInterval(fetchPlaybackData, 15000); // Fetch every 15 seconds
+    return () => clearInterval(interval); // Cleanup interval on unmount
   }, []);
+
+  useEffect(() => {
+    if (playback) {
+      setTimeout(() => setShouldAnimate(true), 300); // Animate after data load
+    }
+  }, [playback]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -125,101 +98,6 @@ export default function SpotifyStatus({ condensed, className, navRef }: SpotifyS
     }
     return () => clearInterval(interval);
   }, [playback?.is_playing, playback?.duration]);
-
-  const fetchPlaybackData = async () => {
-    try {
-      const token = await checkAuth();
-
-      const res = await fetch('/api/spotify/now-playing', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      if (res.status === 401) {
-        return fetchPlaybackData();
-      }
-
-      if (!res.ok) throw new Error('Failed to fetch playback');
-
-      const data = await res.json();
-      setPlayback(data);
-      setLocalProgress(data.progress || 0);
-      setLocalDuration(data.duration || 0);
-
-    } catch (err) {
-      console.log('Error fetching playback:', error);
-      setError(err instanceof Error ? err.message : 'Unknown error');
-      setStatus('error');
-    }
-  };
-
-  useEffect(() => {
-    if (status === 'authenticated') {
-      const fetchInitialData = async () => {
-        await fetchPlaybackData();
-        setTimeout(() => setShouldAnimate(true), 300); // Animate after data load
-      };
-      fetchInitialData();
-      const interval = setInterval(fetchPlaybackData, 10000);
-      return () => clearInterval(interval);
-    }
-  }, [status]);
-
-  // Check for overflow
-  useEffect(() => {
-    if (condensed && navRef?.current && spotifyStatusRef.current && playback?.is_playing) {
-      const navWidth = navRef.current.offsetWidth;
-      const spotifyStatusWidth = spotifyStatusRef.current.offsetWidth;
-      const spotifyStatusLeft = spotifyStatusRef.current.offsetLeft;
-      setTruncate(spotifyStatusWidth + spotifyStatusLeft > navWidth);
-    }
-  }, [condensed, playback, navRef]);
-
-  // Loading state
-  if (status === 'loading') {
-    return <div></div>;
-  }
-
-  // Unauthenticated state
-  if (status === 'unauthenticated') {
-    return (
-      <div className="p-4 bg-blue-50 rounded-lg text-center">
-        <button
-          onClick={() => window.location.href = '/api/spotify/auth'}
-          className={`${BASE_CLASS_NAME} whitespace-nowrap pr-10 ${shouldAnimate ? 'slide-down-fade-in' : 'opacity-0'}`}
-          style={{ pointerEvents: 'auto' }}
-        >
-          Connect Spotify
-        </button>
-      </div>
-    );
-  }
-
-  // Error state
-  if (status === 'error') {
-    return (
-      <div className={`${BASE_CLASS_NAME} ${shouldAnimate ? 'slide-down-fade-in' : 'opacity-0'}`} style={{ pointerEvents: 'auto' }}>
-        <button onClick={() => window.location.reload()}>
-          Press to Reload
-        </button>
-      </div>
-    );
-  }
-
-  // No current playback or playback is null
-  if (!playback || !playback.is_playing) {
-    if (condensed) {
-      return (
-        <div className={`${BASE_CLASS_NAME} ${shouldAnimate ? 'slide-down-fade-in' : 'opacity-0'}`} ref={spotifyStatusRef}>
-          <Header text="Not playing" />
-        </div>
-      );
-    }
-    return (
-      <div className={`${BASE_CLASS_NAME} ${shouldAnimate ? 'slide-down-fade-in' : 'opacity-0'}`}>
-        <Header text="I'm not listening to anything..." />
-      </div>
-    );
-  }
 
   // Format time helper
   const formatTime = (ms: number) => {
@@ -232,11 +110,25 @@ export default function SpotifyStatus({ condensed, className, navRef }: SpotifyS
   const progressPercentage = localDuration > 0
     ? (localProgress / localDuration) * 100
     : 0;
-  
-  if (condensed) {
 
-  return (
-    <div className={`${BASE_CLASS_NAME} overflow-hidden max-w-2/3 mx-10 flex flex-row gap-2 items-center ${shouldAnimate ? 'slide-down-fade-in' : 'opacity-0'} sm:flex sm:flex-row sm:gap-2 sm:items-center hidden sm:block flex-shrink overflow-hidden whitespace-nowrap`} style={{ pointerEvents: 'auto' }} ref={spotifyStatusRef}>
+  if (!playback || !playback.is_playing) {
+    if (condensed) {
+      return (
+        <div className={`${BASE_CLASS_NAME} ${shouldAnimate ? 'slide-down-fade-in' : 'opacity-0'}`}>
+          <Header text="Not playing" />
+        </div>
+      );
+    }
+    return (
+      <div className={`${BASE_CLASS_NAME} ${shouldAnimate ? 'slide-down-fade-in' : 'opacity-0'}`}>
+        <Header text="I'm not listening to anything..." />
+      </div>
+    );
+  }
+
+  if (condensed) {
+    return (
+      <div className={`${BASE_CLASS_NAME} overflow-hidden max-w-2/3 mx-10 flex flex-row gap-2 items-center ${shouldAnimate ? 'slide-down-fade-in' : 'opacity-0'} sm:flex sm:flex-row sm:gap-2 sm:items-center hidden sm:block flex-shrink overflow-hidden whitespace-nowrap`} style={{ pointerEvents: 'auto' }}>
         {playback?.image && (
           <Image
             src={playback.image}
@@ -247,17 +139,18 @@ export default function SpotifyStatus({ condensed, className, navRef }: SpotifyS
           />
         )}
         <div className="">
-          <a href={playback.external_url} target="_blank" rel="noopener noreferrer" className={`font-black text-base md:text-xl 2xl:text-2xl text-white sm:hover:underline cursor-pointer ${truncate ? 'truncate' : ''}`}>
+          <a href={playback.external_url} target="_blank" rel="noopener noreferrer" className={`font-black text-base md:text-xl 2xl:text-2xl text-white sm:hover:underline cursor-pointer`}>
             {playback.track}
           </a>
 
         </div>
 
-        <p className={`text-md font-black 2xl:text-xl ${truncate ? 'truncate' : ''}`}>by {playback.artist}</p>
+        <p className={`text-md font-black 2xl:text-xl`}>by {playback.artist}</p>
         <SpotifyLogo className="shrink-0"/>
       </div>
     );
   }
+
   return (
     <div className={`${BASE_CLASS_NAME} w-full ${shouldAnimate ? 'slide-down-fade-in' : 'opacity-0'}`} style={{ pointerEvents: 'auto' }}>
 
