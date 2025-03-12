@@ -25,7 +25,7 @@ interface SetColorsFunction {
   (key: string, value: string): void; // Define setColors as a function
 }
 
-export default function ColorPaletteEditor({className}: {className: string}) {
+export default function ColorPaletteEditor({className=""}: {className?: string}) {
   const [isPickerVisible, setIsPickerVisible] = useState(false);
 
   const [colors, setColors] = useLocalStorageMulti(
