@@ -33,7 +33,7 @@ export async function GET() {
     }
   } catch (redisError) {
     console.error('Error retrieving tokens from Redis:', redisError);
-    await lock.release('spotify_token_refresh'); // Ensure lock is released
+    await lock.release(); // Ensure lock is released
     return NextResponse.json({ error: 'Failed to retrieve tokens' }, { status: 500 });
   }
 
@@ -74,7 +74,7 @@ export async function GET() {
       }
     } catch (refreshError) {
       console.error('Error refreshing token:', refreshError);
-      await lock.release('spotify_token_refresh'); // Ensure lock is released
+      await lock.release(); // Ensure lock is released
       return NextResponse.json({ error: 'Failed to refresh token' }, { status: 500 });
     }
   }
@@ -96,13 +96,13 @@ export async function GET() {
     playbackData = await response.json();
   } catch (fetchError) {
     console.error('Error fetching currently playing track:', fetchError);
-    await lock.release('spotify_token_refresh'); // Ensure lock is released
+    await lock.release(); // Ensure lock is released
     return NextResponse.json({ error: 'Failed to fetch currently playing track' }, { status: 500 });
   }
 
   try {
     // Release the lock after processing
-    await lock.release('spotify_token_refresh');
+    await lock.release();
   } catch (releaseError) {
     console.error('Error releasing lock:', releaseError);
     return NextResponse.json({ error: 'Failed to release lock' }, { status: 500 });
