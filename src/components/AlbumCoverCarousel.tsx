@@ -7,6 +7,12 @@ const HEIGHT = 300;
 const BASE = "p-2";
 
 
+interface HeaderProps {
+  className?: string;
+  text: string; // Define the type here
+  href?: string;
+}
+
 const Header = ({
   className = "font-bold text-2xl 2xl:text-4xl text-white cursor-pointer pb-2",
   text,
