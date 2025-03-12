@@ -37,7 +37,7 @@ export async function GET(request: Request) {
         console.log('Cached activities are valid. Returning cached data...');
         const cachedActivities = await redis.get('cached_activities');
         if (cachedActivities) {
-          await lock.release(); // Release lock
+          await lock.release(); // Corrected: No arguments passed to release()
           return NextResponse.json(JSON.parse(cachedActivities), { status: 200 });
         }
       }
@@ -74,7 +74,7 @@ export async function GET(request: Request) {
       } catch (error) {
         console.error('Error fetching activities:', error);
         console.log('Refreshing access token...');
-        await refreshAccessToken(redis, refreshToken);
+        await refreshAccessToken(redis, refreshToken); // Safe because refreshToken is guaranteed to be a string
         accessToken = await redis.get('strava_access_token');
       }
     }
@@ -95,7 +95,7 @@ export async function GET(request: Request) {
     }
 
     console.log('Releasing lock...');
-    await lock.release();
+    await lock.release(); // Corrected: No arguments passed to release()
 
     return NextResponse.json(filteredActivities, { status: 200 });
   } catch (error) {
@@ -104,8 +104,19 @@ export async function GET(request: Request) {
       await lock.release(); // Ensure lock is released on error
     } catch (releaseError) {
       console.error('Error releasing lock:', releaseError);
+      // Narrow the type of releaseError
+      if (releaseError instanceof Error) {
+        return NextResponse.json({ message: releaseError.message }, { status: 500 });
+      } else {
+        return NextResponse.json({ message: 'An unknown error occurred.' }, { status: 500 });
+      }
     }
-    return NextResponse.json({ message: error.message }, { status: 500 });
+    // Narrow the type of error
+    if (error instanceof Error) {
+      return NextResponse.json({ message: error.message }, { status: 500 });
+    } else {
+      return NextResponse.json({ message: 'An unknown error occurred.' }, { status: 500 });
+    }
   }
 }
 
