@@ -227,7 +227,7 @@ const RunningStats = () => {
         <>
             <div className="2xl:text-3xl">
               <p className={BASE_SUBTITLE_CLASS}>Total Mileage in {new Date().getFullYear()}: </p> 
-              <p className="inline  ">{totalMileage.toFixed(2)} miles ({percentage.toFixed(2)}%)</p>
+              <p className="inline  ">{totalMileage.toFixed(2)} of 365 miles ({percentage.toFixed(2)}%)</p>
             </div>
 
             <div className="2xl:text-3xl">
