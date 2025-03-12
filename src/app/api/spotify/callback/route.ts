@@ -4,9 +4,9 @@ import { createLock } from '@microfleet/ioredis-lock';
 
 const redis = new Redis(process.env.REDIS_URL!);
 const lock = createLock(redis, {
-  timeout: 20000, // Lock expiration time in milliseconds
-  retries: 3, // Maximum number of retries to acquire the lock
-  delay: 100, // Delay between retries in milliseconds
+  timeout: 5000, // Lock expiration time in milliseconds
+  retries: 3,    // Maximum number of retries to acquire the lock
+  delay: 100,    // Delay between retries in milliseconds
 });
 
 export async function GET() {
@@ -15,7 +15,7 @@ export async function GET() {
   let expiry: string | null = null;
 
   try {
-    // Acquire lock to prevent concurrent refresh attempts
+    // Acquire lock with a predefined timeout set during lock creation
     await lock.acquire('spotify_token_refresh');
   } catch (lockError) {
     console.error('Error acquiring lock:', lockError);
