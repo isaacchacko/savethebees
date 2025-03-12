@@ -193,7 +193,7 @@ const RunningStats = () => {
   };
 
   const chartOptions = {
-    indexAxis: 'y', // Flip axes to make bars horizontal
+    indexAxis: 'y' as const, // Set indexAxis to 'y'
     plugins: {
       legend: { display: false }, // Remove legend
       title: {
