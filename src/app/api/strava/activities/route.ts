@@ -111,9 +111,60 @@ export async function GET(request: Request) {
         return NextResponse.json({ message: 'An unknown error occurred.' }, { status: 500 });
       }
     }
+
     // Narrow the type of error
     if (error instanceof Error) {
-      return NextResponse.json({ message: error.message }, { status: 500 });
+      if (error.message.includes('500')) { // Check if error is related to a 500 status
+        let retryCount = 0;
+        const maxRetries = 3;
+        const retryDelay = 3000; // 3 seconds
+
+        const retryFetch = async () => {
+          try {
+            // Attempt to fetch activities again
+            const activitiesResponse = await fetch(STRAVA_API_URL, {
+              headers: { Authorization: `Bearer ${await redis.get('strava_access_token')}` },
+              method: 'GET',
+            });
+
+            if (!activitiesResponse.ok) {
+              throw new Error(`Failed to fetch activities: ${activitiesResponse.statusText}`);
+            }
+
+            const activitiesData = await activitiesResponse.json();
+
+            // Filter activities for the current year
+            const filteredActivities = activitiesData.filter((activity: any) => {
+              const activityDate = new Date(activity.start_date);
+              return activityDate.getFullYear() === new Date().getFullYear();
+            });
+
+            // Cache activities with expiration if using cached activities
+            if (USE_CACHED_ACTIVITIES) {
+              const cacheExpirationTime = new Date(new Date().getTime() + 15 * 60 * 1000).toISOString(); // Expire in 15 minutes
+              await redis.set('cached_activities', JSON.stringify(filteredActivities));
+              await redis.set('cached_activities_expiration_date', cacheExpirationTime);
+              console.log('Cached filtered activities.');
+            }
+
+            return NextResponse.json(filteredActivities, { status: 200 });
+          } catch (retryError) {
+            retryCount++;
+            if (retryCount < maxRetries) {
+              console.log(`Retry ${retryCount + 1} of ${maxRetries} in ${retryDelay / 1000} seconds...`);
+              await new Promise(resolve => setTimeout(resolve, retryDelay));
+              return retryFetch(); // Recursive retry
+            } else {
+              console.error('All retries failed:', retryError);
+              return NextResponse.json({ message: retryError.message }, { status: 500 });
+            }
+          }
+        };
+
+        return retryFetch();
+      } else {
+        return NextResponse.json({ message: error.message }, { status: 500 });
+      }
     } else {
       return NextResponse.json({ message: 'An unknown error occurred.' }, { status: 500 });
     }

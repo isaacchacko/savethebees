@@ -28,7 +28,7 @@ export default function Home() {
                 In Progress!
               </h2>
               <p className="text-sm sm:text-base md:text-lg lg:text-xl">
-                While you&apos;re here, how about you find some bugs for me! Let me know what you find.
+                While you&apos;re here, how about you find some bugs for me! Let me know what you find.               
               </p>
             </div>
 

@@ -34,6 +34,7 @@ export default function Navbar({
         {showColorPalette && <ColorPaletteEditor />}
       </div>
       
+      <ColorPaletteEditor className="absolute invisible w-0 h-0 pointer-events-none" />
       {spotifyStatus && <SpotifyStatus condensed={true} className=""/>}
 
       <div className="flex justify-between gap-10 ml-10">

@@ -1,9 +1,37 @@
 import Image from 'next/image';
 import React, { useRef, useEffect, useState } from 'react';
+import SpotifyLogo from "@/components/SpotifyLogo";
 
 const WIDTH = 300;
 const HEIGHT = 300;
 const BASE = "p-2";
+
+
+const Header = ({
+  className = "font-bold text-2xl 2xl:text-4xl text-white cursor-pointer pb-2",
+  text,
+  href = ""
+}: HeaderProps) => (
+    <div className="flex flex-row justify-between items-center gap-4">
+      {href !== "" ? (
+        <div className={className}>
+          <a
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-black text-white sm:hover:underline cursor-pointer"
+          >
+            {text}
+          </a>
+        </div>
+      ) : (
+          <div className={className}>
+            <span>{text}</span>
+          </div>
+        )}
+      <SpotifyLogo />
+    </div>
+  );
 
 const AlbumCoverCarousel: React.FC = () => {
   const carouselRef = useRef<HTMLDivElement>(null);
@@ -99,9 +127,11 @@ const AlbumCoverCarousel: React.FC = () => {
 
   return (
     <div className="px-4">
-       <h2   className="font-black text-white text-2xl 2xl:text-4xl text-white cursor-pointer pb-2">
-        Favorite Albums
+      <h2 className="font-black text-white text-2xl 2xl:text-4xl text-white cursor-pointer">
+        <Header text="Favorite Album Covers" href="https://open.spotify.com/playlist/4IlbP26s8HFFvcjoYW8oUD?si=4d2e1ef821fa4c8a"/>
       </h2>
+      <p>Because some things ARE judged by their cover.</p>
+      <hr className="mt-5 mb-5"></hr>
       <div className="px-4">
         <div
           className="relative flex items-center"
@@ -119,7 +149,7 @@ const AlbumCoverCarousel: React.FC = () => {
           {/* Carousel */}
           <div
             ref={carouselRef}
-            className="scroll flex flex-row overflow-x-hidden scrollbar-none w-full"
+            className="scroll flex flex-row overflow-x-scroll overflow-y-hidden scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-200"
             style={{ pointerEvents: 'auto', height: HEIGHT }}
           >
             {images.map((image, index) => (

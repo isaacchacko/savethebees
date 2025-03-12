@@ -29,13 +29,14 @@ export default function Home() {
             </div>
           </div>
 
+          <div className="flex flex-col w-full max-w-4xl mx-auto py-4 md:py-8 mt-4 backdrop-blur-sm relative bg-(--spotify-background) rounded-lg shadow">
+            <AlbumCoverCarousel />
+          </div>
+
           <div className="flex flex-col w-full max-w-4xl mx-auto p-4 md:p-8 mt-4 backdrop-blur-sm relative bg-(--spotify-background) rounded-lg shadow">
             <RunningStats />
           </div>
 
-          <div className="flex flex-col w-full max-w-4xl mx-auto py-4 md:py-8 mt-4 backdrop-blur-sm relative bg-(--spotify-background) rounded-lg shadow">
-            <AlbumCoverCarousel />
-          </div>
 
           <div className="flex flex-col w-full max-w-4xl mx-auto p-4 md:p-8 mt-8 backdrop-blur-sm relative bg-(--spotify-background) rounded-lg shadow">
             <div className="text-base leading-relaxed">
@@ -43,7 +44,7 @@ export default function Home() {
                 Under construction...
               </h2>
               <p className="text-sm sm:text-base md:text-lg lg:text-xl">
-                I'll eventually cover this page with any metric you can think of. Red Bulls downed, light night hours grinded, you name it.
+                I'll eventually cover this page with any metric you can think of. Red Bulls downed, late night hours grinded, you name it.
               </p>
             </div>
           </div>

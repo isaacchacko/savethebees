@@ -25,7 +25,7 @@ interface SetColorsFunction {
   (key: string, value: string): void; // Define setColors as a function
 }
 
-export default function ColorPaletteEditor() {
+export default function ColorPaletteEditor({className}) {
   const [isPickerVisible, setIsPickerVisible] = useState(false);
 
   const [colors, setColors] = useLocalStorageMulti(
@@ -81,7 +81,7 @@ export default function ColorPaletteEditor() {
   };
 
   return (
-    <div className="slide-down-fade-in ml-3 relative flex flex-row p-3 pl-0 items-center overflow-hidden">
+    <div className={className + "slide-down-fade-in ml-3 relative flex flex-row p-3 pl-0 items-center overflow-hidden"}>
       {/* Color Swatch Trigger */}
       <div
         className={`flex-none scale-90 z-20 cursor-pointer border-2 border-gray-300 rounded shadow-md transition-transform duration-300 hover:scale-100 transition-all duration-300`}

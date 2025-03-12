@@ -123,3 +123,17 @@ transform: rotateY(180deg);
 .scroll:active {
   cursor: grabbing; /* Change cursor while dragging */
 }
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 10px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background-color: #eee;
+}
