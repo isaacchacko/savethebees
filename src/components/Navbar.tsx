@@ -37,12 +37,14 @@ export default function Navbar({
       {spotifyStatus && <SpotifyStatus condensed={true} className=""/>}
 
       <div className="flex justify-between gap-10 ml-10">
-        <Link 
-          href={learnMorePath}
-          className={BASE_CLASS_NAME + " block sm:hidden"}
-        >
-          Learn More &gt;
-        </Link>
+        {learnMorePath && (
+          <Link 
+            href={learnMorePath}
+            className={BASE_CLASS_NAME + " block sm:hidden"}
+          >
+            Learn More &gt;
+          </Link>
+        )}
         
         <div className="hidden sm:flex gap-10">
           <Link href="#projects" className={BASE_CLASS_NAME}>
