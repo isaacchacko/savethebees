@@ -16,7 +16,7 @@ const Header = ({
   className = "font-bold text-2xl 2xl:text-4xl text-white cursor-pointer pb-2",
   text,
   href = ""
-}: HeaderProps): => (
+}: HeaderProps) => (
   <div className="flex flex-row justify-between items-center gap-4">
     {href !== "" ? (
       <div className={className}>
