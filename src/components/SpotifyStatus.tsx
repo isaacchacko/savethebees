@@ -145,7 +145,19 @@ export default function SpotifyStatus({ condensed, className, navRef }: SpotifyS
 
         </div>
 
-        <p className={`text-md font-black 2xl:text-xl`}>by {playback.artist}</p>
+        <p className={`text-md font-black 2xl:text-xl`}>
+          by{' '}
+          {playback.artist_uri && (
+            <a
+              href={`https://open.spotify.com/artist/${playback.artist_uri.split(':')[2]}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white sm:hover:underline cursor-pointer"
+            >
+              {playback.artist}
+            </a>
+          )}
+        </p>
         <SpotifyLogo className="shrink-0"/>
       </div>
     );
@@ -183,8 +195,30 @@ export default function SpotifyStatus({ condensed, className, navRef }: SpotifyS
                 >
                   {playback.track}
                 </a>
-                <p className="text-md font-black 2xl:text-xl text-white">{playback.artist}</p>
-                <p className="text-md 2xl:text-xl text-gray-500">{playback.album}</p>
+                <p className={`text-md font-black 2xl:text-xl`}>
+                  {playback.artist_uri && (
+                    <a
+                      href={`https://open.spotify.com/artist/${playback.artist_uri.split(':')[2]}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-white sm:hover:underline cursor-pointer"
+                    >
+                      {playback.artist}
+                    </a>
+                  )}
+                </p>
+                <p className={`text-md 2xl:text-xl text-gray-500`}>
+                  {playback.album_uri && (
+                    <a
+                      href={`https://open.spotify.com/album/${playback.album_uri.split(':')[2]}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-gray-500 sm:hover:underline cursor-pointer"
+                    >
+                      {playback.album}
+                    </a>
+                  )}
+                </p>
               </div>
 
             </div>
