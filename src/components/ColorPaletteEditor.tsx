@@ -17,6 +17,10 @@ interface HSVColor {
   a: number;
 }
 
+interface ColorObject {
+  [key: string]: string; // Define colors as an object with string keys
+}
+
 export default function ColorPaletteEditor() {
   const [isPickerVisible, setIsPickerVisible] = useState(false);
 
@@ -29,8 +33,11 @@ export default function ColorPaletteEditor() {
     }
   );
 
+  // Ensure colors is an object
+  const colorObject = colors as ColorObject;
+
   // Add a fallback for undefined values
-  const primaryColor = colors['primary-color'] || DEFAULT_HEADER_COLOR;
+  const primaryColor = colorObject['primary-color'] || DEFAULT_HEADER_COLOR;
 
   // Ensure primaryColor is valid before passing it to hexToHsva
   const headerColorHSVA = hexToHsva(primaryColor);
@@ -39,10 +46,10 @@ export default function ColorPaletteEditor() {
 
   // Set dynamic styles after hydration
   useEffect(() => {
-    document.documentElement.style.setProperty('--primary-color', colors['primary-color'] || DEFAULT_HEADER_COLOR);
-    document.documentElement.style.setProperty('--secondary-color', colors['secondary-color'] || DEFAULT_SECONDARY_COLOR);
-    document.documentElement.style.setProperty('--tertiary-color', colors['tertiary-color'] || DEFAULT_TERTIARY_COLOR);
-    setSwatchColor(colors['primary-color'] || DEFAULT_HEADER_COLOR); // Update swatch color after hydration
+    document.documentElement.style.setProperty('--primary-color', colorObject['primary-color'] || DEFAULT_HEADER_COLOR);
+    document.documentElement.style.setProperty('--secondary-color', colorObject['secondary-color'] || DEFAULT_SECONDARY_COLOR);
+    document.documentElement.style.setProperty('--tertiary-color', colorObject['tertiary-color'] || DEFAULT_TERTIARY_COLOR);
+    setSwatchColor(colorObject['primary-color'] || DEFAULT_HEADER_COLOR); // Update swatch color after hydration
   }, [colors]);
 
   const resetColorHSVA = () => {
