@@ -20,12 +20,23 @@ export async function GET(request: Request) {
       return NextResponse.json({ message: 'Token refresh in progress. Please try again later.' }, { status: 429 });
     }
 
-    // Check the expiration timestamp
-    const expirationTimestamp = await redis.get('strava_token_expiration');
+    // Check if cached activities are not expired
+    const expirationDate = await redis.get('cached_activities_expiration_date');
     const currentTime = new Date();
+    if (expirationDate && new Date(expirationDate) > currentTime) {
+      // Return cached activities if not expired
+      const cachedActivities = await redis.get('cached_activities');
+      if (cachedActivities) {
+        await redis.del(lockKey); // Release lock
+        return NextResponse.json(JSON.parse(cachedActivities), { status: 200 });
+      }
+    }
+
+    // Check the expiration timestamp for tokens
+    const tokenExpirationTimestamp = await redis.get('strava_token_expiration');
     let accessToken = await redis.get('strava_access_token');
 
-    if (!expirationTimestamp || new Date(expirationTimestamp) <= currentTime) {
+    if (!tokenExpirationTimestamp || new Date(tokenExpirationTimestamp) <= currentTime) {
       // Refresh tokens
       const refreshToken = await redis.get('strava_refresh_token');
       if (!refreshToken) {
@@ -52,8 +63,8 @@ export async function GET(request: Request) {
       // Update Redis with new tokens and expiration time
       await redis.set('strava_access_token', access_token);
       await redis.set('strava_refresh_token', newRefreshToken);
-      const newExpirationTime = new Date(currentTime.getTime() + expires_in * 1000).toISOString();
-      await redis.set('strava_token_expiration', newExpirationTime);
+      const newTokenExpirationTime = new Date(currentTime.getTime() + expires_in * 1000).toISOString();
+      await redis.set('strava_token_expiration', newTokenExpirationTime);
 
       accessToken = access_token; // Use the refreshed access token
     }
@@ -76,6 +87,11 @@ export async function GET(request: Request) {
       const activityDate = new Date(activity.start_date);
       return activityDate.getFullYear() === currentTime.getFullYear();
     });
+
+    // Cache activities with expiration
+    const cacheExpirationTime = new Date(currentTime.getTime() + 15 * 60 * 1000).toISOString(); // Expire in 15 minutes
+    await redis.set('cached_activities', JSON.stringify(filteredActivities));
+    await redis.set('cached_activities_expiration_date', cacheExpirationTime);
 
     // Release the lock
     await redis.del(lockKey);
