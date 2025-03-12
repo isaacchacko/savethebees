@@ -246,7 +246,7 @@ export default function SpotifyStatus({ condensed, className, navRef }: SpotifyS
             className="hidden 2xl:block rounded-lg object-cover"
           />
         )}
-        <div className="min-w-0 flex-1">
+        <div className="flex flex-row justify-between gap-2 min-w-0 flex-1">
           <a href={playback.external_url} target="_blank" rel="noopener noreferrer" className={`font-black text-base md:text-xl 2xl:text-2xl text-white sm:hover:underline cursor-pointer ${truncate ? 'truncate' : ''}`}>
             {playback.track}
           </a>
