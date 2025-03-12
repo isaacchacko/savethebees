@@ -49,6 +49,11 @@ export async function GET(request: Request) {
     let accessToken = await redis.get('strava_access_token');
     const refreshToken = await redis.get('strava_refresh_token');
 
+    // Ensure refreshToken is not null
+    if (!refreshToken) {
+      throw new Error('Refresh token not found in Redis.');
+    }
+
     // Attempt to fetch activities
     let activitiesData;
     let retry = true;
