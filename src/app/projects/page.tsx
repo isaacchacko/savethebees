@@ -64,6 +64,10 @@ export default function Home() {
             </div>
           </div>
         </div>
+
+        <footer className="absolute bottom-2 left-2 contactInfo">
+          <p>Copyright &copy; 2025 Isaac Chacko</p>
+        </footer>
       </div>
     </div>
   );

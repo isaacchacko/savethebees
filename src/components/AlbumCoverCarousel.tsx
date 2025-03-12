@@ -92,9 +92,16 @@ const AlbumCoverCarousel: React.FC = () => {
       image.style.transform = `perspective(400px) rotate3d(1, -1, 0, ${rotateX}deg) rotate3d(1, 1, 0, ${rotateY}deg) scale(1.05)`;
     }
   };
+  
+  useEffect(() => {
+  if (carouselRef.current) {
+      carouselRef.current.scrollLeft = 0;
+    }
+  }, []);
 
   useEffect(() => {
     if (carouselRef.current) {
+
       let intervalId: NodeJS.Timeout;
 
       const maxScrollLeft = carouselRef.current.scrollWidth - carouselRef.current.clientWidth;
