@@ -10,8 +10,8 @@ const redis = new Redis({
 
 const lock = createLock(redis, {
   timeout: 200000, // Lock timeout in milliseconds
-  retries: 3, // Number of retries
-  delay: 100, // Delay between retries in milliseconds
+  retries: 3,      // Number of retries
+  delay: 100,      // Delay between retries in milliseconds
 });
 
 export async function GET() {
@@ -22,9 +22,14 @@ export async function GET() {
   try {
     // Acquire lock to prevent concurrent refresh attempts
     await lock.acquire('spotify_token_refresh');
-  } catch (lockError) {
-    console.error('Error acquiring lock:', );
-    return NextResponse.json({ error: 'Failed to acquire lock. ' + lockError }, { status: 500 });
+  } catch (lockError: unknown) {
+    if (lockError instanceof Error) {
+      console.error('Error acquiring lock:', lockError.message);
+      return NextResponse.json({ error: 'Failed to acquire lock: ' + lockError.message }, { status: 500 });
+    } else {
+      console.error('Error acquiring lock:', lockError);
+      return NextResponse.json({ error: 'Failed to acquire lock: Unknown error' }, { status: 500 });
+    }
   }
 
   try {
@@ -36,10 +41,16 @@ export async function GET() {
     if (!accessToken || !refreshToken || !expiry) {
       throw new Error('Missing Spotify tokens or expiry in Redis');
     }
-  } catch (redisError) {
-    console.error('Error retrieving tokens from Redis:', redisError);
-    await lock.release(); // Ensure lock is released
-    return NextResponse.json({ error: 'Failed to retrieve tokens' }, { status: 500 });
+  } catch (redisError: unknown) {
+    if (redisError instanceof Error) {
+      console.error('Error retrieving tokens from Redis:', redisError.message);
+      await lock.release(); // Ensure lock is released
+      return NextResponse.json({ error: 'Failed to retrieve tokens: ' + redisError.message }, { status: 500 });
+    } else {
+      console.error('Error retrieving tokens from Redis:', redisError);
+      await lock.release(); // Ensure lock is released
+      return NextResponse.json({ error: 'Failed to retrieve tokens: Unknown error' }, { status: 500 });
+    }
   }
 
   const expiryTime = parseInt(expiry);
@@ -74,13 +85,23 @@ export async function GET() {
         await redis.set('spotify_access_token', access_token);
         await redis.set('spotify_expiry', String(Date.now() + expires_in * 1000));
         accessToken = access_token; // Update local variable with new token
-      } catch (redisUpdateError) {
-        throw new Error(`Failed to update Redis with refreshed token: ${redisUpdateError.message}`);
+      } catch (redisUpdateError: unknown) {
+        if (redisUpdateError instanceof Error) {
+          throw new Error(`Failed to update Redis with refreshed token: ${redisUpdateError.message}`);
+        } else {
+          throw new Error(`Failed to update Redis with refreshed token: Unknown error`);
+        }
       }
-    } catch (refreshError) {
-      console.error('Error refreshing token:', refreshError);
-      await lock.release(); // Ensure lock is released
-      return NextResponse.json({ error: 'Failed to refresh token' }, { status: 500 });
+    } catch (refreshError: unknown) {
+      if (refreshError instanceof Error) {
+        console.error('Error refreshing token:', refreshError.message);
+        await lock.release(); // Ensure lock is released
+        return NextResponse.json({ error: 'Failed to refresh token: ' + refreshError.message }, { status: 500 });
+      } else {
+        console.error('Error refreshing token:', refreshError);
+        await lock.release(); // Ensure lock is released
+        return NextResponse.json({ error: 'Failed to refresh token: Unknown error' }, { status: 500 });
+      }
     }
   }
 
@@ -99,18 +120,29 @@ export async function GET() {
     }
 
     playbackData = await response.json();
-  } catch (fetchError) {
-    console.error('Error fetching currently playing track:', fetchError);
-    await lock.release(); // Ensure lock is released
-    return NextResponse.json({ error: 'Failed to fetch currently playing track' }, { status: 500 });
+  } catch (fetchError: unknown) {
+    if (fetchError instanceof Error) {
+      console.error('Error fetching currently playing track:', fetchError.message);
+      await lock.release(); // Ensure lock is released
+      return NextResponse.json({ error: 'Failed to fetch currently playing track: ' + fetchError.message }, { status: 500 });
+    } else {
+      console.error('Error fetching currently playing track:', fetchError);
+      await lock.release(); // Ensure lock is released
+      return NextResponse.json({ error: 'Failed to fetch currently playing track: Unknown error' }, { status: 500 });
+    }
   }
 
   try {
     // Release the lock after processing
     await lock.release();
-  } catch (releaseError) {
-    console.error('Error releasing lock:', releaseError);
-    return NextResponse.json({ error: 'Failed to release lock' }, { status: 500 });
+  } catch (releaseError: unknown) {
+    if (releaseError instanceof Error) {
+      console.error('Error releasing lock:', releaseError.message);
+      return NextResponse.json({ error: 'Failed to release lock: ' + releaseError.message }, { status: 500 });
+    } else {
+      console.error('Error releasing lock:', releaseError);
+      return NextResponse.json({ error: 'Failed to release lock: Unknown error' }, { status: 500 });
+    }
   }
 
   // Return playback data in the expected format
