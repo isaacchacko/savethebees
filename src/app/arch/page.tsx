@@ -18,12 +18,19 @@ interface Area {
   targetId: string;
 }
 
+interface HeaderProps {
+  className?: string;
+  text: string; // Define the type here
+  href?: string;
+  id?: string;
+}
+
 const Header = ({
   className = "font-bold text-2xl 2xl:text-4xl text-white pb-2",
   text,
   href = "",
   id = ""
-}) => (
+}: HeaderProps) => (
     <div className="flex flex-row justify-between items-center gap-4">
       {href !== "" ? (
         <div className={className + "cursor-pointer"}>
