@@ -14,7 +14,16 @@ export default function TextCycler({
   const [isExiting, setIsExiting] = useState(false);
   const [containerWidth, setContainerWidth] = useState(566.167);
   const textRef = useRef<HTMLDivElement>(null);
-  const resizeObserverRef = useRef<ResizeObserver>();
+
+  // Initialize ResizeObserver with a callback
+  const resizeObserverRef = useRef<ResizeObserver>(
+    new ResizeObserver(entries => {
+      for (const entry of entries) {
+        const { width } = entry.contentRect;
+        setContainerWidth(width);
+      }
+    })
+  );
 
   const updateWidth = () => {
     if (textRef.current) {
@@ -26,13 +35,6 @@ export default function TextCycler({
   useEffect(() => {
     const handleResize = () => requestAnimationFrame(updateWidth);
     window.addEventListener("resize", handleResize);
-    
-    resizeObserverRef.current = new ResizeObserver(entries => {
-      for (const entry of entries) {
-        const { width } = entry.contentRect;
-        setContainerWidth(width);
-      }
-    });
 
     if (textRef.current) {
       resizeObserverRef.current.observe(textRef.current);
@@ -49,7 +51,7 @@ export default function TextCycler({
       if (!textRef.current) return 0;
       const tempEl = document.createElement("div");
       const styles = window.getComputedStyle(textRef.current);
-      
+
       // Copy relevant styles
       tempEl.style.font = styles.font;
       tempEl.style.fontSize = styles.fontSize;
@@ -59,7 +61,7 @@ export default function TextCycler({
       tempEl.style.visibility = "hidden";
       tempEl.style.position = "absolute";
       tempEl.style.left = "-9999px";
-      
+
       tempEl.textContent = text;
       document.body.appendChild(tempEl);
       const width = tempEl.getBoundingClientRect().width;
