@@ -147,9 +147,14 @@ const RunningStats = () => {
 
         setWeeklyMileage(weeklyData);
         break; // Exit loop if successful
-      } catch (err) {
-        console.error('Error fetching activities:', err);
-        setError(err.message);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          console.error('Error fetching activities:', err);
+          setError(err.message);
+        } else {
+          console.error('Unknown error occurred:', err);
+          setError('An unknown error occurred.');
+        }
         break; // Exit loop if failed after retries
       }
     }
