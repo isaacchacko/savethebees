@@ -21,6 +21,10 @@ interface ColorObject {
   [key: string]: string; // Define colors as an object with string keys
 }
 
+interface SetColorsFunction {
+  (key: string, value: string): void; // Define setColors as a function
+}
+
 export default function ColorPaletteEditor() {
   const [isPickerVisible, setIsPickerVisible] = useState(false);
 
@@ -35,6 +39,9 @@ export default function ColorPaletteEditor() {
 
   // Ensure colors is an object
   const colorObject = colors as ColorObject;
+
+  // Ensure setColors is a function
+  const setColorsFunction = setColors as SetColorsFunction;
 
   // Add a fallback for undefined values
   const primaryColor = colorObject['primary-color'] || DEFAULT_HEADER_COLOR;
@@ -54,16 +61,16 @@ export default function ColorPaletteEditor() {
 
   const resetColorHSVA = () => {
     const defaultColorHex = getComputedStyle(document.documentElement).getPropertyValue("--default-primary-color").trim();
-    setColors('primary-color', defaultColorHex);
-    setColors('secondary-color', dimColor(defaultColorHex, 0.8));
-    setColors('tertiary-color', dimColor(defaultColorHex, 0.6));
+    setColorsFunction('primary-color', defaultColorHex);
+    setColorsFunction('secondary-color', dimColor(defaultColorHex, 0.8));
+    setColorsFunction('tertiary-color', dimColor(defaultColorHex, 0.6));
   };
 
   const handleHeaderColorChange = (color: { hsva: HSVColor }) => {
     const newColorHex = hsvaToHex(color.hsva);
-    setColors('primary-color', newColorHex);
-    setColors('secondary-color', dimColor(newColorHex, 0.8));
-    setColors('tertiary-color', dimColor(newColorHex, 0.6));
+    setColorsFunction('primary-color', newColorHex);
+    setColorsFunction('secondary-color', dimColor(newColorHex, 0.8));
+    setColorsFunction('tertiary-color', dimColor(newColorHex, 0.6));
   };
 
   const dimColor = (hex: string, factor: number): string => {
