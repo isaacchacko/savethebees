@@ -14,7 +14,7 @@ const Header = ({
   className = "font-bold text-lg 2xl:text-2xl text-white cursor-pointer pb-2",
   text,
   href = ""
-}: HeaderProps): JSX.Element => (
+}: HeaderProps) => (
   <div className="flex flex-row justify-between items-center gap-4">
     {href !== "" ? (
       <div className={className}>
