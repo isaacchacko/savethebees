@@ -60,7 +60,7 @@ export default function SpotifyStatus({ condensed, className, navRef }: SpotifyS
   const [playback, setPlayback] = useState<PlaybackState | null>(null);
   const [localProgress, setLocalProgress] = useState(0);
   const [localDuration, setLocalDuration] = useState(0);
-  const [shouldAnimate, setShouldAnimate] = useState(false);
+  const [shouldAnimate, setShouldAnimate] = useState(true);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -84,12 +84,6 @@ export default function SpotifyStatus({ condensed, className, navRef }: SpotifyS
     interval = setInterval(fetchPlaybackData, 15000); // Fetch every 15 seconds
     return () => clearInterval(interval); // Cleanup interval on unmount
   }, []);
-
-  useEffect(() => {
-    if (playback) {
-      setTimeout(() => setShouldAnimate(true), 300); // Animate after data load
-    }
-  }, [playback]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
