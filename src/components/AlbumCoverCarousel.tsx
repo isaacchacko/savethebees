@@ -141,7 +141,7 @@ const AlbumCoverCarousel: React.FC = () => {
   return (
     <div className="px-4">
       <h2 className="font-black text-white text-2xl 2xl:text-4xl text-white cursor-pointer">
-        <Header text="Favorite Album Covers" href="https://open.spotify.com/playlist/4IlbP26s8HFFvcjoYW8oUD?si=4d2e1ef821fa4c8a"/>
+        <Header text="Favorite Albums" href="https://open.spotify.com/playlist/4IlbP26s8HFFvcjoYW8oUD?si=4d2e1ef821fa4c8a"/>
       </h2>
       <p>Because some things ARE judged by their cover.</p>
       <hr className="mt-5 mb-5"></hr>
