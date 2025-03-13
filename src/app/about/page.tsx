@@ -38,7 +38,7 @@ export default function Home() {
             >
               {/* Inner Card */}
               <div
-                className={`transition-transform duration-500 transform-style-preserve-3d ${
+                className={`pointer-events-auto transition-transform duration-500 transform-style-preserve-3d ${
                   isFlipped ? 'rotate-y-180' : ''
                 }`}
               >

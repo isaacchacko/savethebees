@@ -56,7 +56,7 @@ interface SpotifyStatusProps {
 }
 
 export default function SpotifyStatus({ condensed, className, navRef }: SpotifyStatusProps) {
-  const BASE_CLASS_NAME = `relative p-4 bg-(--spotify-background) rounded-lg shadow ${className}`;
+  const BASE_CLASS_NAME = `relative p-2 bg-(--spotify-background) rounded-lg shadow ${className}`;
   const [playback, setPlayback] = useState<PlaybackState | null>(null);
   const [localProgress, setLocalProgress] = useState(0);
   const [localDuration, setLocalDuration] = useState(0);
@@ -124,37 +124,45 @@ export default function SpotifyStatus({ condensed, className, navRef }: SpotifyS
 
   if (condensed) {
     return (
-      <div className={`${BASE_CLASS_NAME} overflow-hidden max-w-2/3 mx-10 flex flex-row gap-2 items-center ${shouldAnimate ? 'slide-down-fade-in' : 'opacity-0'} sm:flex sm:flex-row sm:gap-2 sm:items-center hidden sm:block flex-shrink overflow-hidden whitespace-nowrap`} style={{ pointerEvents: 'auto' }}>
+      <div 
+        className={`${BASE_CLASS_NAME} mx-4 flex flex-row gap-2 items-center ${
+shouldAnimate ? 'slide-down-fade-in' : 'opacity-0'
+} sm:flex flex-shrink-0 overflow-x-auto scrollbar-hide`} 
+        style={{ pointerEvents: 'auto', maxWidth: 'calc(100vw - 2rem)' }}
+      >
         {playback?.image && (
           <Image
             src={playback.image}
             alt="Album cover"
             width={40}
             height={40}
-            className="hidden 2xl:block rounded-lg object-cover"
+            className="shrink-0 hidden 2xl:block rounded-lg object-cover"
           />
         )}
-        <div className="">
-          <a href={playback.external_url} target="_blank" rel="noopener noreferrer" className={`font-black text-base md:text-xl 2xl:text-2xl text-white sm:hover:underline cursor-pointer`}>
+        <div className="flex items-center gap-2 min-w-0">
+          <a 
+            href={playback.external_url} 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className={`font-black text-base md:text-xl 2xl:text-2xl text-white sm:hover:underline cursor-pointer truncate`}
+          >
             {playback.track}
           </a>
-
+          <span className="text-gray-400">•</span>
+          <p className={`text-md font-black 2xl:text-xl truncate`}>
+            {playback.artist_uri && (
+              <a
+                href={`https://open.spotify.com/artist/${playback.artist_uri.split(':')[2]}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white sm:hover:underline cursor-pointer"
+              >
+                {playback.artist}
+              </a>
+            )}
+          </p>
         </div>
-
-        <p className={`text-md font-black 2xl:text-xl`}>
-          by{' '}
-          {playback.artist_uri && (
-            <a
-              href={`https://open.spotify.com/artist/${playback.artist_uri.split(':')[2]}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-white sm:hover:underline cursor-pointer"
-            >
-              {playback.artist}
-            </a>
-          )}
-        </p>
-        <SpotifyLogo className="shrink-0"/>
+        <SpotifyLogo className="shrink-0 ml-2" />
       </div>
     );
   }

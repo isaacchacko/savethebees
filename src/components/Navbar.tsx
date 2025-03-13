@@ -33,9 +33,17 @@ export default function Navbar({
         </div>
         {showColorPalette && <ColorPaletteEditor />}
       </div>
-      
-      <ColorPaletteEditor className="absolute invisible w-0 h-0 pointer-events-none" />
-      {spotifyStatus && <SpotifyStatus condensed={true} className=""/>}
+
+      {/* Render ColorPaletteEditor invisibly */}
+      <div className="absolute invisible w-0 h-0 pointer-events-none">
+        <ColorPaletteEditor />
+      </div>
+
+      {spotifyStatus && (
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+          <SpotifyStatus condensed={true} className="mx-auto" />
+        </div>
+      )}
 
       <div className="flex justify-between gap-10 ml-10">
         {learnMorePath && (
@@ -46,7 +54,7 @@ export default function Navbar({
             Learn More &gt;
           </Link>
         )}
-        
+
         <div className="hidden sm:flex gap-10">
           <Link href="/projects" className={BASE_CLASS_NAME}>
             Projects

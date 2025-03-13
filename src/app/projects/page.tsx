@@ -17,13 +17,13 @@ export default function Home() {
     <div className="relative font-sans">
       <CanvasBackground numBees={numBees} spawnRadius={spawnRadius} />
 
-      <div className="relative flex flex-col min-h-screen justify-start">
+      <div className="pointer-events-none relative flex flex-col min-h-screen justify-start">
         <Navbar showColorPalette={false} learnMorePath="/tracking" />
 
         <div className="slide-down-fade-in flex flex-col w-full max-w-4xl mx-auto p-4 md:p-8 my-8 backdrop-blur-sm relative bg-(--spotify-background) rounded-lg shadow">
           <div className="flex flex-col-reverse md:flex-row items-center justify-between gap-8">
             {/* About Me Text */}
-            <div className="text-base leading-relaxed text-center md:text-left">
+            <div className="pointer-events-auto text-base leading-relaxed text-center md:text-left">
               <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl text-(--primary-color) font-black pb-1 md:pb-6">
                 In Progress!
               </h2>
@@ -34,7 +34,7 @@ export default function Home() {
 
             {/* Flip Card Container */}
             <div
-              className="relative perspective w-[250px] sm:w-[400px] md:w-[600px] lg:w-[800px]"
+              className="pointer-events-auto relative perspective w-[250px] sm:w-[400px] md:w-[600px] lg:w-[800px]"
               onClick={() => setIsFlipped(!isFlipped)}
             >
               {/* Inner Card */}
