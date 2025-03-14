@@ -145,14 +145,16 @@ export default function SpotifyStatus({ condensed, className }: SpotifyStatusPro
           </a>
 
           <p className="hidden md:flex text-md font-black 2xl:text-xl truncate">
-            <a
-              href={`https://open.spotify.com/artist/${playback.artist_uri.split(':')[2]}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-white sm:hover:underline cursor-pointer"
-            >
-              {playback.artist}
-            </a>
+            {playback.artist_uri && (
+              <a
+                href={`https://open.spotify.com/artist/${playback.artist_uri.split(':')[2]}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white sm:hover:underline cursor-pointer"
+              >
+                {playback.artist}
+              </a>
+            )}
           </p>
         </div>
         <SpotifyLogo className="shrink-0 ml-2" />
