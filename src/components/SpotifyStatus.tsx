@@ -4,6 +4,8 @@ import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import SpotifyLogo from './SpotifyLogo';
 
+const BASE_CLASS_NAME = "relative p-2 bg-(--spotify-background) rounded-lg shadow slide-down-fade-in";
+
 interface HeaderProps {
   className?: string;
   text: string;
@@ -22,7 +24,7 @@ const Header = ({
           href={href}
           target="_blank"
           rel="noopener noreferrer"
-          className="font-black text-white sm:hover:underline cursor-pointer"
+          className="font-black text-white hover:underline cursor-pointer"
         >
           {text}
         </a>
@@ -55,15 +57,13 @@ interface SpotifyStatusProps {
     navRef?: React.RefObject<HTMLElement>;
 }
 
-export default function SpotifyStatus({ condensed, className, navRef }: SpotifyStatusProps) {
-  const BASE_CLASS_NAME = `relative p-2 bg-(--spotify-background) rounded-lg shadow ${className}`;
+export default function SpotifyStatus({ condensed, className }: SpotifyStatusProps) {
+  const combinedClassName = BASE_CLASS_NAME + " " + className;
   const [playback, setPlayback] = useState<PlaybackState | null>(null);
   const [localProgress, setLocalProgress] = useState(0);
   const [localDuration, setLocalDuration] = useState(0);
-  const [shouldAnimate, setShouldAnimate] = useState(true);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
     const fetchPlaybackData = async () => {
       try {
         const res = await fetch('/api/spotify/now-playing');
@@ -81,7 +81,7 @@ export default function SpotifyStatus({ condensed, className, navRef }: SpotifyS
     };
 
     fetchPlaybackData(); // Initial fetch
-    interval = setInterval(fetchPlaybackData, 15000); // Fetch every 15 seconds
+    const interval = setInterval(fetchPlaybackData, 15000); // Fetch every 15 seconds
     return () => clearInterval(interval); // Cleanup interval on unmount
   }, []);
 
@@ -110,13 +110,13 @@ export default function SpotifyStatus({ condensed, className, navRef }: SpotifyS
   if (!playback || !playback.is_playing) {
     if (condensed) {
       return (
-        <div className={`${BASE_CLASS_NAME} ${shouldAnimate ? 'slide-down-fade-in' : 'opacity-0'}`}>
+        <div className={combinedClassName}>
           <Header text="Not playing" />
         </div>
       );
     }
     return (
-      <div className={`${BASE_CLASS_NAME} ${shouldAnimate ? 'slide-down-fade-in' : 'opacity-0'}`}>
+      <div className={combinedClassName}>
         <Header text="I'm not listening to anything..." />
       </div>
     );
@@ -124,42 +124,35 @@ export default function SpotifyStatus({ condensed, className, navRef }: SpotifyS
 
   if (condensed) {
     return (
-      <div 
-        className={`${BASE_CLASS_NAME} mx-4 flex flex-row gap-2 items-center ${
-shouldAnimate ? 'slide-down-fade-in' : 'opacity-0'
-} sm:flex flex-shrink-0 overflow-x-auto scrollbar-hide`} 
-        style={{ pointerEvents: 'auto', maxWidth: 'calc(100vw - 2rem)' }}
-      >
+      <div className={`${combinedClassName} truncate mx-auto flex flex-row gap-2 items-center`}>
         {playback?.image && (
           <Image
             src={playback.image}
             alt="Album cover"
-            width={40}
-            height={40}
-            className="shrink-0 hidden 2xl:block rounded-lg object-cover"
+            width={100}
+            height={100}
+            className="pulse-border shrink-1 rounded-lg object-cover"
           />
         )}
-        <div className="flex items-center gap-2 min-w-0">
+        <div className="hidden md:block flex items-center gap-2 min-w-0">
           <a 
             href={playback.external_url} 
             target="_blank" 
             rel="noopener noreferrer" 
-            className={`font-black text-base md:text-xl 2xl:text-2xl text-white sm:hover:underline cursor-pointer truncate`}
+            className="font-black text-base md:text-xl 2xl:text-2xl text-white sm:hover:underline cursor-pointer truncate"
           >
             {playback.track}
           </a>
-          <span className="text-gray-400">•</span>
-          <p className={`text-md font-black 2xl:text-xl truncate`}>
-            {playback.artist_uri && (
-              <a
-                href={`https://open.spotify.com/artist/${playback.artist_uri.split(':')[2]}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white sm:hover:underline cursor-pointer"
-              >
-                {playback.artist}
-              </a>
-            )}
+
+          <p className="hidden md:flex text-md font-black 2xl:text-xl truncate">
+            <a
+              href={`https://open.spotify.com/artist/${playback.artist_uri.split(':')[2]}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white sm:hover:underline cursor-pointer"
+            >
+              {playback.artist}
+            </a>
           </p>
         </div>
         <SpotifyLogo className="shrink-0 ml-2" />
@@ -168,10 +161,10 @@ shouldAnimate ? 'slide-down-fade-in' : 'opacity-0'
   }
 
   return (
-    <div className={`${BASE_CLASS_NAME} w-full ${shouldAnimate ? 'slide-down-fade-in' : 'opacity-0'}`} style={{ pointerEvents: 'auto' }}>
+    <div className={`${combinedClassName} w-full my-10 cursor-events-auto`}>
 
       <Header text="I'm currently listening to:" />
-      <div className="flex flex-row gap-4">
+      <div className="flex flex-col 2xl:flex-row gap-4">
 
         {/* Album art */}
         {playback?.image && (
@@ -180,7 +173,7 @@ shouldAnimate ? 'slide-down-fade-in' : 'opacity-0'
             alt="Album cover"
             width={256}
             height={256}
-            className="hidden 2xl:block rounded-lg object-cover"
+            className="pulse-border rounded-lg object-cover"
           />
         )}
 

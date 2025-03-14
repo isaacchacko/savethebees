@@ -137,3 +137,15 @@ transform: rotateY(180deg);
 .scrollbar-thin::-webkit-scrollbar-track {
   background-color: #eee;
 }
+
+@keyframes border-pulsate {
+    0%   { border-color: rgba(30, 215, 96, 0.9); }
+    50%  { border-color: rgba(30, 215, 96, 0.3); }
+    100%   { border-color: rgba(30, 215, 96, 0.9); }
+}
+
+.pulse-border {
+    border: 3px solid;
+    border-color: #1ED760;
+    animation: border-pulsate 2s ease-in-out infinite;
+}

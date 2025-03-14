@@ -3,7 +3,7 @@ export default function StravaLogo({ className }: { className?: string }) {
     <svg
       role="img"
       viewBox="0 0 512 512"
-      className={"w-6 h-6" + className}
+      className={"w-12 h-12" + className}
       xmlns="http://www.w3.org/2000/svg"
       aria-label="Strava"
     >
