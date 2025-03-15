@@ -91,7 +91,7 @@ const RunningStats = () => {
             continue;
           }
 
-          throw new Error(`Failed to fetch activities: ${response.status} ${response.statusText}`);
+          throw new Error(`Failed to fetch activities. Reload the page and try again. ${response.status} ${response.statusText}`);
         }
 
         const data: Activity[] = await response.json();

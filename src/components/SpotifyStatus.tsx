@@ -163,7 +163,7 @@ export default function SpotifyStatus({ condensed, className }: SpotifyStatusPro
   }
 
   return (
-    <div className={`${combinedClassName} w-full my-10 cursor-events-auto`}>
+    <div className={`${combinedClassName} w-full my-10 pointer-events-auto`}>
 
       <Header text="I'm currently listening to:" />
       <div className="flex flex-col 2xl:flex-row gap-4">
