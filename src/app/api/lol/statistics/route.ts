@@ -41,7 +41,7 @@ async function calculateAverageCSPerMinute(puuid: string) {
       
       if (!match.info?.participants) continue;
 
-      const participant = match.info.participants.find((p: { queueType: string }) => p.puuid === puuid);
+      const participant = match.info.participants.find((p: { puuid: string }) => p.puuid === puuid);
       if (participant) {
         const totalCS = participant.totalMinionsKilled + participant.neutralMinionsKilled;
         const gameMinutes = match.info.gameDuration / 60;
