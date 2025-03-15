@@ -149,3 +149,7 @@ transform: rotateY(180deg);
     border-color: #1ED760;
     animation: border-pulsate 2s ease-in-out infinite;
 }
+
+.info {
+    border: 1000 solid rgba(0,0,0,0.9);
+}

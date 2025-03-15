@@ -10,7 +10,7 @@ export default function Home() {
   const spawnRadius = 100;
 
   return (
-    <div className="relative font-sans">
+    <div className="relative font-sans mb-10"> {/* because the info modal is too close to ground */}
       <CanvasBackground numBees={numBees} spawnRadius={spawnRadius} />
 
       <div className="relative flex flex-col z-20 min-h-screen" style={{ pointerEvents: 'none' }}>
@@ -21,5 +21,6 @@ export default function Home() {
         <Hero />
       </div>
     </div>
+
   );
 }
