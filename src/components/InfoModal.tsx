@@ -11,7 +11,7 @@ const InfoModal = () => {
     FlyingTriangles: <FlyingTriangles />,
   };
 
-  const openModal = (key) => {
+  const openModal = (key: keyof typeof componentMap) => {
     setComponentKey(key);
     setIsOpen(true);
   };
@@ -22,7 +22,7 @@ const InfoModal = () => {
   };
 
   useEffect(() => {
-    const handleEscape = (event) => {
+    const handleEscape = (event : {key: string}) => {
       if (event.key === 'Escape') closeModal();
     };
     window.addEventListener('keydown', handleEscape);
@@ -31,7 +31,7 @@ const InfoModal = () => {
 
   return (
     <>
-      <div className="flex flex-col lg:flex-row mt-10 gap-2 italic text-(--primary-color) font-black">
+      <div className="flex flex-col lg:flex-row mt-10 gap-2 text-(--primary-color) font-black">
         <a
           className="hover:underline pointer-events-auto cursor-pointer"
           onClick={() => openModal("HowWebsite")}
@@ -52,7 +52,7 @@ const InfoModal = () => {
           onClick={closeModal}
         >
           <div
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => e.stopPropagation()}
           >
             {componentKey && componentMap[componentKey]}
           </div>
