@@ -24,7 +24,7 @@ async function getRank(summonerId: string) {
   );
   if (!response.ok) throw new Error(`Rank Request Failed: ${response.statusText}`);
   const data = await response.json();
-  return data.find(entry => entry.queueType === "RANKED_SOLO_5x5") || {};
+  return data.find((entry: { queueType: string }) => entry.queueType === "RANKED_SOLO_5x5") || {};
 }
 
 async function calculateAverageCSPerMinute(puuid: string) {
