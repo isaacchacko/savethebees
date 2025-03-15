@@ -4,7 +4,7 @@ import FlyingTriangles from '@/components/FlyingTriangles';
 
 const InfoModal = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [componentKey, setComponentKey] = useState(null);
+  const [componentKey, setComponentKey] = useState<keyof typeof componentMap | null>(null);
 
   const componentMap = {
     HowWebsite: <HowWebsite />,
