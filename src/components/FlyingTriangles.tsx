@@ -1,14 +1,13 @@
-
 import React from 'react';
 
 const FlyingTriangles = () => {
   return (
-    <div className="">
-      <h2 className="whitespace-nowrap text-2xl font-bold mb-4">What are the flying triangles?</h2>
+    <div className="w-full flex flex-col gap-4">
+      <h2 className="text-2xl font-bold">What are the flying triangles?</h2>
       <div className="text-(--primary-color) leading-relaxed">
-        These flying triangles are called <p className="text-white inline">Boids</p>, an artifical life program that mimicks the flocking patterns of birds. Each ship can only &quot;see&quot; ships in small radius from itself. Each ship is dumb, but by following three simple rules <p className="text-white inline">(Separation, Alignment, Cohesion)</p>, the ships coalesce into flocks, resembling an intelligent body. <p className="text-white inline">Try clicking and holding on the background!</p>
+        These flying triangles are called <span className="text-white">Boids</span>, an artificial life program that mimics the flocking patterns of birds. Each ship can only &quot;see&quot; ships in a small radius from itself. Each ship is simple, but by following three basic rules <span className="text-white">(Separation, Alignment, Cohesion)</span>, the ships coalesce into flocks, resembling an intelligent body. <span className="text-white">Try clicking and holding on the background!</span>
       </div>
-      <div className="mt-5 italic">
+      <div className="italic">
         Click anywhere to exit...
       </div>
     </div>

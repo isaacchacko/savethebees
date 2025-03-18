@@ -22,7 +22,7 @@ const InfoModal = () => {
   };
 
   useEffect(() => {
-    const handleEscape = (event : {key: string}) => {
+    const handleEscape = (event: { key: string }) => {
       if (event.key === 'Escape') closeModal();
     };
     window.addEventListener('keydown', handleEscape);
@@ -31,13 +31,14 @@ const InfoModal = () => {
 
   return (
     <>
-      <div className="flex flex-col lg:flex-row mt-10 gap-2 text-(--primary-color) font-black">
+      <div className="flex flex-col italic lg:flex-row lg:divide-y-0 mt-10 gap-2 text-(--primary-color) font-black">
         <a
           className="hover:underline pointer-events-auto cursor-pointer"
           onClick={() => openModal("HowWebsite")}
         >
           How&apos;d you make the website?
         </a>
+        <div className="bg-gray-400 w-full h-1 lg:hidden rounded-lg"></div>
         <span className="text-gray-400 hidden lg:flex">•</span>
         <a
           className="hover:underline pointer-events-auto cursor-pointer"
@@ -47,11 +48,10 @@ const InfoModal = () => {
         </a>
       </div>
       {isOpen && (
-        <div
-          className="info bg-clip-padding bg-black fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col p-6 rounded-lg w-full-1/3 pointer-events-auto"
-          onClick={closeModal}
-        >
+        <div className="absolute info bg-clip-padding flex items-center justify-center pointer-events-auto"
+          onClick={closeModal}>
           <div
+            className="bg-black p-6 rounded-lg w-1/3 min-w-[300px] max-w-[90vw]" // i hate how this is arbitrary but whatever
             onClick={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => e.stopPropagation()}
           >
             {componentKey && componentMap[componentKey]}

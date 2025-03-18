@@ -151,5 +151,6 @@ transform: rotateY(180deg);
 }
 
 .info {
-    border: 1000 solid rgba(0,0,0,0.9);
+    border: 1000 solid rgba(0,0,0,0.5);
+    background-clip: padding-box;
 }
