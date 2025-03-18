@@ -24,7 +24,7 @@ export default function Home() {
                 Tracking
               </h2>
               <p className="text-sm sm:text-base md:text-lg lg:text-xl">
-                When life get hectic, you write it down. Here is my digitial scrapbook of anything I care to track.
+                When life gets hectic, you write it down. Here is my digitial scrapbook of anything I care to track.
               </p>
             </div>
           </div>
