@@ -226,7 +226,7 @@ const RunningStats = () => {
   return (
     <div className="relative font-sans bg-(--spotify-background) rounded-lg shadow">
       <Header text="Running"/>
-      <p>I love to run! I&apos;ve ran two half-marathons in the past, one in SF and another in Houston. Although my next goal is to run a <i>full</i> marathon, I&apos;ve definitely fallen off. I will have to make up some ground before I&apos;m marathon ready. My goal for 2025 is to run 365 miles.</p>
+      <p>I love to run! I&apos;ve ran two half-marathons in the past, one in SF and another in Houston. Although my next goal is to run a <i>full</i> marathon, I&apos;ve definitely fallen off. I will have to make up some ground before I&apos;m marathon ready. My goal for 2025 is to run 365 miles. Below is a graph of my weekly progress. Each bar is a week of the year, and its length is my weekly mileage.</p>
       <hr className="mt-5 mb-5"></hr>
       {error ? (
         <p className="text-red-500 mb-4">{error}</p>
