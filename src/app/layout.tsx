@@ -1,4 +1,5 @@
 import { Manrope } from 'next/font/google';
+import { Analytics } from "@vercel/analytics/react"
 import './globals.css';
 
 const manrope = Manrope({
@@ -13,6 +14,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={manrope.className}>
+      <Analytics/>
       <body>
         {/* Shared base for all layouts */}
         {children}
