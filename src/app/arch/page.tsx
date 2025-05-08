@@ -192,9 +192,9 @@ export default function About() {
 
             <hr className="mt-5 mb-5"></hr>
 
-            <h2 id='pywal' className="text-2xl text-gray-300 font-medium italic mb-4">pywal</h2>
+            <h2 id='autowal' className="text-2xl text-gray-300 font-medium italic mb-4">autowal</h2>
             <p className="text-lg leading-loose mb-4">
-              <a target="_blank" href='https://github.com/dylanaraps/pywal' rel="noopener noreferrer" className="text-(--primary-color) underline underline-offset-2 hover:text-(--tertiary-color)">pywal</a> is what cinches my whole setup together. It is a color palette generator based on the current background image. So, when I refresh my i3 and receive a new wallpaper from wallhaven.cc, pywal will reactively generate the latest color palette and apply it to my system palette. This allows for literally any application on my computer to utilize the palette and thus reactively match my background. Works like a charm and something I recommend for anyone who is getting into ricing.
+              <a target="_blank" href='https://github.com/isaacchacko/autowal' rel="noopener noreferrer" className="text-(--primary-color) underline underline-offset-2 hover:text-(--tertiary-color)">autowal</a> is what cinches my whole setup together. It's a command line tool I developed myself to marry the aesthetics of wallpapers from wallhaven.cc and the color palette tools of pywal. On a keybind/system boot, autowal polls wallhaven.cc for the newest wallpapers with high ratings, and then reactively generate the latest color palette and apply it to my system. This allows for literally any application on my computer to utilize the palette and thus reactively match the colors found in my background. I recommend autowal for anyone who wants an easy, quick-to-use tool to make your rice better. You should check it out on my GitHub!
             </p>
           </div>
         </div>
