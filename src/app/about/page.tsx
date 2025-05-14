@@ -28,7 +28,7 @@ export default function Home() {
                 About Me
               </h2>
               <p className="text-sm sm:text-base md:text-lg lg:text-xl">
-                I&apos;m Isaac. I&apos;m CS/Applied Math Engineering Honors @ TAMU. Currently, I&apos;m developing for Dreamweavers, an indie puzzle platformer. For fun, I queue up League of Legends in the botlane, indulge in fantasy stories, train for the marathon, and eats lots of Blue Bell.</p>
+                I&apos;m Isaac. I&apos;m CS/Applied Math Engineering Honors @ TAMU and currently intern @ <a target="_blank" href="http://www.siso-eng.com" rel="noopener noreferrer" className="text-(--primary-color) underline underline-offset-2 hover:text-(--tertiary-color)">SISO</a>. On the side, I&apos;m developing for <a target="_blank" href='https://www.eulerelo.vercel.app' rel="noopener noreferrer" className="text-(--primary-color) underline underline-offset-2 hover:text-(--tertiary-color)">Eulerelo</a>, a competitive math platform. For fun, I play board games, train for the Cheveron marathon, and eat lots of Blue Bell.</p>
             </div>
 
             {/* Flip Card Container */}
