@@ -1,8 +1,8 @@
-import { Mansalva } from 'next/font/google';
+import { Manrope } from 'next/font/google';
 import { Analytics } from "@vercel/analytics/react"
 import './globals.css';
 
-const mansalva = Mansalva({
+const manrope = Manrope({
   weight: '400',
   subsets: ['latin'],
 });
@@ -13,7 +13,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={mansalva.className}>
+    <html lang="en" className={manrope.className}>
       <Analytics/>
       <body>
         {/* Shared base for all layouts */}
