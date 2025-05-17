@@ -16,7 +16,6 @@
     "@next/font": "^14.2.15",
     "@splidejs/react-splide": "^0.7.12",
     "@splidejs/splide-extension-auto-scroll": "^0.5.3",
-    "@uiw/react-color-wheel": "^2.4.1",
     "@vercel/analytics": "^1.5.0",
     "axios": "^1.8.2",
     "chart.js": "^4.4.8",
