@@ -5,7 +5,8 @@
 @layer theme {
   :root {
     --foreground: #ffffff;
-    --background: #323437;
+    /* --background: #323437; from original dark mode */
+    --background: #E6C77A;
     --primary-color: #10B981;
     --secondary-color: #059669;
     --tertiary-color: #047857;

@@ -48,7 +48,7 @@ export default function Navbar({
       <div className="fixed top-0 left-0 right-0 z-50">
         <nav 
           ref={navRef}
-          className="cursor-pointer flex justify-between items-center p-4 bg-(--spotify-background)/80 backdrop-blur-sm border-b border-gray-500" 
+          className="cursor-pointer flex justify-between items-center p-4" // bg-(--spotify-background)/80 backdrop-blur-sm border-b border-gray-500" 
           style={{ pointerEvents: 'auto' }}
         >
           <div className="flex flex-row items-center relative mr-10">
