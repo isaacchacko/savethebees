@@ -19,11 +19,10 @@ export default function Home() {
                 "Software Developer",
                 "Redbull Zealot",
                 "Half-Marathon Runner",
-                "Godot Developer",
                 "Hackathon Addict",
                 "CS Student",
                 "i3 User",
-                "Poker Junkie",
+                "Data Engineer",
               ]}
               interval={5000}
               className="text-2xl lg:text-4xl 2xl:text-6xl font-bold"

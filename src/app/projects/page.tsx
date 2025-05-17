@@ -36,11 +36,10 @@ export default function Home() {
 
           <div className="pointer-events-auto flex flex:w-col w-full max-w-4xl mx-auto p-4 md:p-8 mt-8 backdrop-blur-sm relative bg-(--spotify-background) rounded-lg shadow">
             <div className="text-base leading-relaxed">
-              <div className="flex flex-row jusitfy-center items">
+              <div className="flex flex-row jusitfy-center items-center">
 
                 <h2   className="font-black text-white text-2xl 2xl:text-4xl text-white text-bold cursor-pointer pb-2">
                   <a href="http://eulerelo.vercel.app" target="_blank" rel="noopener noreferrer" className="underline underline-offset-5 hover:text-(--primary-color)">
-
                     Eulerelo
                   </a>
 
