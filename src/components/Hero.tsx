@@ -25,8 +25,8 @@ import { PiLineVerticalBold } from "react-icons/pi";
 export default function Home() {
   return (
     <>
-      <div className='px-8 sm:p-none flex flex-col items-center justify-center w-screen'>
-          <div className="w-full xl:w-1/2 flex flex-col items-start gap-3">
+      <div className='px-4 sm:p-none flex flex-col items-center justify-center w-screen h-screen'>
+          <div className="w-full lg:w-1/2 flex flex-col items-start gap-3">
             <h1 className="text-2xl sm:text-4xl md:text-6xl title-slide-down-fade-in font-bold">
               Howdy! I&apos;m Isaac.
 

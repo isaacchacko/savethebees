@@ -54,9 +54,14 @@ export default function TextCycler (
         isNewTab={isNewTabs[index % texts.length]}
         className={` ${textClassName} absolute inset-0 flex items-center justify-start  ${isMoving ? 'animate-drop-out' : ''}`}
       />
-      <div className={` ${textClassName} absolute inset-0 flex items-center justify-start  ${isMoving ? 'animate-drop-in' : 'invisible'}`}>
-        {texts[(index+1) % texts.length]}
-      </div>
+
+      <HeroLink
+        href={hrefs[(index + 1) % texts.length]}
+        text={texts[(index + 1) % texts.length]}
+        isNewTab={isNewTabs[(index + 1) % texts.length]}
+        className={` ${textClassName} absolute inset-0 flex items-center justify-start  ${isMoving ? 'animate-drop-in' : 'invisible'}`}
+      />
+
     </div>
   );
 }
