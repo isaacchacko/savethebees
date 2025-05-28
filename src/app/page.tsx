@@ -11,7 +11,7 @@ export default function Home() {
 
   return (
     <div className="absolute top-0 left-0 font-sans w-screen h-screen">
-      <Navbar spotifyStatus={false} learnMorePath="/about" />
+      <Navbar />
       <CanvasBackground numBees={numBees} spawnRadius={spawnRadius} />
       <Hero />
     </div>

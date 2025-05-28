@@ -1,6 +1,6 @@
 'use client'; // Required for client-side interactivity
 
-import { ms } from "@public/fonts.ts";
+import { ms } from "@public/fonts";
 import { useState, useEffect, useRef } from "react";
 import Link from 'next/link';
 import ColorPaletteEditor from './ColorPaletteEditor';

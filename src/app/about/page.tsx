@@ -16,7 +16,7 @@ export default function Home() {
   return (
     <div className="relative font-sans">
       <CanvasBackground numBees={numBees} spawnRadius={spawnRadius} />
-      <Navbar showColorPalette={false} learnMorePath="/projects" />
+      <Navbar />
 
       <div className="slide-down-fade-in relative flex flex-col min-h-screen justify-start pointer-events-none">
 

@@ -1,7 +1,7 @@
 import { Mansalva } from 'next/font/google';
 import { Analytics } from "@vercel/analytics/react"
 import './globals.css';
-import { gr } from "@public/fonts.ts";
+import { gr } from "@public/fonts";
 
 export default function RootLayout({
   children,

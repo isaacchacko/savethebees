@@ -27,7 +27,7 @@ export default function TextCycler (
   
   // black magic
   const [containerWidth, setContainerWidth] = useState(0);
-  const timeoutRef = useRef<number>();
+  const timeoutRef = useRef<NodeJS.Timeout | number | null>(null);
   
   useEffect(() => {
 
@@ -41,7 +41,7 @@ export default function TextCycler (
 
     return () => {
       clearInterval(intervalID);
-      clearTimeout(timeoutRef.current);
+      clearTimeout(timeoutRef.current);  // TODO
     };
   }, [] // means that it will run on mount and umount
   );
