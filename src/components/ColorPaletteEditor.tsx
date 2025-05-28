@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import Reset from './Reset';
 import useLocalStorageMulti from '@/hooks/useLocalStorageMulti';
+import { BiPalette, BiX} from 'react-icons/bi';
 
 const DEFAULT_COLOR = "#10B981";
 const ACCENT_COLORS = [
-  "#10B981", // emerald
+  "#E60000",
+  "#FF781F",
+  "#e6ac00",
+  "#69b647",
   "#3B82F6", // blue
-  "#F59E0B", // amber
-  "#EF4444", // red
   "#8B5CF6", // violet
+  "#10B981", // emerald
 ];
 
 const COLOR_KEYS = [
@@ -17,13 +19,6 @@ const COLOR_KEYS = [
   'secondary-color',
   'tertiary-color',
 ]
-
-interface HSVColor {
-  h: number;
-  s: number;
-  v: number;
-  a: number;
-}
 
 interface ColorDict {
   [key: string]: string; // a dictionary string -> color strings
@@ -54,13 +49,6 @@ export default function ColorPaletteEditor({className=""}: {className?: string})
     );
   }, [colorDict]);
 
-  const resetColor = () => {
-    const defaultColorHex = getComputedStyle(document.documentElement)
-    .getPropertyValue("--default-primary-color").trim();
-
-    applyColor(defaultColorHex);
-  };
-
   const applyColor = (hex: string) => {
     COLOR_KEYS.forEach(
       (key, index) => { // crazy that the second parameter is always an index
@@ -78,31 +66,33 @@ export default function ColorPaletteEditor({className=""}: {className?: string})
 
   return (
     <>
-      <div className={className + "slide-down-fade-in ml-3 relative flex flex-row p-3 pl-0 items-center overflow-hidden"}>
+      <div className={className + "relative flex flex-row pl-0 items-center"}>
 
-        {/* Color Swatch */}
-        <div
-          className={`w-10 h-10 bg-(--primary-color) flex-none z-20 cursor-pointer border-2 border-gray-300 rounded transition-transform duration-300 hover:scale-100 transition-all duration-300`}
-          onClick={() => setVisible(!visible)}
-        />
+        <div className='z-20 cursor-pointer w-10 h-10 scale-80 hover:scale-100 duration-300' onClick={() => setVisible(!visible)}>
+          {!(visible) && (<BiPalette className="w-10 h-10 cursor-pointer scale-80 hover:scale-100 duration-300"/>)}
+          {visible && (<BiX className="w-10 h-10 cursor-pointer scale-80 hover:scale-100 duration-300" />)}
 
-        <div className={`flex items-center transition-transform duration-300 z-0 ${visible ? 'translate-x-0' : '-translate-x-80'}`}>
-          <Reset onReset={resetColor}/>
-          {
-            ACCENT_COLORS.map(
-              color => {
-                return <div 
-                  key={color}
-                  onClick={() => applyColor(color)}
-                  className="w-8 h-8 rounded-full cursor-pointer border-2 border-gray-300 hover:scale-110 transition-transform mr-2"
-                  style={{ backgroundColor: color }}
-                />
-              }
-            )
-          }
+        </div>
+      
+        <div className="overflow-hidden">
+          <div className={`flex items-center transition-transform duration-300 ${visible ? 'translate-x-0' : '-translate-x-90'}` }>
+            {
+              ACCENT_COLORS.map(
+                color => {
+                  return <div 
+                    key={color}
+                    onClick={() => applyColor(color)}
+                    className="w-8 h-8 rounded-full cursor-pointer border-2 border-gray-50 dark:border-none scale-80 hover:scale-100 transition-transform mr-2"
+                    style={{ backgroundColor: color }}
+                  />
+                }
+              )
+            }
+          </div>
+
         </div>
 
-      </div>
+        </div>
     </>
   );
 }

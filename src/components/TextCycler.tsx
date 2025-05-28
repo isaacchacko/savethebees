@@ -1,117 +1,61 @@
 'use client';
-import { useState, useEffect, useRef } from "react";
 
-export default function TextCycler({
-  texts,
-  interval = 3000,
-  className = "",
-}: {
-  texts: string[];
-  interval?: number;
-  className?: string;
-}) {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [isExiting, setIsExiting] = useState(false);
-  const [containerWidth, setContainerWidth] = useState(566.167);
-  const textRef = useRef<HTMLDivElement>(null);
-  const resizeObserverRef = useRef<ResizeObserver | null>(null);
+import React, { useState, useEffect, useRef } from 'react';
+import HeroLink from '@/components/HeroLink';
 
-  const updateWidth = () => {
-    if (textRef.current) {
-      const rect = textRef.current.getBoundingClientRect();
-      setContainerWidth(rect.width);
-    }
-  };
-
+export default function TextCycler (
+  { 
+    texts,
+    hrefs,
+    isNewTabs,
+    interval=5000,
+    divClassName="",
+    textClassName="" 
+  } :
+  { 
+    texts: string[];
+    hrefs: string[];
+    isNewTabs: boolean[];
+    interval?: number;
+    divClassName?: string;
+    textClassName?: string;
+  }
+) {
+  
+  const [index, setIndex] = useState(0);
+  const [isMoving, setIsMoving] = useState(false);
+  
+  // black magic
+  const [containerWidth, setContainerWidth] = useState(0);
+  const timeoutRef = useRef<number>();
+  
   useEffect(() => {
-    const handleResize = () => requestAnimationFrame(updateWidth);
-    window.addEventListener("resize", handleResize);
 
-    resizeObserverRef.current = new ResizeObserver(entries => {
-      for (const entry of entries) {
-        const { width } = entry.contentRect;
-        setContainerWidth(width);
-      }
-    });
-
-    if (textRef.current) {
-      resizeObserverRef.current.observe(textRef.current);
-    }
+    const intervalID = setInterval(() => {
+      setIsMoving(true);
+      timeoutRef.current = setTimeout(() => {
+        setIndex(prev => prev + 1);
+        setIsMoving(false); 
+      }, 500);
+    }, interval);
 
     return () => {
-      window.removeEventListener("resize", handleResize);
-      resizeObserverRef.current?.disconnect();
+      clearInterval(intervalID);
+      clearTimeout(timeoutRef.current);
     };
-  }, []);
-
-  useEffect(() => {
-    const measureNextWidth = (text: string) => {
-      if (!textRef.current) return 0;
-      const tempEl = document.createElement("div");
-      const styles = window.getComputedStyle(textRef.current);
-
-      // Copy relevant styles
-      tempEl.style.font = styles.font;
-      tempEl.style.fontSize = styles.fontSize;
-      tempEl.style.fontWeight = styles.fontWeight;
-      tempEl.style.letterSpacing = styles.letterSpacing;
-      tempEl.style.whiteSpace = "nowrap";
-      tempEl.style.visibility = "hidden";
-      tempEl.style.position = "absolute";
-      tempEl.style.left = "-9999px";
-
-      tempEl.textContent = text;
-      document.body.appendChild(tempEl);
-      const width = tempEl.getBoundingClientRect().width;
-      document.body.removeChild(tempEl);
-      return width;
-    };
-
-    const cycle = () => {
-      const nextIndex = (activeIndex + 1) % texts.length;
-      const nextText = texts[nextIndex];
-      const currentWidth = containerWidth;
-      const nextWidth = measureNextWidth(nextText);
-
-      if (nextWidth > currentWidth) {
-        // Longer text: Resize -> Animate -> Update
-        setContainerWidth(nextWidth);
-        setTimeout(() => {
-          setIsExiting(true);
-          setTimeout(() => {
-            setActiveIndex(nextIndex);
-            setIsExiting(false);
-          }, 500);
-        }, 300); // Match CSS transition duration
-      } else {
-        // Shorter/same text: Animate -> Update -> Resize
-        setIsExiting(true);
-        setTimeout(() => {
-          setActiveIndex(nextIndex);
-          setIsExiting(false);
-          requestAnimationFrame(updateWidth);
-        }, 500);
-      }
-    };
-
-    const intervalId = setInterval(cycle, interval);
-    return () => clearInterval(intervalId);
-  }, [texts, interval, activeIndex, containerWidth]);
+  }, [] // means that it will run on mount and umount
+  );
 
   return (
-    <div
-      className={`relative h-[1.2em] text-(--primary-color) items-center whitespace-nowrap transition-[width] duration-300 ${className}`}
-      style={{ width: containerWidth }}
-    >
-      <div 
-        ref={textRef}
-        className={`absolute ${isExiting ? "animate-drop-out" : ""}`}
-      >
-        {texts[activeIndex]}
-      </div>
-      
-      <div className={`absolute ${isExiting ? "animate-drop-in" : "invisible"}`}>
-        {texts[(activeIndex + 1) % texts.length]}
+    <div className={"relative overflow-hidden text-nowrap h-[1em]" + divClassName}>
+      <HeroLink
+        href={hrefs[index % texts.length]}
+        text={texts[index % texts.length]}
+        isNewTab={isNewTabs[index % texts.length]}
+        className={` ${textClassName} absolute inset-0 flex items-center justify-start  ${isMoving ? 'animate-drop-out' : ''}`}
+      />
+      <div className={` ${textClassName} absolute inset-0 flex items-center justify-start  ${isMoving ? 'animate-drop-in' : 'invisible'}`}>
+        {texts[(index+1) % texts.length]}
       </div>
     </div>
   );

@@ -6,13 +6,17 @@
   :root {
     --foreground: #ffffff;
     /* --background: #323437; from original dark mode */
-    --background: #E6C77A;
+    --background: #E6D29F;
     --primary-color: #10B981;
     --secondary-color: #059669;
     --tertiary-color: #047857;
     --default-primary-color: #10B981;
     --spotify-foreground: #1ED760;
     --spotify-background: #121212;
+  }
+
+  .dark {
+    --background: oklch(12.9% 0.042 264.695);
   }
 }
 
@@ -26,28 +30,38 @@ body {
   background: var(--background);
 }
 
-/* Allow pointer events through overlays */
-nav, .overlay-element {
-  pointer-events: none;
+.clickable-elements {
+  pointer-events: auto;
 }
 
-
 @keyframes drop-out {
-  0% { transform: translateY(0); opacity: 1; }
-  100% { transform: translateY(1.5rem); opacity: 0; }
+  0% {
+  transform: translateY(0);
+    opacity: 1;
+}
+  100% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
 }
 
 @keyframes drop-in {
-  0% { transform: translateY(-1.5rem); opacity: 0; }
-  100% { transform: translateY(0); opacity: 1; }
+  0% { 
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .animate-drop-out {
-  animation: drop-out 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: drop-out 0.5s ease-in-out forwards;
 }
 
 .animate-drop-in {
-  animation: drop-in 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: drop-in 0.5s ease-in-out forwards;
 }
 
 .invisible {
@@ -73,7 +87,7 @@ nav, .overlay-element {
 /* Define the keyframes */
 @keyframes slideDownFadeIn {
   0% {
-    transform: translateY(-20px); /* Start slightly above */
+    transform: translateY(20px); /* Start slightly above */
     opacity: 0; /* Fully transparent */
   }
   100% {
@@ -82,12 +96,17 @@ nav, .overlay-element {
   }
 }
 
+.title-slide-down-fade-in {
+  animation: slideDownFadeIn 0.4s ease-out forwards;
+  opacity: 0;
+  animation-delay: 500ms;
+}
+
 /* Create the animation class */
 .slide-down-fade-in {
-  animation: slideDownFadeIn 1.5s ease-out forwards;
-  opacity: 0; /* Start invisible */
-  animation-delay: 500ms; /* Match the JS delay */
-  
+  animation: slideDownFadeIn 0.4s ease-out forwards;
+  opacity: 0;
+  animation-delay: 1000ms;
 }
 
 .wait-longer {

@@ -166,7 +166,7 @@ export default function SpotifyStatus({ condensed, className }: SpotifyStatusPro
     <div className={`${combinedClassName} w-full my-10 pointer-events-auto`}>
 
       <Header text="I'm currently listening to:" />
-      <div className="flex flex-col 2xl:flex-row gap-4">
+      <div className="flex flex-col xl:flex-row gap-4">
 
         {/* Album art */}
         {playback?.image && (
@@ -175,7 +175,7 @@ export default function SpotifyStatus({ condensed, className }: SpotifyStatusPro
             alt="Album cover"
             width={256}
             height={256}
-            className="pulse-border rounded-lg object-cover"
+            className="pulse-border rounded-lg object-cover max-w-1/3"
           />
         )}
 
@@ -184,13 +184,13 @@ export default function SpotifyStatus({ condensed, className }: SpotifyStatusPro
           <div>
 
             {/* Track info */}
-            <div className="flex-1 space-y-2 overflow-ellipsis text-white">
+            <div className="flex-1 space-y-2 text-white">
               <div>
                 <a
                   href={playback.external_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-black text-xl md:text-4xl 2xl:text-4xl text-white sm:hover:underline cursor-pointer"
+                  className="overflow-hidden font-black text-xl md:text-4xl 2xl:text-4xl text-white sm:hover:underline cursor-pointer"
                 >
                   {playback.track}
                 </a>

@@ -1,11 +1,7 @@
 import { Mansalva } from 'next/font/google';
 import { Analytics } from "@vercel/analytics/react"
 import './globals.css';
-
-const mansalva = Mansalva({
-  weight: '400',
-  subsets: ['latin'],
-});
+import { gr } from "@public/fonts.ts";
 
 export default function RootLayout({
   children,
@@ -13,7 +9,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={mansalva.className}>
+    <html lang="en" className={gr.className}>
       <Analytics/>
       <body>
         {/* Shared base for all layouts */}
