@@ -75,7 +75,7 @@ export default function About() {
     <div className="relative font-sans">
       <CanvasBackground numBees={numBees} spawnRadius={spawnRadius} />
 
-      <Navbar showColorPalette={false} learnMorePath="/arch" />
+      <Navbar />
       <div className="slide-down-fade-in relative flex flex-col min-h-screen justify-start pointer-events-none">
 
         <div className="flex flex-col w-full max-w-4xl mx-auto p-4 md:p-8 mt-8 backdrop-blur-sm relative bg-(--spotify-background) rounded-lg shadow pointer-events-auto">

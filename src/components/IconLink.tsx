@@ -2,6 +2,10 @@
 import React from "react";
 import Link from 'next/link';
 
+interface T {
+  className?: string;
+}
+
 export default function HeroLink(
   {
     IconComponent,

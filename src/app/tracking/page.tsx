@@ -15,7 +15,7 @@ export default function Home() {
       <CanvasBackground numBees={numBees} spawnRadius={spawnRadius} />
 
       <div className="pointer-events-none relative flex flex-col min-h-screen justify-start">
-        <Navbar showColorPalette={false} learnMorePath="/arch" />
+        <Navbar />
       
         <div className="slide-down-fade-in">
           <div className="pointer-events-auto flex flex-col w-full max-w-4xl mx-auto p-4 md:p-8 mt-8 backdrop-blur-sm relative bg-(--spotify-background) rounded-lg shadow">
