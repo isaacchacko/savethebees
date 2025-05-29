@@ -26,12 +26,12 @@ export default function Home() {
   return (
     <>
       <div className='px-8 sm:p-none flex flex-col items-center justify-center w-screen'>
-          <div className="w-full xl:w-1/2 flex flex-col items-start gap-3">
-            <h1 className="text-2xl sm:text-4xl md:text-6xl title-slide-down-fade-in font-bold">
+          <div className="w-full sm:w-1/2 flex flex-col items-center gap-3">
+            <h1 className=" text-center text-2xl sm:text-4xl md:text-6xl title-slide-down-fade-in font-bold">
               Howdy! I&apos;m Isaac.
 
             </h1>
-            <p className=" text-md sm:text-xl md:text-2xl lg:text-4xl slide-down-fade-in font-light">
+            <p className=" text-center text-md sm:text-xl md:text-2xl lg:text-4xl slide-down-fade-in font-light">
               I'm a computer science major{' '}
             <HeroLink text="&#64;TAMU" href="https://www.tamu.edu" />{' '}
               and intern{' '}
@@ -41,8 +41,8 @@ export default function Home() {
             {/* TextCycler Container */}
 
             {/* Wrapping text container */}
-            <div className="slide-down-fade-in text-md sm:text-xl md:text-2xl lg:text-4xl font-light">
-              Want more? I'm also a
+            <div className="text-center slide-down-fade-in text-md sm:text-xl md:text-2xl lg:text-4xl font-light">
+              Want more? I'm also a{' '}
               <TextCycler
                 texts={[
                   "Half-Marathon Runner.",
@@ -66,12 +66,12 @@ export default function Home() {
                   false
                 ]}
 
-                divClassName="slide-down-fade-in mx-2 inline"
-                textClassName="sm:text-4xl font-bold underline text-(--primary-color)"
+                divClassName=" translate-y-[0.4rem] slide-down-fade-in inline-block "
+                textClassName=" text-md sm:text-xl md:text-2xl lg:text-4xl font-bold underline text-(--primary-color) "
               />
             </div>
 
-            <div className="slide-down-fade-in flex flex-row justify-start">
+            <div className="slide-down-fade-in flex flex-row justify-center w-full ">
               <IconLink IconComponent={AiOutlineLinkedin} href='https://www.linkedin.com/in/isaacchacko' isNewTab={true} />
               <IconLink IconComponent={BiFile} href='/Isaac_Chacko.pdf' isNewTab={true} />
               <IconLink IconComponent={FiGithub} href='https://www.github.com/isaacchacko' isNewTab={true} />
@@ -93,7 +93,7 @@ export default function Home() {
                 <BiMoon className="hidden dark:block visible w-10 h-10 cursor-pointer scale-80 hover:scale-100 duration-300" />
                 <BiSun className="dark:hidden block w-10 h-10 cursor-pointer scale-80 hover:scale-100 duration-300" />
               </button>
-              <ColorPaletteEditor className=""/>
+              <ColorPaletteEditor className="hidden sm:flex "/>
             </div>
           </div>
 

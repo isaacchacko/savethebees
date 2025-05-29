@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import HeroLink from '@/components/HeroLink';
 
 export default function TextCycler (
@@ -27,8 +27,10 @@ export default function TextCycler (
   
   // black magic
   const [containerWidth, setContainerWidth] = useState(0);
+  const [containerHeight, setContainerHeight] = useState(0);
   const timeoutRef = useRef<number>();
-  
+  const measureRef = useRef(null); 
+
   useEffect(() => {
 
     const intervalID = setInterval(() => {
@@ -45,18 +47,31 @@ export default function TextCycler (
     };
   }, [] // means that it will run on mount and umount
   );
+  
+  useLayoutEffect(() => {
+    if (measureRef.current) {
+      setContainerWidth(measureRef.current.offsetWidth);
+      setContainerHeight(measureRef.current.offsetHeight);
+    }
+  }, [texts[index % texts.length]]);
 
   return (
-    <div className={"relative overflow-hidden text-nowrap h-[1em]" + divClassName}>
-      <HeroLink
-        href={hrefs[index % texts.length]}
-        text={texts[index % texts.length]}
-        isNewTab={isNewTabs[index % texts.length]}
-        className={` ${textClassName} absolute inset-0 flex items-center justify-start  ${isMoving ? 'animate-drop-out' : ''}`}
-      />
-      <div className={` ${textClassName} absolute inset-0 flex items-center justify-start  ${isMoving ? 'animate-drop-in' : 'invisible'}`}>
-        {texts[(index+1) % texts.length]}
+    <>
+      <span className={ " absolute whitespace-nowrap opacity-0 " + textClassName} ref={measureRef}>{texts[index % texts.length]}</span>
+      <div className={"relative whitespace-nowrap h-[1em] " + divClassName} style={{width: containerWidth, height: containerHeight}}>
+        <HeroLink
+          href={hrefs[index % texts.length]}
+          text={texts[index % texts.length]}
+          isNewTab={isNewTabs[index % texts.length]}
+          className={` ${textClassName} absolute inset-0 flex items-center justify-start  ${isMoving ? 'animate-drop-out' : ''}`}
+        />
+        <HeroLink
+          href={hrefs[(index + 1) % texts.length]}
+          text={texts[(index + 1) % texts.length]}
+          isNewTab={isNewTabs[(index + 1) % texts.length]}
+          className={` ${textClassName} absolute inset-0 flex items-center justify-start  ${isMoving ? 'animate-drop-in' : 'invisible'}`}
+        />
       </div>
-    </div>
+    </>
   );
 }
