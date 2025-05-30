@@ -45,11 +45,11 @@ export default function Home() {
             Want more? I'm also a{' '}
             <TextCycler
               texts={[
-                "Half-Marathon Runner",
-                "Software Developer",
-                "CD Enthusiast",
-                "Data Engineer",
-                "Linux user"
+                "Half-Marathon Runner.",
+                "Software Developer.",
+                "CD Enthusiast.",
+                "Data Engineer.",
+                "Linux user."
               ]}
               hrefs={[
                 "/tracking",
@@ -68,7 +68,7 @@ export default function Home() {
 
               divClassName=" translate-y-[0.4rem] slide-down-fade-in inline-block "
               textClassName=" text-md sm:text-xl md:text-2xl lg:text-4xl font-bold underline text-(--primary-color) "
-            />.
+            />
           </div>
 
           <div className="slide-down-fade-in flex flex-row justify-center w-full ">
@@ -93,7 +93,6 @@ export default function Home() {
               <BiMoon className="hidden dark:block visible w-10 h-10 cursor-pointer scale-80 hover:scale-100 duration-300" />
               <BiSun className="dark:hidden block w-10 h-10 cursor-pointer scale-80 hover:scale-100 duration-300" />
             </button>
-            <ColorPaletteEditor className="hidden sm:flex " />
           </div>
         </div>
 

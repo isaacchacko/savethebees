@@ -25,33 +25,29 @@ export default function Navbar() {
   const navRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
   const isHome = mounted && window.location.pathname === "/";
-  
+
   useEffect(
     () => {
-    setMounted(true);
+      setMounted(true);
     }, []);
   return (
     <>
       <div className="fixed top-0 left-0 right-0 z-50">
-       
-        <nav 
+
+        <nav
           ref={navRef}
-          className="cursor-pointer flex justify-end items-center p-4 px-8" // bg-(--spotify-background)/80 backdrop-blur-sm border-b border-gray-500" 
+          className="cursor-pointer flex justify-between items-center p-4 px-8" // bg-(--spotify-background)/80 backdrop-blur-sm border-b border-gray-500" 
           style={{ pointerEvents: 'auto' }}
         >
 
-          {mounted && !isHome && (
-            <div className="flex flex-row">
-              <Link href="/">
-                <svg className="scale-80 hover:scale-100 duration-300" width="50" height="50" viewBox="0 0 24 24" fill="none">
-                  <path fillRule="evenodd" clipRule="evenodd" d="M12 3.1875L21.4501 10.275L21.0001 11.625H20.25V20.25H3.75005V11.625H3.00005L2.55005 10.275L12 3.1875ZM5.25005 10.125V18.75H18.75V10.125L12 5.0625L5.25005 10.125Z" fill="#ffffff"/>
-                </svg>
-              </Link>
-              <SpotifyStatus condensed={false} className="" />
-            </div>
-            ) 
-          }
-
+          <div className="flex flex-row items-center gap-10">
+            <Link href="/">
+              <svg className="scale-80 hover:scale-100 duration-300" width="50" height="50" viewBox="0 0 24 24" fill="none">
+                <path fillRule="evenodd" clipRule="evenodd" d="M12 3.1875L21.4501 10.275L21.0001 11.625H20.25V20.25H3.75005V11.625H3.00005L2.55005 10.275L12 3.1875ZM5.25005 10.125V18.75H18.75V10.125L12 5.0625L5.25005 10.125Z" fill="#ffffff" />
+              </svg>
+            </Link>
+            <SpotifyStatus condensed={true} className="" />
+          </div>
 
           <div className="flex justify-between items-center gap-10 ml-10">
             <HamburgerIcon onClick={() => setIsMenuOpen(!isMenuOpen)} />

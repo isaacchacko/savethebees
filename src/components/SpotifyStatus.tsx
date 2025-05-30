@@ -34,7 +34,7 @@ const Header = ({
         <span>{text}</span>
       </div>
     )}
-    <SpotifyLogo className="shrink-0"/>
+    <SpotifyLogo className="shrink-0" />
   </div>
 );
 
@@ -52,9 +52,9 @@ type PlaybackState = {
 };
 
 interface SpotifyStatusProps {
-    condensed?: boolean;
-    className?: string;
-    navRef?: React.RefObject<HTMLElement>;
+  condensed?: boolean;
+  className?: string;
+  navRef?: React.RefObject<HTMLElement>;
 }
 
 export default function SpotifyStatus({ condensed, className }: SpotifyStatusProps) {
@@ -124,27 +124,28 @@ export default function SpotifyStatus({ condensed, className }: SpotifyStatusPro
 
   if (condensed) {
     return (
-      <div className={`${combinedClassName} truncate mx-auto flex flex-row gap-2 items-center`}>
+      <div className={`relative p-1 bg-(--spotify-background) rounded-lg shadow slide-down-fade-in mx-auto flex flex-row gap-2 items-center `}>
         {playback?.image && (
-          <Image
-            src={playback.image}
-            alt="Album cover"
-            width={100}
-            height={100}
-            className="pulse-border shrink-1 rounded-lg object-cover"
-          />
+          <div className='h-20 w-20 relative'>
+            <Image
+              src={playback.image}
+              alt="Album cover"
+              fill
+              className="pulse-border shrink-1 rounded-lg object-cover"
+            />
+          </div>
         )}
         <div className="hidden md:block flex items-center gap-2 min-w-0">
-          <a 
-            href={playback.external_url} 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            className="font-black text-base md:text-xl 2xl:text-2xl text-white sm:hover:underline cursor-pointer truncate"
+          <a
+            href={playback.external_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-black text-base md:text-xl 2xl:text-2xl text-white sm:hover:underline cursor-pointer overflow-ellipsis "
           >
-            {playback.track}
+            {playback.track?.length ? playback.track?.length > 30 ? playback.track?.slice(0, 30).trimEnd() + '...' : playback.track : undefined}
           </a>
 
-          <p className="hidden md:flex text-md font-black 2xl:text-xl truncate">
+          <p className="hidden md:flex text-md font-black 2xl:text-xl truncate w- ">
             {playback.artist_uri && (
               <a
                 href={`https://open.spotify.com/artist/${playback.artist_uri.split(':')[2]}`}
@@ -152,7 +153,7 @@ export default function SpotifyStatus({ condensed, className }: SpotifyStatusPro
                 rel="noopener noreferrer"
                 className="text-white sm:hover:underline cursor-pointer"
               >
-                {playback.artist}
+                {playback.artist?.length ? playback.artist?.length > 30 ? playback.artist?.slice(0, 30).trimEnd() + '...' : playback.artist : undefined}
               </a>
             )}
           </p>

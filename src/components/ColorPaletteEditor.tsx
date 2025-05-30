@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import useLocalStorageMulti from '@/hooks/useLocalStorageMulti';
-import { BiPalette, BiX} from 'react-icons/bi';
+import { BiPalette, BiX } from 'react-icons/bi';
 
 const DEFAULT_COLOR = "#10B981";
 const ACCENT_COLORS = [
@@ -30,9 +30,9 @@ interface SetColorDict {
   (key: string, value: string): void;
 }
 
-export default function ColorPaletteEditor({className=""}: {className?: string}) {
+export default function ColorPaletteEditor({ className = "" }: { className?: string }) {
   const [visible, setVisible] = useState(false);
-  
+
   // useLocalStorageMulti takes in keys to attempt to retrieve
   // and then a default value to fall back upon if retrieval fails
 
@@ -69,17 +69,17 @@ export default function ColorPaletteEditor({className=""}: {className?: string})
       <div className={className + "relative flex flex-row pl-0 items-center"}>
 
         <div className='z-20 cursor-pointer w-10 h-10 scale-80 hover:scale-100 duration-300' onClick={() => setVisible(!visible)}>
-          {!(visible) && (<BiPalette className="w-10 h-10 cursor-pointer scale-80 hover:scale-100 duration-300"/>)}
+          {!(visible) && (<BiPalette className="w-10 h-10 cursor-pointer scale-80 hover:scale-100 duration-300" />)}
           {visible && (<BiX className="w-10 h-10 cursor-pointer scale-80 hover:scale-100 duration-300" />)}
 
         </div>
-      
+
         <div className="absolute translate-x-10 overflow-hidden">
-          <div className={`flex items-center transition-transform duration-300 ${visible ? 'translate-x-0' : '-translate-x-90'}` }>
+          <div className={`flex items-center transition-transform duration-300 ${visible ? 'translate-x-0' : '-translate-x-90'}`}>
             {
               ACCENT_COLORS.map(
                 color => {
-                  return <div 
+                  return <div
                     key={color}
                     onClick={() => applyColor(color)}
                     className="w-8 h-8 rounded-full cursor-pointer border-2 border-gray-50 dark:border-none scale-80 hover:scale-100 transition-transform mr-2"
@@ -92,7 +92,7 @@ export default function ColorPaletteEditor({className=""}: {className?: string})
 
         </div>
 
-        </div>
+      </div>
     </>
   );
 }
