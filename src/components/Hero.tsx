@@ -93,6 +93,7 @@ export default function Home() {
               <BiMoon className="hidden dark:block visible w-10 h-10 cursor-pointer scale-80 hover:scale-100 duration-300" />
               <BiSun className="dark:hidden block w-10 h-10 cursor-pointer scale-80 hover:scale-100 duration-300" />
             </button>
+            <ColorPaletteEditor />
           </div>
         </div>
 
