@@ -36,23 +36,24 @@ export default function Navbar() {
 
         <nav
           ref={navRef}
-          className="cursor-pointer flex justify-between items-center p-4 px-8" // bg-(--spotify-background)/80 backdrop-blur-sm border-b border-gray-500" 
+          className="cursor-pointer flex items-center p-4 px-8 gap-10" // bg-(--spotify-background)/80 backdrop-blur-sm border-b border-gray-500" 
           style={{ pointerEvents: 'auto' }}
         >
 
-          <div className="flex flex-row items-center gap-10">
+          <div className="flex flex-row items-center gap-3">
             <Link href="/">
               <svg className="scale-80 hover:scale-100 duration-300" width="50" height="50" viewBox="0 0 24 24" fill="none">
                 <path fillRule="evenodd" clipRule="evenodd" d="M12 3.1875L21.4501 10.275L21.0001 11.625H20.25V20.25H3.75005V11.625H3.00005L2.55005 10.275L12 3.1875ZM5.25005 10.125V18.75H18.75V10.125L12 5.0625L5.25005 10.125Z" fill="#ffffff" />
               </svg>
             </Link>
-            <SpotifyStatus condensed={true} className="" />
           </div>
 
-          <div className="flex justify-between items-center gap-10 ml-10">
+          <SpotifyStatus condensed={true} className="" />
+
+          <div className="flex justify-between items-center gap-10">
             <HamburgerIcon onClick={() => setIsMenuOpen(!isMenuOpen)} />
 
-            <div className={`${isMenuOpen ? 'flex' : 'hidden'} mt-3 lg:flex flex-col lg:flex-row absolute lg:relative top-full right-0 lg:top-auto lg:right-auto bg-(--spotify-background)/80 lg:bg-transparent p-4 lg:p-0 gap-4 lg:gap-10`}>
+            <div className={`${isMenuOpen ? 'flex' : 'hidden'} lg:flex flex-col lg:flex-row absolute lg:relative top-full right-0 lg:top-auto lg:right-auto bg-(--spotify-background)/80 lg:bg-transparent p-4 lg:p-0 gap-4 lg:gap-10`}>
               <Link href="/projects" className={BASE_CLASS_NAME}>
                 Projects
               </Link>
