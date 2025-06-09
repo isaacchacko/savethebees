@@ -5,6 +5,8 @@ import { useRef, useState, useEffect, useLayoutEffect } from 'react';
 import SpotifyLogo from './SpotifyLogo';
 
 const BASE_CLASS_NAME = "relative p-2 bg-(--spotify-background) rounded-lg shadow slide-down-fade-in";
+const TEXT_SCROLL_DURATION = 10000;
+const TEXT_PAUSE_DURATION = 500;
 
 interface HeaderProps {
   className?: string;
@@ -63,11 +65,19 @@ export default function SpotifyStatus({ condensed, className }: SpotifyStatusPro
   const [localProgress, setLocalProgress] = useState(0);
   const [localDuration, setLocalDuration] = useState(0);
 
+  const [hovered, setHovered] = useState(false);
+
+  // resizing effect
   const parentRef = useRef<HTMLDivElement>(null);
   const childRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
   const [height, setHeight] = useState(0);
-  const [hovered, setHovered] = useState(false);
+
+  // text scrolling effect
+  const textRef = useRef<HTMLDivElement>(null);
+  const [hiddenWidth, setHiddenWidth] = useState(0);
+  const [translate, setTranslate] = useState(0);
+  const [scrollState, setScrollState] = useState('ready');
 
   useEffect(() => {
     const fetchPlaybackData = async () => {
@@ -133,6 +143,57 @@ export default function SpotifyStatus({ condensed, className }: SpotifyStatusPro
     }
   }, [childRef.current]);
 
+
+  useLayoutEffect(() => {
+    if (!textRef.current) return;
+
+    const observer = new ResizeObserver(entries => {
+      setHiddenWidth(entries[0].target.scrollWidth - entries[0].target.clientWidth);
+    });
+
+    observer.observe(textRef.current);
+
+    return () => {
+      observer.disconnect();
+    }
+  }, [textRef.current]);
+
+  useEffect(() => {
+    if (!textRef.current) { return; }
+
+    setHiddenWidth(textRef.current.scrollWidth - textRef.current.clientWidth);
+
+    let timeout: ReturnType<typeof setTimeout> | undefined;
+
+    if (scrollState === "ready") {
+      setTranslate(-hiddenWidth);
+      setScrollState('left');
+      timeout = setTimeout(() => {
+        setScrollState('left-paused');
+      }, TEXT_SCROLL_DURATION);
+    } else if (scrollState === "left-paused") {
+      timeout = setTimeout(() => {
+        setTranslate(0);
+        setScrollState('right');
+      }, TEXT_PAUSE_DURATION);
+    } else if (scrollState === "right-paused") {
+      timeout = setTimeout(() => {
+        setTranslate(-hiddenWidth);
+        setScrollState('left');
+      }, TEXT_PAUSE_DURATION);
+    } else if (scrollState === "right") {
+      timeout = setTimeout(() => {
+        setScrollState('right-paused');
+      }, TEXT_SCROLL_DURATION);
+    } else if (scrollState === "left") {
+      timeout = setTimeout(() => {
+        setScrollState('left-paused');
+      }, TEXT_SCROLL_DURATION);
+    }
+
+    return () => clearTimeout(timeout);
+  }, [scrollState, hiddenWidth]);
+
   // Format time helper
   const formatTime = (ms: number) => {
     const totalSeconds = Math.floor(ms / 1000);
@@ -166,7 +227,7 @@ export default function SpotifyStatus({ condensed, className }: SpotifyStatusPro
 
   return (
     <div onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} ref={parentRef} style={{ height }} className='group flex flex-row flex-grow flex items-center'>
-      <div className='h-20 w-20 relative flex justify-center items-center'>
+      <div className='h-20 w-20 relative flex justify-start items-center'>
         <SpotifyLogo className="" />
       </div>
       <div className="relative p-3 bg-(--spotify-background) rounded-lg flex flex-grow gap-2 items-center">
@@ -192,17 +253,19 @@ export default function SpotifyStatus({ condensed, className }: SpotifyStatusPro
             />
           </div>
         )}
-        <div className="flex flex-col gap-1 w-full">
-          <div className='flex flex-row gap-3'>
-            <p className='font-bold md:text-xl 2xl:text-2xl text-white '>
-              Now Listening:{' '}
+        <div className="overflow-hidden flex flex-col gap-1 w-full">
+          <div className={`flex flex-row gap-3 delay-1000 transition-transform duration-${TEXT_SCROLL_DURATION} ease-linear`}
+            style={{ transform: `translateX(${translate}px)` }}
+            ref={textRef}>
+            <p className='font-bold md:text-xl 2xl:text-2xl text-white whitespace-nowrap'>
+              Isaac is now listening to:{' '}
               <a
                 href={playback.external_url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="font-bold md:text-xl 2xl:text-2xl text-white italic sm:hover:underline cursor-pointer "
               >
-                {playback.track?.length ? playback.track?.length > 30 ? playback.track?.slice(0, 30).trimEnd() + '...' : playback.track : undefined}
+                {playback.track}
               </a>
             </p>
 
@@ -213,9 +276,9 @@ export default function SpotifyStatus({ condensed, className }: SpotifyStatusPro
                   href={`https://open.spotify.com/artist/${playback.artist_uri.split(':')[2]}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-bold md:text-xl 2xl:text-2xl text-white italic sm:hover:underline cursor-pointer "
+                  className="whitespace-nowrap font-bold md:text-xl 2xl:text-2xl text-white italic sm:hover:underline cursor-pointer "
                 >
-                  {playback.artist?.length ? playback.artist?.length > 30 ? playback.artist?.slice(0, 30).trimEnd() + '...' : playback.artist : undefined}
+                  {playback.artist}
                 </a>
               </>
             )}

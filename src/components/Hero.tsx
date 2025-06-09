@@ -24,59 +24,59 @@ import { PiLineVerticalBold } from "react-icons/pi";
 
 export default function Home() {
   return (
-    <>
-      <div className='px-8 sm:p-none flex flex-col items-center justify-center w-screen h-screen'>
-        <div className="w-full sm:w-1/2 flex flex-col items-center gap-3">
-          <h1 className=" text-center text-2xl sm:text-4xl md:text-6xl title-slide-down-fade-in font-bold">
-            Howdy! I&apos;m Isaac.
+    <div className='sm:p-none flex flex-col items-center justify-center w-screen h-screen'>
+      <div className="w-full sm:w-1/2 flex flex-col items-center gap-3">
+        <h1 className=" text-center text-2xl sm:text-4xl md:text-6xl title-slide-down-fade-in font-bold">
+          Howdy! I&apos;m a<br></br>
+          <TextCycler
+            texts={[
+              "Half-Marathon Runner",
+              "Software Developer",
+              "CD Enthusiast",
+              "Star Wars Fan",
+              "Data Engineer",
+              "Linux user"
+            ]}
+            hrefs={[
+              "/tracking",
+              "/projects",
+              "/tracking",
+              "/projects",
+              "/arch"
+            ]}
+            isNewTabs={[
+              false,
+              false,
+              false,
+              false,
+              false
+            ]}
 
-          </h1>
-          <p className=" text-center text-md sm:text-xl md:text-2xl lg:text-4xl slide-down-fade-in font-light">
-            I'm a computer science major{' '}
-            <HeroLink text="&#64;TAMU" href="https://www.tamu.edu" />{' '}
-            and intern{' '}
-            <HeroLink text="&#64;SISO" href="https://www.siso-eng.com" />.
-          </p>
+            divClassName=" title-slide-down-fade-in inline-block "
+            textClassName=" text-center text-2xl sm:text-4xl md:text-6xl font-bold underline text-(--primary-color) "
+          />
 
-          {/* TextCycler Container */}
+        </h1>
+        <p className=" text-center text-md sm:text-xl md:text-2xl lg:text-4xl slide-down-fade-in font-light">
+          I&apos;m currently studying CS{' '}
+          <HeroLink text="&#64;TAMU" href="https://www.tamu.edu" />{' '}
+          and interning{' '}
+          <HeroLink text="&#64;SISO" href="https://www.siso-eng.com" />. Previously at{' '}
+          <HeroLink text="&#64;LUMINARE" href="https://luminare.io/" />.
+        </p>
 
-          {/* Wrapping text container */}
-          <div className="text-center slide-down-fade-in text-md sm:text-xl md:text-2xl lg:text-4xl font-light">
-            Want more? I'm also a{' '}
-            <TextCycler
-              texts={[
-                "Half-Marathon Runner.",
-                "Software Developer.",
-                "CD Enthusiast.",
-                "Data Engineer.",
-                "Linux user."
-              ]}
-              hrefs={[
-                "/tracking",
-                "/projects",
-                "/tracking",
-                "/projects",
-                "/arch"
-              ]}
-              isNewTabs={[
-                false,
-                false,
-                false,
-                false,
-                false
-              ]}
+        <div className="mb-10 slide-down-fade-in flex sm:flex-row flex-col items-center justify-center w-full ">
+          <div className='flex'>
 
-              divClassName=" translate-y-[0.4rem] slide-down-fade-in inline-block "
-              textClassName=" text-md sm:text-xl md:text-2xl lg:text-4xl font-bold underline text-(--primary-color) "
-            />
-          </div>
-
-          <div className="slide-down-fade-in flex flex-row justify-center w-full ">
             <IconLink IconComponent={AiOutlineLinkedin} href='https://www.linkedin.com/in/isaacchacko' isNewTab={true} />
             <IconLink IconComponent={BiFile} href='/Isaac_Chacko.pdf' isNewTab={true} />
             <IconLink IconComponent={FiGithub} href='https://www.github.com/isaacchacko' isNewTab={true} />
             <IconLink IconComponent={BiMailSend} href='mailto:isaac.chacko05@tamu.edu' isNewTab={true} />
-            <PiLineVerticalBold className="w-10 h-10" />
+          </div>
+          <div className='hidden sm:block bg-white w-1 h-10 rounded-full mx-1'></div>
+          <div className='block sm:hidden bg-white w-1/3 h-1 rounded-full my-1'></div>
+          <div className='flex'>
+
             <IconLink IconComponent={BiRun} href='/tracking' isNewTab={false} />
             <IconLink IconComponent={BiDisc} href='/tracking' isNewTab={false} />
             <button
@@ -96,13 +96,13 @@ export default function Home() {
             <ColorPaletteEditor />
           </div>
         </div>
+      </div>
 
-        {/*
+      {/*
           <SpotifyStatus className="my-10"/>
         <Glyphs />
           */}
-        <InfoModal className="slide-down-fade-in" />
-      </div>
-    </>
+      <InfoModal className="slide-down-fade-in" />
+    </div>
   );
 }

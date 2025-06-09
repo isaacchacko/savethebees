@@ -66,7 +66,7 @@ export default function ColorPaletteEditor({ className = "" }: { className?: str
 
   return (
     <>
-      <div className={className + "relative flex flex-row pl-0 items-center"}>
+      <div>
 
         <div className='z-20 cursor-pointer w-10 h-10 scale-80 hover:scale-100 duration-300' onClick={() => setVisible(!visible)}>
           {!(visible) && (<BiPalette className="w-10 h-10 cursor-pointer scale-80 hover:scale-100 duration-300" />)}
@@ -74,8 +74,8 @@ export default function ColorPaletteEditor({ className = "" }: { className?: str
 
         </div>
 
-        <div className="absolute translate-x-10 overflow-hidden">
-          <div className={`flex items-center transition-transform duration-300 ${visible ? 'translate-x-0' : '-translate-x-90'}`}>
+        <div className="absolute -translate-x-full overflow-hidden">
+          <div className={`flex items-center transition-transform duration-300 ${visible ? 'translate-y-0' : 'translate-y-full'}`}>
             {
               ACCENT_COLORS.map(
                 color => {

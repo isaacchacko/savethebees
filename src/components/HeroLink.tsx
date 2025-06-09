@@ -8,12 +8,12 @@ export default function HeroLink(
     isNewTab = true,
     className = ""
   }:
-  {
-    text: string;
-    href: string;
-    isNewTab?: boolean;
-    className?: string;
-  }
+    {
+      text: string;
+      href: string;
+      isNewTab?: boolean;
+      className?: string;
+    }
 ) {
   return (
     <Link href={href} target={isNewTab ? "_blank" : ""} className={`${className} text-md sm:text-xl md:text-2xl lg:text-4xl font-bold underline text-(--primary-color) hover:text-white transition-colors duration-300`}>

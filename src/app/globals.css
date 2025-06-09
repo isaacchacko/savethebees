@@ -174,3 +174,16 @@ transform: rotateY(180deg);
     border: 1000 solid rgba(0,0,0,0.5);
     background-clip: padding-box;
 }
+
+@keyframes scroll-x {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-scroll-x {
+  animation: scroll-x 10s linear infinite;
+}
