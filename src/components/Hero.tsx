@@ -4,7 +4,7 @@ import Glyphs from '../components/Glyphs'
 import InfoModal from "@/components/InfoModal"
 
 // hero text
-import HeroLink from '@/components/HeroLink';
+import HeroAtLink from '@/components/HeroAtLink';
 
 // glyphs
 import IconLink from '@/components/IconLink';
@@ -59,10 +59,10 @@ export default function Home() {
         </h1>
         <p className=" text-center text-md sm:text-xl md:text-2xl lg:text-4xl slide-down-fade-in font-light">
           I&apos;m currently studying CS{' '}
-          <HeroLink text="&#64;TAMU" href="https://www.tamu.edu" />{' '}
+          <HeroAtLink text="TAMU" href="https://www.tamu.edu" />{' '}
           and interning{' '}
-          <HeroLink text="&#64;SISO" href="https://www.siso-eng.com" />. Previously at{' '}
-          <HeroLink text="&#64;LUMINARE" href="https://luminare.io/" />.
+          <HeroAtLink text="SISO" href="https://www.siso-eng.com" />. Previously at{' '}
+          <HeroAtLink text="LUMINARE" href="https://luminare.io/" />.
         </p>
 
         <div className="mb-10 slide-down-fade-in flex sm:flex-row flex-col items-center justify-center w-full ">

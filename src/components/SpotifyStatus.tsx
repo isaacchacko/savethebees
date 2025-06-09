@@ -5,7 +5,7 @@ import { useRef, useState, useEffect, useLayoutEffect } from 'react';
 import SpotifyLogo from './SpotifyLogo';
 
 const BASE_CLASS_NAME = "relative p-2 bg-(--spotify-background) rounded-lg shadow slide-down-fade-in";
-const TEXT_SCROLL_DURATION = 10000;
+const TEXT_SCROLL_SPEED = 0.020;
 const TEXT_PAUSE_DURATION = 500;
 
 interface HeaderProps {
@@ -170,7 +170,7 @@ export default function SpotifyStatus({ condensed, className }: SpotifyStatusPro
       setScrollState('left');
       timeout = setTimeout(() => {
         setScrollState('left-paused');
-      }, TEXT_SCROLL_DURATION);
+      }, hiddenWidth / TEXT_SCROLL_SPEED);
     } else if (scrollState === "left-paused") {
       timeout = setTimeout(() => {
         setTranslate(0);
@@ -184,11 +184,13 @@ export default function SpotifyStatus({ condensed, className }: SpotifyStatusPro
     } else if (scrollState === "right") {
       timeout = setTimeout(() => {
         setScrollState('right-paused');
-      }, TEXT_SCROLL_DURATION);
+      }, hiddenWidth / TEXT_SCROLL_SPEED);
     } else if (scrollState === "left") {
       timeout = setTimeout(() => {
         setScrollState('left-paused');
-      }, TEXT_SCROLL_DURATION);
+      }, hiddenWidth / TEXT_SCROLL_SPEED);
+    } else {  
+      timeout = undefined; 
     }
 
     return () => clearTimeout(timeout);
@@ -216,7 +218,7 @@ export default function SpotifyStatus({ condensed, className }: SpotifyStatusPro
           <div className="flex flex-row justify-between items-center gap-4">
             <div className={className}>
               <p className="font-black text-white cursor-pointer">
-                I&apos;m not listening to anything...
+                Isaac isn&apos;t not listening to anything...
               </p>
             </div>
           </div>
@@ -254,8 +256,9 @@ export default function SpotifyStatus({ condensed, className }: SpotifyStatusPro
           </div>
         )}
         <div className="overflow-hidden flex flex-col gap-1 w-full">
-          <div className={`flex flex-row gap-3 delay-1000 transition-transform duration-${TEXT_SCROLL_DURATION} ease-linear`}
-            style={{ transform: `translateX(${translate}px)` }}
+          <div className={`flex flex-row gap-3 delay-1000 transition-transform ease-linear`}
+            style={{ transform: `translateX(${translate}px)`,
+                      transitionDuration: `${hiddenWidth / TEXT_SCROLL_SPEED}ms`}}
             ref={textRef}>
             <p className='font-bold md:text-xl 2xl:text-2xl text-white whitespace-nowrap'>
               Isaac is now listening to:{' '}
@@ -271,14 +274,13 @@ export default function SpotifyStatus({ condensed, className }: SpotifyStatusPro
 
             {playback.artist_uri && (
               <>
-                <div className='w-1 h-1 self-center rounded-full bg-white'></div>
                 <a
                   href={`https://open.spotify.com/artist/${playback.artist_uri.split(':')[2]}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="whitespace-nowrap font-bold md:text-xl 2xl:text-2xl text-white italic sm:hover:underline cursor-pointer "
+                  className="whitespace-nowrap font-bold md:text-xl 2xl:text-2xl text-white sm:hover:underline cursor-pointer "
                 >
-                  {playback.artist}
+                  by <p className="italic inline">{playback.artist}</p>
                 </a>
               </>
             )}
