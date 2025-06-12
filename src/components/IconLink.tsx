@@ -12,11 +12,11 @@ export default function HeroLink(
     href,
     isNewTab,
   }:
-  {
-    IconComponent: React.ComponentType<T>;
-    href: string;
-    isNewTab: boolean;
-  }
+    {
+      IconComponent: React.ComponentType<T>;
+      href: string;
+      isNewTab: boolean;
+    }
 ) {
   return (
     <Link href={href} target={isNewTab ? "_blank" : ""}>

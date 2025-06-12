@@ -102,7 +102,6 @@ export default function Home() {
           <SpotifyStatus className="my-10"/>
         <Glyphs />
           */}
-      <InfoModal className="slide-down-fade-in" />
     </div>
   );
 }

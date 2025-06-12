@@ -74,7 +74,7 @@ export default function ColorPaletteEditor({ className = "" }: { className?: str
 
         </div>
 
-        <div className="absolute -translate-x-full overflow-hidden">
+        <div className="fixed top-1/2 left-1/2 -translate-x-1/2 translate-y-15 sm:translate-y-5 overflow-hidden">
           <div className={`flex items-center transition-transform duration-300 ${visible ? 'translate-y-0' : 'translate-y-full'}`}>
             {
               ACCENT_COLORS.map(

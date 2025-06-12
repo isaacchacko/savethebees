@@ -210,7 +210,7 @@ export default function SpotifyStatus({ condensed, className }: SpotifyStatusPro
 
   if (!playback || !playback.is_playing) {
     return (
-      <div className='flex-grow flex justify-start items-center'>
+      <div className='hidden sm:block flex-grow flex justify-start items-center'>
         <div className='h-20 w-20 relative flex justify-center items-center'>
           <SpotifyLogo className="" />
         </div>
@@ -228,7 +228,7 @@ export default function SpotifyStatus({ condensed, className }: SpotifyStatusPro
   }
 
   return (
-    <div onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} ref={parentRef} style={{ height }} className='group flex flex-row flex-grow flex items-center'>
+    <div onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} ref={parentRef} style={{ height }} className='hidden sm:flex group flex flex-row flex-grow flex items-center'>
       <div className='h-20 w-20 relative flex justify-start items-center'>
         <SpotifyLogo className="" />
       </div>
