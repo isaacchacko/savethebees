@@ -14,9 +14,9 @@ export default function CanvasBackground({
   const mouseWaypointRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const isMouseDownRef = useRef(false);
 
-  // FPS tracking variables
-  const lastFrameTimeRef = useRef(performance.now());
-  const frameCountRef = useRef(0);
+  // FPS tracking variables (commented but left for future debug
+  // const lastFrameTimeRef = useRef(performance.now());
+  // const frameCountRef = useRef(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -91,14 +91,14 @@ export default function CanvasBackground({
         boidRef.current.draw(ctx);
       }
 
-      // FPS calculation
-      frameCountRef.current++;
-      const now = performance.now();
-      if (now - lastFrameTimeRef.current >= 1000) {
-        console.log(`FPS: ${frameCountRef.current}`);
-        frameCountRef.current = 0;
-        lastFrameTimeRef.current = now;
-      }
+      // FPS calculation (commented but left for future debug)
+      // frameCountRef.current++;
+      // const now = performance.now();
+      // if (now - lastFrameTimeRef.current >= 1000) {
+      //   console.log(`FPS: ${frameCountRef.current}`);
+      //   frameCountRef.current = 0;
+      //   lastFrameTimeRef.current = now;
+      // }
 
       animationFrameId = requestAnimationFrame(animate);
     };
