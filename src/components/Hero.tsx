@@ -19,7 +19,7 @@ import { AiOutlineLinkedin } from "react-icons/ai";
 
 export default function Home() {
   return (
-    <div className='fixed sm:p-none flex flex-col items-center justify-center w-screen h-screen'>
+    <div className='fixed top-0 sm:p-none flex flex-col items-center justify-center w-screen h-screen'>
       <div className="w-full sm:w-1/2 flex flex-col items-center gap-3">
         <h1 className=" text-center text-2xl sm:text-4xl md:text-6xl title-slide-down-fade-in font-bold">
           Howdy! I&apos;m a<br></br>
