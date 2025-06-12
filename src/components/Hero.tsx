@@ -1,14 +1,10 @@
 import TextCycler from './TextCycler'
-import SpotifyStatus from '../components/SpotifyStatus';
-import Glyphs from '../components/Glyphs'
-import InfoModal from "@/components/InfoModal"
 
 // hero text
 import HeroAtLink from '@/components/HeroAtLink';
 
 // glyphs
 import IconLink from '@/components/IconLink';
-import Link from 'next/link';
 import ColorPaletteEditor from "@/components/ColorPaletteEditor"
 import {
   BiFile,          // Resume/file text
@@ -20,11 +16,10 @@ import {
 } from 'react-icons/bi';
 import { FiGithub } from "react-icons/fi";
 import { AiOutlineLinkedin } from "react-icons/ai";
-import { PiLineVerticalBold } from "react-icons/pi";
 
 export default function Home() {
   return (
-    <div className='sm:p-none flex flex-col items-center justify-center w-screen h-screen'>
+    <div className='fixed sm:p-none flex flex-col items-center justify-center w-screen h-screen'>
       <div className="w-full sm:w-1/2 flex flex-col items-center gap-3">
         <h1 className=" text-center text-2xl sm:text-4xl md:text-6xl title-slide-down-fade-in font-bold">
           Howdy! I&apos;m a<br></br>
@@ -57,13 +52,13 @@ export default function Home() {
           />
 
         </h1>
-        <p className=" text-center text-md sm:text-xl md:text-2xl lg:text-4xl slide-down-fade-in font-light">
+        <div className=" text-center text-md sm:text-xl md:text-2xl lg:text-4xl slide-down-fade-in font-light">
           I&apos;m currently studying CS{' '}
           <HeroAtLink text="TAMU" href="https://www.tamu.edu" />{' '}
           and interning{' '}
           <HeroAtLink text="SISO" href="https://www.siso-eng.com" />. Previously at{' '}
           <HeroAtLink text="LUMINARE" href="https://luminare.io/" />.
-        </p>
+        </div>
 
         <div className="mb-10 slide-down-fade-in flex sm:flex-row flex-col items-center justify-center w-full ">
           <div className='flex'>
