@@ -39,7 +39,7 @@ export default function CanvasBackground({
         isMouseDownRef.current = true;
         boidRef.current?.updateWaypointWeight(100);
         mouseWaypointRef.current = { x: e.clientX, y: e.clientY };
-      } 
+      }
     };
 
     const handleMouseUp = () => {
@@ -50,7 +50,7 @@ export default function CanvasBackground({
     };
 
     const handleMouseMove = (e: MouseEvent) => {
-      if (isMouseDownRef.current === false) {return;}
+      if (isMouseDownRef.current === false) { return; }
       mouseWaypointRef.current = { x: e.clientX, y: e.clientY };
 
     };

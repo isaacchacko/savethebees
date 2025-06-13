@@ -10,7 +10,7 @@ export default function Home() {
   const spawnRadius = 100;
 
   return (
-    <div className="absolute top-0 left-0 font-sans w-screen h-screen">
+    <div className="font-sans w-screen h-screen overflow-hidden">
       <Navbar />
       <CanvasBackground numBees={numBees} spawnRadius={spawnRadius} />
       <Hero />

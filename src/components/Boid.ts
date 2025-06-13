@@ -4,9 +4,9 @@ import { Bee } from './Bee';
 
 export class Boid {
   bees: Bee[];
-  currentWaypointWeight: number;  
-  canvasWidth: number; 
-  canvasHeight: number; 
+  currentWaypointWeight: number;
+  canvasWidth: number;
+  canvasHeight: number;
 
   constructor(spawnPosition: { x: number, y: number },
     numBees: number,
@@ -28,7 +28,7 @@ export class Boid {
       // by default the bees have a waypointweight of 1 so no need to set this
     }
   }
-  
+
 
   updateWaypointWeight(newWeight: number) {
     this.currentWaypointWeight = newWeight;

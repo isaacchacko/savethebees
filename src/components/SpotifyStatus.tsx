@@ -5,8 +5,8 @@ import { useRef, useState, useEffect, useLayoutEffect } from 'react';
 import SpotifyLogo from './SpotifyLogo';
 
 const BASE_CLASS_NAME = "relative p-2 bg-(--spotify-background) rounded-lg shadow slide-down-fade-in";
-const TEXT_SCROLL_SPEED = 0.020;
-const TEXT_PAUSE_DURATION = 500;
+const TEXT_SCROLL_SPEED = 0.100;
+const TEXT_PAUSE_DURATION = 1000;
 
 interface HeaderProps {
   className?: string;
@@ -76,7 +76,7 @@ export default function SpotifyStatus({ condensed, className }: SpotifyStatusPro
   // text scrolling effect
   const textRef = useRef<HTMLDivElement>(null);
   const [hiddenWidth, setHiddenWidth] = useState(0);
-  const [translate, setTranslate] = useState(0);
+  const [translate, setTranslate] = useState("0%");
   const [scrollState, setScrollState] = useState('ready');
 
   useEffect(() => {
@@ -147,8 +147,19 @@ export default function SpotifyStatus({ condensed, className }: SpotifyStatusPro
   useLayoutEffect(() => {
     if (!textRef.current) return;
 
-    const observer = new ResizeObserver(entries => {
-      setHiddenWidth(entries[0].target.scrollWidth - entries[0].target.clientWidth);
+    const updateWidth = () => {
+      if (!textRef.current) return;
+      if (textRef.current.scrollWidth <= textRef.current.clientWidth) {
+        setHiddenWidth(0);
+      } else {
+        setHiddenWidth(Math.ceil(textRef.current.scrollWidth - textRef.current.clientWidth + 4));
+      }
+    }
+
+    updateWidth();
+
+    const observer = new ResizeObserver(() => {
+      updateWidth();
     });
 
     observer.observe(textRef.current);
@@ -156,45 +167,49 @@ export default function SpotifyStatus({ condensed, className }: SpotifyStatusPro
     return () => {
       observer.disconnect();
     }
-  }, [textRef.current]);
+  }, [textRef.current, playback]);
 
   useEffect(() => {
     if (!textRef.current) { return; }
 
-    setHiddenWidth(textRef.current.scrollWidth - textRef.current.clientWidth);
-
     let timeout: ReturnType<typeof setTimeout> | undefined;
 
-    if (scrollState === "ready") {
-      setTranslate(-hiddenWidth);
-      setScrollState('left');
+    console.log("case statement: hiddenWidth = " + hiddenWidth + " and in as " + scrollState);
+    if (scrollState === "left-paused") {
       timeout = setTimeout(() => {
-        setScrollState('left-paused');
-      }, hiddenWidth / TEXT_SCROLL_SPEED);
-    } else if (scrollState === "left-paused") {
-      timeout = setTimeout(() => {
-        setTranslate(0);
         setScrollState('right');
       }, TEXT_PAUSE_DURATION);
     } else if (scrollState === "right-paused") {
       timeout = setTimeout(() => {
-        setTranslate(-hiddenWidth);
         setScrollState('left');
       }, TEXT_PAUSE_DURATION);
     } else if (scrollState === "right") {
+      setTranslate("1px");
       timeout = setTimeout(() => {
         setScrollState('right-paused');
       }, hiddenWidth / TEXT_SCROLL_SPEED);
-    } else if (scrollState === "left") {
+    } else if (scrollState == "ready" || scrollState === "left") {
+      if (hiddenWidth != 0) setTranslate(`-${hiddenWidth}px`);
       timeout = setTimeout(() => {
         setScrollState('left-paused');
       }, hiddenWidth / TEXT_SCROLL_SPEED);
-    } else {  
-      timeout = undefined; 
+    } else {
+      timeout = undefined;
     }
 
+    console.log("case statement: out as " + scrollState);
     return () => clearTimeout(timeout);
   }, [scrollState, hiddenWidth]);
+
+  useEffect(() => {
+    if (!textRef.current) return;
+
+    textRef.current.classList.add("transition-none");
+    textRef.current.style.transform = "translateX(0px)";
+    void textRef.current.offsetHeight;
+    textRef.current.classList.remove("transition-none");
+    setScrollState('ready');
+  }, [playback]);
 
   // Format time helper
   const formatTime = (ms: number) => {
@@ -218,7 +233,7 @@ export default function SpotifyStatus({ condensed, className }: SpotifyStatusPro
           <div className="flex flex-row justify-between items-center gap-4">
             <div className={className}>
               <p className="font-black text-white cursor-pointer">
-                Isaac isn&apos;t not listening to anything...
+                Isaac isn&apos;t listening to anything...
               </p>
             </div>
           </div>
@@ -256,9 +271,11 @@ export default function SpotifyStatus({ condensed, className }: SpotifyStatusPro
           </div>
         )}
         <div className="overflow-hidden flex flex-col gap-1 w-full">
-          <div className={`flex flex-row gap-3 delay-1000 transition-transform ease-linear`}
-            style={{ transform: `translateX(${translate}px)`,
-                      transitionDuration: `${hiddenWidth / TEXT_SCROLL_SPEED}ms`}}
+          <div className={`flex flex-row delay-1000 transition-transform ease-linear`}
+            style={{
+              transform: `translateX(${translate})`,
+              transitionDuration: `${hiddenWidth / TEXT_SCROLL_SPEED}ms`
+            }}
             ref={textRef}>
             <p className='font-bold md:text-xl 2xl:text-2xl text-white whitespace-nowrap'>
               Isaac is now listening to:{' '}
@@ -266,24 +283,20 @@ export default function SpotifyStatus({ condensed, className }: SpotifyStatusPro
                 href={playback.external_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-bold md:text-xl 2xl:text-2xl text-white italic sm:hover:underline cursor-pointer "
+                className="font-bold md:text-xl 2xl:text-2xl text-white sm:hover:underline cursor-pointer "
               >
                 {playback.track}
-              </a>
-            </p>
-
-            {playback.artist_uri && (
-              <>
                 <a
-                  href={`https://open.spotify.com/artist/${playback.artist_uri.split(':')[2]}`}
+                  href={`https://open.spotify.com/artist/${playback.artist_uri?.split(':')[2]}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="whitespace-nowrap font-bold md:text-xl 2xl:text-2xl text-white sm:hover:underline cursor-pointer "
                 >
-                  by <p className="italic inline">{playback.artist}</p>
+                  {' by ' + playback.artist}
                 </a>
-              </>
-            )}
+              </a>
+            </p>
+
           </div>
           <div className="">
             <div className="w-full h-1 bg-gray-200 rounded-full">

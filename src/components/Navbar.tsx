@@ -48,7 +48,7 @@ export default function Navbar() {
   return (
     <>
       <div style={{ height }}>
-        <div className="fixed top-0 left-0 right-0 z-50" ref={navRef}>
+        <div className="fixed top-0 left-0 right-0 z-2" ref={navRef}>
 
           <nav
             className="box-border cursor-pointer flex justify-between sm:justify-start items-center p-4 px-8 gap-10" // bg-(--spotify-background)/80 backdrop-blur-sm border-b border-gray-500" 

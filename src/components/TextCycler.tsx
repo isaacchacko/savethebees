@@ -28,7 +28,6 @@ export default function TextCycler(
   // black magic
   const [containerWidth, setContainerWidth] = useState(0);
   const [containerHeight, setContainerHeight] = useState(0);
-  const timeoutRef = useRef<number>();
   const measureRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -53,9 +52,11 @@ export default function TextCycler(
 
   useEffect(() => {
 
+    let timeout: ReturnType<typeof setTimeout> | undefined;
+
     const intervalID = setInterval(() => {
       setIsMoving(true);
-      timeoutRef.current = setTimeout(() => {
+      timeout = setTimeout(() => {
         setIndex(prev => prev + 1);
         setIsMoving(false);
       }, 500);
@@ -63,14 +64,14 @@ export default function TextCycler(
 
     return () => {
       clearInterval(intervalID);
-      clearTimeout(timeoutRef.current);  // TODO
+      clearTimeout(timeout);
     };
   }, [] // means that it will run on mount and umount
   );
 
   return (
     <>
-      <span className={" absolute whitespace-nowrap opacity-0 " + textClassName} ref={measureRef}>{texts[index % texts.length]}</span>
+      <span className={" fixed left-0 whitespace-nowrap opacity-0 " + textClassName} ref={measureRef}>{texts[index % texts.length]}</span>
       <div className={"relative whitespace-nowrap h-[1em] " + divClassName}
         style={{
           width: containerWidth,
