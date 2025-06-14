@@ -21,9 +21,7 @@ export default function Home() {
   return (
     <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 sm:p-none flex flex-col items-center justify-center'>
       <div className="flex flex-col items-center gap-3">
-        <h1 className=" text-center text-2xl sm:text-4xl md:text-6xl title-slide-down-fade-in font-bold"
-          style={{ pointerEvents: 'auto' }}
-        >
+        <h1 className=" text-center text-2xl sm:text-4xl md:text-6xl title-slide-down-fade-in font-bold">
           Howdy! I&apos;m a<br></br>
           <TextCycler
             texts={[
@@ -35,6 +33,7 @@ export default function Home() {
 
               // if you change "Zealot" to "User" instead of zealot overflow scroll bars appear for some
               // screen sizes...
+              // i think it's because "User" is smaller than "Howdy! I'm" while "Zealot" isn't
               "Linux Zealot"
             ]}
             hrefs={[
@@ -97,11 +96,6 @@ export default function Home() {
           </div>
         </div>
       </div>
-
-      {/*
-          <SpotifyStatus className="my-10"/>
-        <Glyphs />
-          */}
     </div>
   );
 }

@@ -63,7 +63,7 @@ export default function Navbar() {
               </Link>
             </div>
 
-            <SpotifyStatus condensed={true} className="" />
+            <SpotifyStatus />
 
             <div className="flex justify-between items-center gap-10">
               <HamburgerIcon onClick={() => setIsMenuOpen(!isMenuOpen)} />
