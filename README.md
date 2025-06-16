@@ -1,5 +1,7 @@
 # My Personal Website
 
+![A screenshot of my website](https://github.com/isaacchacko/savethebees/blob/868a46e0fcaf497b8fa2ea372113fa68ba2ce375/public/spring-2025.png "My website! Circa spring 2025")
+
 Howdy! Have fun playing around with an interactive boid simulation, learn about my music tastes, and discover my other projects at [isaacchacko.co](https://isaacchacko.co)!
 
 I made this website with **Next.js**, **Typescript**, **TailwindCSS**, **Redis Cloud Databases**, and **Vercel**.
