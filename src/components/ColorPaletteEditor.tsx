@@ -30,7 +30,6 @@ interface SetColorDict {
 }
 
 export default function ColorPaletteEditor({ hide = false, widthHeight = "" }: { hide?: boolean; widthHeight?: string }) {
-  const [visible, setVisible] = useState(false);
   const [colorDict, setColorDict] = useLocalStorageMulti(
     COLOR_KEYS,
     DEFAULT_COLOR
@@ -58,9 +57,9 @@ export default function ColorPaletteEditor({ hide = false, widthHeight = "" }: {
   }, [colorDict]);
 
   const dimColor = (hex: string, factor: number): string => {
-    const r = Math.round(parseInt(hex.slice(1, 3), 16) * 1); // * factor);
-    const g = Math.round(parseInt(hex.slice(3, 5), 16) * 1); // * factor);
-    const b = Math.round(parseInt(hex.slice(5, 7), 16) * 1); // * factor);
+    const r = Math.round(parseInt(hex.slice(1, 3), 16) * 1 * factor);
+    const g = Math.round(parseInt(hex.slice(3, 5), 16) * 1 * factor);
+    const b = Math.round(parseInt(hex.slice(5, 7), 16) * 1 * factor);
     return `rgb(${r}, ${g}, ${b})`;
   };
 

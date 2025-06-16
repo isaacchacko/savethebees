@@ -1,6 +1,5 @@
 'use client'; // Required for client-side interactivity
 
-import { ms } from "@public/fonts";
 import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import Link from 'next/link';
 import ColorPaletteEditor from './ColorPaletteEditor';
@@ -55,7 +54,7 @@ export default function Navbar() {
             style={{ pointerEvents: 'auto' }}
           >
 
-            <div className="flex flex-row items-center gap-3">
+            <div className={` ${isHome ? "hidden" : ""} flex flex-row items-center gap-3`}>
               <Link href="/">
                 <svg className="scale-80 hover:scale-100 duration-300 w-15 h-15" viewBox="0 0 24 24" fill="none">
                   <path fillRule="evenodd" clipRule="evenodd" d="M12 3.1875L21.4501 10.275L21.0001 11.625H20.25V20.25H3.75005V11.625H3.00005L2.55005 10.275L12 3.1875ZM5.25005 10.125V18.75H18.75V10.125L12 5.0625L5.25005 10.125Z" fill="#ffffff" />
