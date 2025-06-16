@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import CanvasBackground from '@/components/CanvasBackground';
 import useResponsiveBees from '@/hooks/useResponsiveBees';
@@ -9,12 +9,48 @@ import Navbar from "@/components/Navbar";
 // for the external links
 import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
 
+// markdown
+import { marked } from 'marked';
+
+interface HTMLDictType {
+  [name: string]: string;
+}
+
 export default function Home() {
   const numBees = useResponsiveBees();
   const spawnRadius = 100;
+  const repositories: string[] = ["savethebees", "eulerelo", "autowal"];
+  const [HTMLDict, setHTMLDict] = useState<HTMLDictType>(() =>
+    repositories.reduce((acc, repo) => ({ ...acc, [repo]: "" }), {})
+  );
 
-  // State to track whether the card is flipped
-  const [isFlipped, setIsFlipped] = useState(false);
+  const setHTMLForRepo = (name: string, html: string) => {
+    setHTMLDict(prev => ({ ...prev, [name]: html }));
+  };
+
+  useEffect(() => {
+    async function fetchHTML() {
+
+      for (const name of repositories) {
+        const response = await fetch(`/api/github/repo/${name}`);
+
+        if (!response.ok) {
+          console.error(`Failed to fetch repository README for "${name}`)
+          continue;
+        } else {
+
+          const json = await response.json();
+          console.log(json.data);
+          setHTMLForRepo(name, json.data);
+
+        }
+
+
+      }
+    }
+
+    fetchHTML();
+  }, []);
 
   return (
     <div className="relative font-sans">
@@ -38,7 +74,7 @@ export default function Home() {
             <div className="text-base leading-relaxed">
               <div className="flex flex-row jusitfy-center items">
 
-                <h2   className="font-black text-white text-2xl 2xl:text-4xl text-white text-bold cursor-pointer pb-2">
+                <h2 className="font-black text-white text-2xl 2xl:text-4xl text-white text-bold cursor-pointer pb-2">
                   <a href="http://eulerelo.vercel.app" target="_blank" rel="noopener noreferrer" className="underline underline-offset-5 hover:text-(--primary-color)">
 
                     Eulerelo
@@ -56,7 +92,7 @@ export default function Home() {
 
           <div className="pointer-events-auto flex flex-col w-full max-w-4xl mx-auto p-4 md:p-8 mt-8 backdrop-blur-sm relative bg-(--spotify-background) rounded-lg shadow">
             <div className="text-base leading-relaxed">
-              <h2   className="font-black text-white text-2xl 2xl:text-4xl text-white cursor-pointer pb-2">
+              <h2 className="font-black text-white text-2xl 2xl:text-4xl text-white cursor-pointer pb-2">
                 Under construction...
               </h2>
               <p className="text-sm sm:text-base md:text-lg lg:text-xl">
@@ -66,6 +102,20 @@ export default function Home() {
           </div>
 
         </div>
+
+        {repositories.map((name, index, arr) => (
+          <div className='text-base leading-relaxed pointer-events-auto flex flex-col w-full max-w-4xl mx-auto p-4 md:p-8 mt-8 backdrop-blur-sm relative bg-(--spotify-background) rounded-lg shadow"'>
+            <h2 className="font-black text-white text-2xl 2xl:text-4xl text-white text-bold cursor-pointer pb-2">
+              <a href={`http://github.com/isaachacko/${name}`} target="_blank" rel="noopener noreferrer" className="underline underline-offset-5 hover:text-(--primary-color)">
+
+                {name}
+              </a>
+
+            </h2>
+            <div key={index} dangerouslySetInnerHTML={{ __html: HTMLDict[name] }} className='markdown-body'>
+            </div>
+          </div>
+        ))}
 
         <footer className="absolute bottom-2 left-2 contactInfo">
           <p>Copyright &copy; 2025 Isaac Chacko</p>
