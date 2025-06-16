@@ -51,7 +51,7 @@ export default function Navbar() {
         <div className="fixed top-0 left-0 right-0 z-2" ref={navRef}>
 
           <nav
-            className="box-border cursor-pointer flex justify-between sm:justify-start items-center p-4 px-8 gap-10" // bg-(--spotify-background)/80 backdrop-blur-sm border-b border-gray-500" 
+            className="box-border cursor-pointer flex justify-between lg:justify-start items-center p-4 px-8 gap-10" // bg-(--spotify-background)/80 backdrop-blur-sm border-b border-gray-500" 
             style={{ pointerEvents: 'auto' }}
           >
 
@@ -64,6 +64,7 @@ export default function Navbar() {
             </div>
 
             <SpotifyStatus />
+            <ColorPaletteEditor hide={true} />
 
             <div className="flex justify-between items-center gap-10">
               <HamburgerIcon onClick={() => setIsMenuOpen(!isMenuOpen)} />

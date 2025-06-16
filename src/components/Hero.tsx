@@ -17,11 +17,13 @@ import {
 import { FiGithub } from "react-icons/fi";
 import { AiOutlineLinkedin } from "react-icons/ai";
 
+const ICON_WIDTH_HEIGHT = "w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 lg:w-10 lg:h-10 ";
+const HOWDY_TEXT_HEIGHT = "text-4xl md:text-4xl lg:text-6xl"
 export default function Home() {
   return (
-    <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 sm:p-none flex flex-col items-center justify-center'>
-      <div className="flex flex-col items-center gap-3">
-        <h1 className=" text-center text-2xl sm:text-4xl md:text-6xl title-slide-down-fade-in font-bold">
+    <div className='w-1/2 sm:p-none flex flex-col items-center justify-center'>
+      <div className="flex flex-col items-center">
+        <h1 className={` text-center  ${HOWDY_TEXT_HEIGHT} title-slide-down-fade-in font-bold`}>
           Howdy! I&apos;m a<br></br>
           <TextCycler
             texts={[
@@ -52,11 +54,11 @@ export default function Home() {
             ]}
 
             divClassName=" title-slide-down-fade-in inline-block "
-            textClassName=" text-center text-2xl sm:text-4xl md:text-6xl font-bold underline text-(--primary-color) "
+            textClassName={` text-center ${HOWDY_TEXT_HEIGHT} font-bold underline text-(--primary-color) `}
           />
 
         </h1>
-        <div className=" text-center text-md sm:text-xl md:text-2xl lg:text-4xl slide-down-fade-in font-light">
+        <div className=" text-center text-sm sm:text-md md:text-lg lg:text-xl slide-down-fade-in font-light">
           I&apos;m currently studying CS{' '}
           <HeroAtLink text="TAMU" href="https://www.tamu.edu" hasPeriod={false} />{' '}
           and interning{' '}
@@ -64,20 +66,19 @@ export default function Home() {
           <HeroAtLink text="LUMINARE" href="https://luminare.io/" hasPeriod={true} />
         </div>
 
-        <div className="mb-10 slide-down-fade-in flex sm:flex-row flex-col items-center justify-center ">
+        <div className="slide-down-fade-in flex sm:flex-row flex-col items-center justify-center ">
           <div className='flex'>
-
-            <IconLink IconComponent={AiOutlineLinkedin} href='https://www.linkedin.com/in/isaacchacko' isNewTab={true} />
-            <IconLink IconComponent={BiFile} href='/Isaac_Chacko.pdf' isNewTab={true} />
-            <IconLink IconComponent={FiGithub} href='https://www.github.com/isaacchacko' isNewTab={true} />
-            <IconLink IconComponent={BiMailSend} href='mailto:isaac.chacko05@tamu.edu' isNewTab={true} />
+            <IconLink className={ICON_WIDTH_HEIGHT} IconComponent={AiOutlineLinkedin} href='https://www.linkedin.com/in/isaacchacko' isNewTab={true} />
+            <IconLink className={ICON_WIDTH_HEIGHT} IconComponent={BiFile} href='/Isaac_Chacko.pdf' isNewTab={true} />
+            <IconLink className={ICON_WIDTH_HEIGHT} IconComponent={FiGithub} href='https://www.github.com/isaacchacko' isNewTab={true} />
+            <IconLink className={ICON_WIDTH_HEIGHT} IconComponent={BiMailSend} href='mailto:isaac.chacko05@tamu.edu' isNewTab={true} />
           </div>
           <div className='hidden sm:block bg-white w-1 h-10 rounded-full mx-1'></div>
           <div className='block sm:hidden bg-white w-40 h-1 rounded-full my-1'></div>
           <div className='flex'>
 
-            <IconLink IconComponent={BiRun} href='/tracking' isNewTab={false} />
-            <IconLink IconComponent={BiDisc} href='/tracking' isNewTab={false} />
+            <IconLink className={ICON_WIDTH_HEIGHT} IconComponent={BiRun} href='/tracking' isNewTab={false} />
+            <IconLink className={ICON_WIDTH_HEIGHT} IconComponent={BiDisc} href='/tracking' isNewTab={false} />
             <button
               aria-label="Toggle theme"
               onClick={() =>
@@ -89,10 +90,10 @@ export default function Home() {
                 )
               }
             >
-              <BiMoon className="hidden dark:block visible w-10 h-10 cursor-pointer scale-80 hover:scale-100 duration-300" />
-              <BiSun className="dark:hidden block w-10 h-10 cursor-pointer scale-80 hover:scale-100 duration-300" />
+              <BiMoon className={`hidden dark:block visible ${ICON_WIDTH_HEIGHT} cursor-pointer scale-80 hover:scale-100 duration-300`} />
+              <BiSun className={`dark:hidden block ${ICON_WIDTH_HEIGHT} cursor-pointer scale-80 hover:scale-100 duration-300`} />
             </button>
-            <ColorPaletteEditor />
+            <ColorPaletteEditor widthHeight={ICON_WIDTH_HEIGHT} />
           </div>
         </div>
       </div>

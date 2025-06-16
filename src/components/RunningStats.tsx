@@ -34,7 +34,7 @@ const Header = ({
         <span>{text}</span>
       </div>
     )}
-      <StravaLogo />
+    <StravaLogo />
   </div>
 );
 
@@ -64,16 +64,17 @@ const RunningStats = () => {
     };
   }, []);
 
-  // Function to convert hex to RGBA
-  function hexToRgba(hexColor: string, alpha = 1): string {
-    const hex = hexColor.replace(/^#/, '');
-    const rgb = {
-      r: parseInt(hex.slice(0, 2), 16),
-      g: parseInt(hex.slice(2, 4), 16),
-      b: parseInt(hex.slice(4, 6), 16),
-    };
+  function rgbToRgbaVariants(rgb: string): [string, string] {
+    // Match "rgb(r, g, b)" and extract the numbers
+    const match = rgb.match(/^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)$/);
+    if (!match) throw new Error("Invalid RGB format");
 
-    return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`;
+    const [r, g, b] = match.slice(1, 4).map(Number);
+
+    return [
+      `rgba(${r}, ${g}, ${b}, 1)`,
+      `rgba(${r}, ${g}, ${b}, 0.6)`
+    ];
   }
 
   // Function to fetch activities from the API endpoint
@@ -170,11 +171,11 @@ const RunningStats = () => {
 
     // Extract CSS variables dynamically after component mounts
     if (typeof window !== 'undefined') {
-      const primaryColorHex = getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim();
-      
-      if (primaryColorHex) {
-        setPrimaryColorRgba(hexToRgba(primaryColorHex));
-        setPrimaryColorRgbaFill(hexToRgba(primaryColorHex, 0.6));
+      const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim();
+      if (primaryColor) {
+        const rgbaColors = rgbToRgbaVariants(primaryColor)
+        setPrimaryColorRgba(rgbaColors[0]);
+        setPrimaryColorRgbaFill(rgbaColors[1]);
       }
     }
   }, []);
@@ -225,22 +226,22 @@ const RunningStats = () => {
 
   return (
     <div className="relative font-sans bg-(--spotify-background) rounded-lg shadow">
-      <Header text="Running"/>
+      <Header text="Running" />
       <p>I love to run! I&apos;ve ran two half-marathons in the past, one in SF and another in Houston. Although my next goal is to run a <i>full</i> marathon, I&apos;ve definitely fallen off. I will have to make up some ground before I&apos;m marathon ready. My goal for 2025 is to run 365 miles. Below is a graph of my weekly progress. Each bar is a week of the year, and its length is my weekly mileage.</p>
       <hr className="mt-5 mb-5"></hr>
       {error ? (
         <p className="text-red-500 mb-4">{error}</p>
       ) : (
         <>
-            <div className="2xl:text-3xl">
-              <p className={BASE_SUBTITLE_CLASS}>Total Mileage in {new Date().getFullYear()}: </p> 
-              <p className="inline  ">{totalMileage.toFixed(2)} of 365 miles ({percentage.toFixed(2)}%)</p>
-            </div>
+          <div className="2xl:text-3xl">
+            <p className={BASE_SUBTITLE_CLASS}>Total Mileage in {new Date().getFullYear()}: </p>
+            <p className="inline  ">{totalMileage.toFixed(2)} of 365 miles ({percentage.toFixed(2)}%)</p>
+          </div>
 
-            <div className="2xl:text-3xl">
-              <p className={BASE_SUBTITLE_CLASS}>Current Status: </p>
-              <p className="inline">{status}</p>
-            </div>
+          <div className="2xl:text-3xl">
+            <p className={BASE_SUBTITLE_CLASS}>Current Status: </p>
+            <p className="inline">{status}</p>
+          </div>
 
           <div className="w-full max-w-4xl mx-auto my-10">
             <Bar data={chartData} options={chartOptions} />

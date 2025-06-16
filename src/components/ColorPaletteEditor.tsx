@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
+import rgbHex from 'rgb-hex';
 import useLocalStorageMulti from '@/hooks/useLocalStorageMulti';
-import { BiPalette, BiX } from 'react-icons/bi';
 
-const DEFAULT_COLOR = "#10B981";
+const DEFAULT_COLOR = "#10b981";
 const ACCENT_COLORS = [
-  "#E60000",
-  "#FF781F",
-  "#e6ac00",
-  "#69b647",
-  "#3B82F6", // blue
-  "#8B5CF6", // violet
-  "#10B981", // emerald
+  "#3b82f6", // blue
+  "#e60000", // red
+  "#ff781f", // orange
+  "#e6ac00", // yellow
+  "#69b647", // green
+  "#8b5cf6", // violet
+  "#10b981", // emerald
 ];
 
 const COLOR_KEYS = [
@@ -30,32 +29,33 @@ interface SetColorDict {
   (key: string, value: string): void;
 }
 
-export default function ColorPaletteEditor({ className = "" }: { className?: string }) {
+export default function ColorPaletteEditor({ hide = false, widthHeight = "" }: { hide?: boolean; widthHeight?: string }) {
   const [visible, setVisible] = useState(false);
-
-  // useLocalStorageMulti takes in keys to attempt to retrieve
-  // and then a default value to fall back upon if retrieval fails
-
   const [colorDict, setColorDict] = useLocalStorageMulti(
     COLOR_KEYS,
     DEFAULT_COLOR
   ) as [ColorDict, SetColorDict];
+  const [index, setIndex] = useState(ACCENT_COLORS.indexOf(`#${rgbHex(colorDict['primary-color'])}`));
+
+  const next = () => {
+    setIndex((prev) => (prev + 1) % ACCENT_COLORS.length);
+  }
 
   useEffect(() => {
     COLOR_KEYS.forEach(
-      (key) => {
+      (key, colorKeyIndex) => {
+        setColorDict(key, dimColor(ACCENT_COLORS[index], 1 - 0.1 * colorKeyIndex));
+      }
+    )
+  }, [index]);
+
+  useEffect(() => {
+    COLOR_KEYS.forEach(
+      key => {
         document.documentElement.style.setProperty(`--${key}`, colorDict[key]);
       }
     );
   }, [colorDict]);
-
-  const applyColor = (hex: string) => {
-    COLOR_KEYS.forEach(
-      (key, index) => { // crazy that the second parameter is always an index
-        setColorDict(key, dimColor(hex, 1 - 0.1 * index));
-      }
-    );
-  };
 
   const dimColor = (hex: string, factor: number): string => {
     const r = Math.round(parseInt(hex.slice(1, 3), 16) * 1); // * factor);
@@ -67,31 +67,7 @@ export default function ColorPaletteEditor({ className = "" }: { className?: str
   return (
     <>
       <div>
-
-        <div className='z-20 cursor-pointer w-10 h-10 scale-80 hover:scale-100 duration-300' onClick={() => setVisible(!visible)}>
-          {!(visible) && (<BiPalette className="w-10 h-10 cursor-pointer scale-80 hover:scale-100 duration-300" />)}
-          {visible && (<BiX className="w-10 h-10 cursor-pointer scale-80 hover:scale-100 duration-300" />)}
-
-        </div>
-
-        <div className="fixed top-1/2 left-1/2 -translate-x-1/2 translate-y-15 sm:translate-y-5 overflow-hidden">
-          <div className={`flex items-center transition-transform duration-300 ${visible ? 'translate-y-0' : 'translate-y-full'}`}>
-            {
-              ACCENT_COLORS.map(
-                color => {
-                  return <div
-                    key={color}
-                    onClick={() => applyColor(color)}
-                    className="w-8 h-8 rounded-full cursor-pointer border-2 border-gray-50 dark:border-none scale-80 hover:scale-100 transition-transform mr-2"
-                    style={{ backgroundColor: color }}
-                  />
-                }
-              )
-            }
-          </div>
-
-        </div>
-
+        <div key="color" onClick={() => next()} className={` ${hide ? "hidden" : ""} ${widthHeight} bg-(--primary-color) rounded-full cursor-pointer border-2 border-gray-50 dark:border-none scale-80 hover:scale-100 transition-transform `}></div>
       </div>
     </>
   );

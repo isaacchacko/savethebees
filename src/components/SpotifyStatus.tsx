@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useRef, useState, useEffect, useLayoutEffect } from 'react';
+import { useRef, useState, useEffect, useLayoutEffect, use } from 'react';
 import SpotifyLogo from './SpotifyLogo';
 
 const TEXT_SCROLL_SPEED = 0.050;
@@ -40,6 +40,8 @@ export default function SpotifyStatus() {
   const [scrollState, setScrollState] = useState('ready');
   const timeout = useRef<NodeJS.Timeout | undefined>(undefined);
   const [clicked, setClicked] = useState(false);  // quick way to "pin" the status so that
+  const [pointerType, setPointerType] = useState("unknown");
+
   // users don't have to constantly hover
 
   // constantly fetch playback data
@@ -124,8 +126,7 @@ export default function SpotifyStatus() {
       // if the actual width is larger than what's visible
       if (textRef.current.scrollWidth >= textRef.current.clientWidth) {
 
-        // + 4 for arbitrary padding. try removing it and see if it still works.
-        setHiddenWidth(Math.ceil(textRef.current.scrollWidth - textRef.current.clientWidth + 4));
+        setHiddenWidth(Math.ceil(textRef.current.scrollWidth - textRef.current.clientWidth));
 
       } else {
 
@@ -153,6 +154,8 @@ export default function SpotifyStatus() {
 
     if (!textRef.current) return;
     if (hiddenWidth <= 0) return; // if there's nothing to hide/scroll to
+
+    console.log("hiddenWidth: " + hiddenWidth);
 
     // the cycle of scrollState goes:
     // ready -> left -> left-paused -> right -> right-paused -> ready
@@ -214,38 +217,53 @@ export default function SpotifyStatus() {
   }, [scrollState, hiddenWidth]);
 
 
+  const haltTimeout = () => {
+    if (timeout.current) {
+      clearTimeout(timeout.current);
+      timeout.current = undefined;
+    }
+  };
+
+  const resetScrollPosition = () => {
+
+    if (!textRef.current) return;
+
+    textRef.current.classList.add("transition-none");
+
+    // similar vain as above. useState isn't synchronous, need
+    // to edit the DOM directly.
+    textRef.current.style.transform = "translateX(0px)";
+    void textRef.current.offsetHeight;
+    textRef.current.classList.remove("transition-none");
+    setScrollState("ready");
+
+  };
+
+  // reset scroll position instantly to the beginning
+  useEffect(() => {
+
+    // not visible -> no need to reset
+    if (!hovered && !clicked) { setScrollState("waiting"); return; }
+
+    haltTimeout();
+    resetScrollPosition();
+
+    console.log(hovered, clicked);
+  }, [playback?.track, width]);
+
   // reset scroll position instantly to the beginning
   useEffect(() => {
 
     if (clicked) return; // if pinned, never attempt to reset
 
-    // clear any ungoing timeout (to prevent future
-    // useState changes)
-    if (timeout.current) {
-      clearTimeout(timeout.current);
-      timeout.current = undefined;
-    }
-
-    if (!textRef.current) return;
-
-    // if the useState hovered change was false -> true
+    haltTimeout();
     if (hovered) {
-      textRef.current.classList.add("transition-none");
-
-      // similar vain as above. useState isn't synchronous, need
-      // to edit the DOM directly.
-      textRef.current.style.transform = "translateX(0px)";
-      void textRef.current.offsetHeight;
-      textRef.current.classList.remove("transition-none");
-      setScrollState("ready");
+      resetScrollPosition();
     } else {
-
-      // if the user is now not hovering (true -> false)
       setScrollState("waiting");
-
     }
 
-  }, [playback?.track, hovered]);
+  }, [hovered]);
 
   // Format time helper
   const formatTime = (ms: number) => {
@@ -261,14 +279,14 @@ export default function SpotifyStatus() {
 
   if (!playback || !playback.is_playing) {
     return (
-      <div className='hidden sm:block flex-grow flex justify-start items-center'>
-        <div className='h-20 w-20 relative flex justify-center items-center'>
+      <div className='hidden lg:flex flex-grow justify-start items-center'>
+        <div className='h-20 w-20 flex relative items-center'>
           <SpotifyLogo className="" />
         </div>
         <div className="relative p-2 bg-(--spotify-background) rounded-lg shadow slide-down-fade-in">
           <div className="flex flex-row justify-between items-center gap-4">
             <div className="relative p-2 bg-(--spotify-background) rounded-lg shadow slide-down-fade-in">
-              <p className="font-black text-white cursor-pointer">
+              <p className="inline font-black text-white cursor-pointer">
                 Isaac isn&apos;t listening to anything...
               </p>
             </div>
@@ -279,7 +297,7 @@ export default function SpotifyStatus() {
   }
 
   return (
-    <div onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} onClick={() => setClicked(!clicked)} ref={parentRef} style={{ height }} className='hidden sm:flex group flex flex-row flex-grow flex items-center'>
+    <div onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} onClick={() => setClicked(!clicked)} ref={parentRef} style={{ height }} className='hidden lg:flex group flex-row flex-grow flex items-center'>
       <div className='h-20 w-20 relative flex justify-start items-center'>
         <SpotifyLogo className="" />
       </div>
@@ -298,7 +316,7 @@ export default function SpotifyStatus() {
       <div ref={childRef} className="absolute transition-opacity duration-400 group-hover:delay-0 delay-300 ease-out p-3 bg-(--spotify-background) rounded-lg flex flex-row flex-grow gap-2 items-center"
         style={{
           width,
-          opacity: (hovered || clicked) ? "100" : "0" // moved opacity from tailwind to ts controlled
+          opacity: (pointerType === "touch") ? (clicked ? "100" : "0") : (hovered || clicked ? "100" : "0")
         }}
       >
         {playback?.image && (
@@ -330,14 +348,19 @@ export default function SpotifyStatus() {
                 {playback.track}
               </a>
               {' by '}
-              <a
-                href={`https://open.spotify.com/artist/${playback.artist_uri?.split(':')[2]}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="whitespace-nowrap font-bold md:text-xl 2xl:text-2xl text-white sm:hover:underline cursor-pointer "
-              >
-                {playback.artist}
-              </a>
+              {typeof playback.artist !== "undefined" && playback.artist?.map((artist, index, arr) => (
+                <span key={index}>
+                  <a
+                    href={`https://open.spotify.com/artist/${playback.artist_uri && playback.artist_uri[index].split(':')[2]}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="whitespace-nowrap font-bold md:text-xl 2xl:text-2xl text-white sm:hover:underline cursor-pointer "
+                  >
+                    {artist.trim()}
+                  </a>
+                  {index < arr.length - 1 && ", "}
+                </span>
+              ))}
             </p>
 
           </div>

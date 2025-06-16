@@ -17,7 +17,7 @@ export default function HeroLink(
     }
 ) {
   return (
-    <Link href={href} target={isNewTab ? "_blank" : ""} className={`${className} text-md sm:text-xl md:text-2xl lg:text-4xl font-bold text-(--primary-color) hover:text-white transition-colors duration-300`}>
+    <Link href={href} target={isNewTab ? "_blank" : ""} className={`${className} text-[length:inherit] font-bold text-(--primary-color) hover:text-white transition-colors duration-300`}>
       &#64;
       <p className='underline inline'>{text}</p>{hasPeriod ? "." : ""}
     </Link>

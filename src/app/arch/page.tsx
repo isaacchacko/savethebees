@@ -31,27 +31,27 @@ const Header = ({
   href = "",
   id = ""
 }: HeaderProps) => (
-    <div className="flex flex-row justify-between items-center gap-4">
-      {href !== "" ? (
-        <div className={className + "cursor-pointer"}>
-          <a
-            href={href}
-            target="_blank"
-            rel="noopener noreferrer"
+  <div className="flex flex-row justify-between items-center gap-4">
+    {href !== "" ? (
+      <div className={className + "cursor-pointer"}>
+        <a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
 
-            id={id}
-            className="font-black text-white sm:hover:underline cursor-pointer"
-          >
-            {text}
-          </a>
-        </div>
-      ) : (
-          <div className={className} id={id}>
-            <span>{text}</span>
-          </div>
-        )}
-    </div>
-  );
+          id={id}
+          className="font-black text-white sm:hover:underline cursor-pointer"
+        >
+          {text}
+        </a>
+      </div>
+    ) : (
+      <div className={className} id={id}>
+        <span>{text}</span>
+      </div>
+    )}
+  </div>
+);
 
 export default function About() {
   const numBees = useResponsiveBees();
@@ -91,7 +91,7 @@ export default function About() {
 
         <div className="flex flex-col w-full max-w-4xl mx-auto p-4 md:p-8 mt-8 backdrop-blur-sm relative bg-(--spotify-background) rounded-lg shadow pointer-events-auto">
           <div className="text-base leading-loose text-center md:text-left">
-            <Header text="My Rice" id="rice"/>
+            <Header text="My Rice" id="rice" />
             <p className="pb-4" >Click on the image to see the technology used.</p>
             <RegionsOfInterest
               imageSrc="/i3_rice.png"
@@ -154,7 +154,7 @@ export default function About() {
 
             <h2 id='lazyvim' className="text-2xl text-gray-300 font-medium italic mb-4">lazyvim</h2>
             <p className="text-lg leading-loose mb-4">
-              <a target="_blank" href='http://www.lazyvim.org/' rel="noopener noreferrer" className="text-(--primary-color) underline underline-offset-2 hover:text-(--tertiary-color)">lazyvim</a> is the one application that I recommend anyone who is trying to be productive and use their time wisely to learn. Lazyvim is essentially a pre-compiled build of NeoVim, with all of the doohickeys and gadgets you could ever ask for, while also staying with the typical norms of NeoVim. Lazyvim takes away the burdens of learning about the wild assortment of plugin managers and plugins you could be using with NeoVim, and instead allows you to spend your time learning what's important: vim keybindings. Vim keybindings have gotten me out of more binds than I can count, and a lot of archaic applications still accept vim keybindings. Once you learn vim, you will never go back.
+              <a target="_blank" href='http://www.lazyvim.org/' rel="noopener noreferrer" className="text-(--primary-color) underline underline-offset-2 hover:text-(--tertiary-color)">lazyvim</a> is the one application that I recommend anyone who is trying to be productive and use their time wisely to learn. Lazyvim is essentially a pre-compiled build of Neovim, with all of the doohickeys and gadgets you could ever ask for, while also staying with the typical norms of Neovim. Lazyvim takes away the burdens of learning about the wild assortment of plugin managers and plugins you could be using with Neovim, and instead allows you to spend your time learning what's important: vim keybindings. Vim keybindings have gotten me out of more binds than I can count, and a lot of archaic applications still accept vim keybindings. Once you learn vim, you will never go back.
             </p>
 
             <button
