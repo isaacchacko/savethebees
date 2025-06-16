@@ -16,6 +16,20 @@ interface HTMLDictType {
   [name: string]: string;
 }
 
+interface StringDict {
+  [name: string]: string;
+}
+
+interface BooleanDict {
+  [name: string]: boolean;
+}
+
+const blurbDict: StringDict = {
+  "savethebees": "bunger afk",
+  "eulerelo": "zunger afk",
+  "autowal": "lunger afk",
+}
+
 export default function Home() {
   const numBees = useResponsiveBees();
   const spawnRadius = 100;
@@ -24,8 +38,16 @@ export default function Home() {
     repositories.reduce((acc, repo) => ({ ...acc, [repo]: "" }), {})
   );
 
+  const [visibleDict, setVisibleDict] = useState<BooleanDict>(() =>
+    repositories.reduce((acc, repo) => ({ ...acc, [repo]: false }), {})
+  );
+
   const setHTMLForRepo = (name: string, html: string) => {
     setHTMLDict(prev => ({ ...prev, [name]: html }));
+  };
+
+  const setVisible = (name: string, state: boolean) => {
+    setVisibleDict(prev => ({ ...prev, [name]: state }));
   };
 
   useEffect(() => {
@@ -51,6 +73,10 @@ export default function Home() {
 
     fetchHTML();
   }, []);
+
+  useEffect(() => {
+    console.log(visibleDict);
+  }, [visibleDict]);
 
   return (
     <div className="relative font-sans">
@@ -101,21 +127,27 @@ export default function Home() {
             </div>
           </div>
 
+          {repositories.map((name, index, arr) => (
+            <div key={index} className='text-base leading-relaxed pointer-events-auto flex flex-col w-full max-w-4xl mx-auto p-4 md:p-8 mt-8 backdrop-blur-sm relative bg-(--spotify-background) rounded-lg shadow"'>
+              <h2 className="font-black text-white text-2xl 2xl:text-4xl text-white text-bold cursor-pointer pb-2">
+                <a href={`http://github.com/isaachacko/${name}`} target="_blank" rel="noopener noreferrer" className="underline underline-offset-5 hover:text-(--primary-color)">
+                  {name}
+                </a>
+              </h2>
+              <p className="text-sm sm:text-base md:text-lg lg:text-xl">
+                {blurbDict[name]}
+              </p>
+              <div onClick={() => {
+                setVisibleDict(prev =>
+                  ({ ...prev, [name]: !prev[name] })
+                )
+              }} className='text-blue-500 hover:text-white underline'>{visibleDict[name] ? "Hide README.md" : "Show README.md"}</div>
+              <div dangerouslySetInnerHTML={{ __html: HTMLDict[name] }} className={` ${visibleDict[name] ? "" : "hidden"} markdown-body`}>
+              </div>
+            </div>
+          ))}
         </div>
 
-        {repositories.map((name, index, arr) => (
-          <div className='text-base leading-relaxed pointer-events-auto flex flex-col w-full max-w-4xl mx-auto p-4 md:p-8 mt-8 backdrop-blur-sm relative bg-(--spotify-background) rounded-lg shadow"'>
-            <h2 className="font-black text-white text-2xl 2xl:text-4xl text-white text-bold cursor-pointer pb-2">
-              <a href={`http://github.com/isaachacko/${name}`} target="_blank" rel="noopener noreferrer" className="underline underline-offset-5 hover:text-(--primary-color)">
-
-                {name}
-              </a>
-
-            </h2>
-            <div key={index} dangerouslySetInnerHTML={{ __html: HTMLDict[name] }} className='markdown-body'>
-            </div>
-          </div>
-        ))}
 
         <footer className="absolute bottom-2 left-2 contactInfo">
           <p>Copyright &copy; 2025 Isaac Chacko</p>
