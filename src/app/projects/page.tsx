@@ -6,17 +6,23 @@ import CanvasBackground from '@/components/CanvasBackground';
 import useResponsiveBees from '@/hooks/useResponsiveBees';
 import Navbar from "@/components/Navbar";
 
-// for the external links
-import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
-
-// markdown
-import { marked } from 'marked';
+// expand/collapse readme
+import { FiGithub, FiChevronRight, FiChevronDown } from "react-icons/fi";
+import { FaGit, FaGithub } from 'react-icons/fa';
 
 interface HTMLDictType {
   [name: string]: string;
 }
 
-interface StringDict {
+interface ChipDict {
+  [name: string]: string[];
+}
+
+interface TechnologyDict {
+  [name: string]: string;
+}
+
+interface TitleDict {
   [name: string]: string;
 }
 
@@ -24,16 +30,36 @@ interface BooleanDict {
   [name: string]: boolean;
 }
 
-const blurbDict: StringDict = {
-  "savethebees": "bunger afk",
-  "eulerelo": "zunger afk",
-  "autowal": "lunger afk",
+const titleDict: TitleDict = {
+  'savethebees': "My Personal Website",
+  'eulerelo': "Eulerelo: Competitve Math",
+  'autowal': "Autowal: a CLI tool"
 }
+
+const techStack: ChipDict = {
+  "savethebees": ["Next.js", "Typescript", "Tailwind CSS", "Redis", "Vercel"],
+  "eulerelo": ["Next.js", "Typescript", "Tailwind CSS", "PrismaDB", "PostgreSQL"],
+  "autowal": ["Python", "Bash", "cURL", "Linux"],
+}
+
+const TECHNOLOGIES: TechnologyDict = {
+  "Next.js": "#ffffff", // Official: black/white, using white
+  "Typescript": "#3178c6", // Official blue
+  "Tailwind CSS": "#38bdf8", // Official blue
+  "Redis": "#dc382d", // Official red
+  "Vercel": "#ffffff", // Official: black
+  "PrismaDB": "#0c344b", // Prisma's dark blue
+  "PostgreSQL": "#336791", // Official blue
+  "Python": "#3776ab", // Official blue
+  "Bash": "#4eaa25", // Green (Bash logo)
+  "cURL": "#073551", // Official blue
+  "Linux": "#1793d1", // Official yellow
+};
 
 export default function Home() {
   const numBees = useResponsiveBees();
   const spawnRadius = 100;
-  const repositories: string[] = ["savethebees", "eulerelo", "autowal"];
+  const repositories: string[] = ["autowal", "eulerelo", "savethebees"];
   const [HTMLDict, setHTMLDict] = useState<HTMLDictType>(() =>
     repositories.reduce((acc, repo) => ({ ...acc, [repo]: "" }), {})
   );
@@ -74,6 +100,22 @@ export default function Home() {
     fetchHTML();
   }, []);
 
+  function getContrastYIQ(hexcolor: string) {
+    // Remove hash if present
+    hexcolor = hexcolor.replace('#', '');
+
+    // Parse r, g, b values
+    const r = parseInt(hexcolor.substr(0, 2), 16);
+    const g = parseInt(hexcolor.substr(2, 2), 16);
+    const b = parseInt(hexcolor.substr(4, 2), 16);
+
+    // YIQ formula
+    const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+
+    // Return black for light backgrounds, white for dark backgrounds
+    return (yiq >= 128) ? '#000000' : '#ffffff';
+  }
+
   useEffect(() => {
     console.log(visibleDict);
   }, [visibleDict]);
@@ -96,53 +138,50 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="pointer-events-auto flex flex:w-col w-full max-w-4xl mx-auto p-4 md:p-8 mt-8 backdrop-blur-sm relative bg-(--spotify-background) rounded-lg shadow">
-            <div className="text-base leading-relaxed">
-              <div className="flex flex-row jusitfy-center items">
-
-                <h2 className="font-black text-white text-2xl 2xl:text-4xl text-white text-bold cursor-pointer pb-2">
-                  <a href="http://eulerelo.vercel.app" target="_blank" rel="noopener noreferrer" className="underline underline-offset-5 hover:text-(--primary-color)">
-
-                    Eulerelo
-                  </a>
-
-                </h2>
-                <ArrowTopRightOnSquareIcon className="ml-1 h-4 w-4" aria-label="Opens in new tab" />
-              </div>
-              <p className="text-sm sm:text-base md:text-lg lg:text-xl">
-                Challenge your math skills in real-time duels, climb the leaderboard, and master topics from arithmetic to calculus. Compete with others, solve problems faster, and see how you rank among math enthusiasts worldwide!
-              </p>
-            </div>
-          </div>
-
-
-          <div className="pointer-events-auto flex flex-col w-full max-w-4xl mx-auto p-4 md:p-8 mt-8 backdrop-blur-sm relative bg-(--spotify-background) rounded-lg shadow">
-            <div className="text-base leading-relaxed">
-              <h2 className="font-black text-white text-2xl 2xl:text-4xl text-white cursor-pointer pb-2">
-                Under construction...
-              </h2>
-              <p className="text-sm sm:text-base md:text-lg lg:text-xl">
-                I'll eventually cover this page with any metric you can think of. Red Bulls downed, late night hours grinded, my CS in League-- you name it.
-              </p>
-            </div>
-          </div>
 
           {repositories.map((name, index, arr) => (
             <div key={index} className='text-base leading-relaxed pointer-events-auto flex flex-col w-full max-w-4xl mx-auto p-4 md:p-8 mt-8 backdrop-blur-sm relative bg-(--spotify-background) rounded-lg shadow"'>
-              <h2 className="font-black text-white text-2xl 2xl:text-4xl text-white text-bold cursor-pointer pb-2">
-                <a href={`http://github.com/isaachacko/${name}`} target="_blank" rel="noopener noreferrer" className="underline underline-offset-5 hover:text-(--primary-color)">
-                  {name}
+              <div className='flex flex-row gap-3 items-center justify-between'>
+                <div className='flex flex-row gap-2 items-center group'>
+                  <span className="font-black text-white text-2xl 2xl:text-4xl text-white text-bold cursor-pointer pb-2 underline underline-offset-5 text-(--primary-color) group-hover:text-white transition-colors duration-300">
+                    <a href={`http://github.com/isaacchacko/${name}`} target="_blank" rel="noopener noreferrer" className="">
+                      {titleDict[name]}
+                    </a>
+                  </span>
+                  <div onClick={() => {
+                    setVisibleDict(prev =>
+                      ({ ...prev, [name]: !prev[name] })
+                    )
+                  }} className='text-(--primary-color) group-hover:text-white underline transition-colors duration-300'>
+                    {visibleDict[name]
+                      ? <FiChevronDown />
+                      : <FiChevronRight />
+                    }</div>
+                </div>
+
+                <a href={`http://github.com/isaacchacko/${name}`} target="_blank" rel="noopener noreferrer" className="">
+                  <div className='hover:scale-110 transition-transform duration-300 rounded-lg flex flex-row gap-2 items-center border border-white px-3 py-1'>
+                    <FaGithub size={24} />
+                    <span>Open on GitHub</span>
+                  </div>
                 </a>
-              </h2>
-              <p className="text-sm sm:text-base md:text-lg lg:text-xl">
-                {blurbDict[name]}
-              </p>
-              <div onClick={() => {
-                setVisibleDict(prev =>
-                  ({ ...prev, [name]: !prev[name] })
-                )
-              }} className='text-blue-500 hover:text-white underline'>{visibleDict[name] ? "Hide README.md" : "Show README.md"}</div>
-              <div dangerouslySetInnerHTML={{ __html: HTMLDict[name] }} className={` ${visibleDict[name] ? "" : "hidden"} markdown-body`}>
+
+              </div>
+              <div className={` ${visibleDict[name] ? "" : "hidden"} w-full markdown-body quick-slide-down-fade-in `}>
+
+                <div className='flex flex-row items-center gap-3 flex-wrap justify-start my-3'>
+                  {techStack[name].map((techName, techIndex, techArr) => (
+                    <div key={techIndex} className={`hover:scale-110 transition-transform duration-300 inline-block px-3 py-1 rounded-full font-semibold text-sm`}
+                      style={{
+                        background: TECHNOLOGIES[techName],
+                        color: getContrastYIQ(TECHNOLOGIES[techName]),
+                      }}>
+                      {techName}
+                    </div>
+                  ))}
+                </div>
+                <div dangerouslySetInnerHTML={{ __html: HTMLDict[name] }} >
+                </div>
               </div>
             </div>
           ))}

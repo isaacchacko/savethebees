@@ -22,7 +22,7 @@ const HOWDY_TEXT_HEIGHT = "text-4xl md:text-4xl lg:text-6xl"
 export default function Home() {
   return (
     <div className='w-1/2 sm:p-none flex flex-col items-center justify-center'>
-      <div className="flex flex-col items-center">
+      <div className="flex flex-col items-center gap-3">
         <h1 className={` text-center  ${HOWDY_TEXT_HEIGHT} title-slide-down-fade-in font-bold`}>
           Howdy! I&apos;m a<br></br>
           <TextCycler
