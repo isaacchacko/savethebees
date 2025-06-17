@@ -190,7 +190,7 @@ export default function Home() {
                 </div>
 
               </div>
-              <div className={` ${visibleDict[name] ? "" : "hidden"} w-full markdown-body quick-slide-down-fade-in `}>
+              {visibleDict[name] && (<div className={` w-full markdown-body quick-slide-down-fade-in `}>
 
                 <div className='flex flex-row items-center gap-3 flex-wrap justify-start my-3'>
                   {techStack[name].map((techName, techIndex, techArr) => (
@@ -205,7 +205,7 @@ export default function Home() {
                 </div>
                 <div dangerouslySetInnerHTML={{ __html: HTMLDict[name] }} >
                 </div>
-              </div>
+              </div>)}
             </div>
           ))}
         </div>
