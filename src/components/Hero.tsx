@@ -11,11 +11,11 @@ import {
   BiMailSend,      // Mail/envelope
   BiRun,           // Running man
   BiDisc,          // CD/disc
-  BiSun,
-  BiMoon
 } from 'react-icons/bi';
 import { FiGithub } from "react-icons/fi";
 import { AiOutlineLinkedin } from "react-icons/ai";
+
+import DarkModeToggle from './DarkModeToggle';
 
 const ICON_WIDTH_HEIGHT = "w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 lg:w-10 lg:h-10 ";
 const HOWDY_TEXT_HEIGHT = "text-4xl md:text-4xl lg:text-6xl"
@@ -79,20 +79,7 @@ export default function Home() {
 
             <IconLink className={ICON_WIDTH_HEIGHT} IconComponent={BiRun} href='/tracking' isNewTab={false} />
             <IconLink className={ICON_WIDTH_HEIGHT} IconComponent={BiDisc} href='/tracking' isNewTab={false} />
-            <button
-              aria-label="Toggle theme"
-              onClick={() =>
-                localStorage.setItem(
-                  'theme',
-                  document.documentElement.classList.toggle('dark')
-                    ? 'dark'
-                    : 'light'
-                )
-              }
-            >
-              <BiMoon className={`hidden dark:block visible ${ICON_WIDTH_HEIGHT} cursor-pointer scale-80 hover:scale-100 duration-300`} />
-              <BiSun className={`dark:hidden block ${ICON_WIDTH_HEIGHT} cursor-pointer scale-80 hover:scale-100 duration-300`} />
-            </button>
+            <DarkModeToggle ICON_WIDTH_HEIGHT={ICON_WIDTH_HEIGHT} />
             <ColorPaletteEditor widthHeight={ICON_WIDTH_HEIGHT} />
           </div>
         </div>

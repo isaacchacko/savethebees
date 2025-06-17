@@ -9,7 +9,7 @@ const redis = new Redis({
 
 export async function GET(
   request: Request,
-  { params }: { params: { name: string } }
+  { params }: { params: Promise<{ name: string }> }
 ) {
 
   const { name } = await params;

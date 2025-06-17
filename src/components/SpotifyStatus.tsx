@@ -348,7 +348,7 @@ export default function SpotifyStatus() {
                 {playback.track}
               </a>
               {' by '}
-              {typeof playback.artist !== "undefined" && playback.artist?.map((artist, index, arr) => (
+              {Array.isArray(playback.artist) && playback.artist.every(item => typeof item === "string") && playback.artist?.map((artist, index, arr) => (
                 <span key={index}>
                   <a
                     href={`https://open.spotify.com/artist/${playback.artist_uri && playback.artist_uri[index].split(':')[2]}`}

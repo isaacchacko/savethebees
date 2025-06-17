@@ -7,8 +7,12 @@ import useResponsiveBees from '@/hooks/useResponsiveBees';
 import Navbar from "@/components/Navbar";
 
 // expand/collapse readme
-import { FiGithub, FiChevronRight, FiChevronDown } from "react-icons/fi";
-import { FaGit, FaGithub } from 'react-icons/fa';
+import { FiChevronRight, FiChevronDown } from "react-icons/fi";
+import { FaGithub } from 'react-icons/fa';
+import { TbExternalLink } from "react-icons/tb";
+
+import Footer from "@/components/Footer"
+const ICON_WIDTH_HEIGHT = "w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 lg:w-10 lg:h-10 ";
 
 interface HTMLDictType {
   [name: string]: string;
@@ -26,20 +30,30 @@ interface TitleDict {
   [name: string]: string;
 }
 
+interface LinkDict {
+  [name: string]: string[] | null;
+}
+
 interface BooleanDict {
   [name: string]: boolean;
 }
 
 const titleDict: TitleDict = {
   'savethebees': "My Personal Website",
-  'eulerelo': "Eulerelo: Competitve Math",
-  'autowal': "Autowal: a CLI tool"
+  'eulerelo': "Eulerelo",
+  'autowal': "Autowal"
 }
 
 const techStack: ChipDict = {
   "savethebees": ["Next.js", "Typescript", "Tailwind CSS", "Redis", "Vercel"],
   "eulerelo": ["Next.js", "Typescript", "Tailwind CSS", "PrismaDB", "PostgreSQL"],
   "autowal": ["Python", "Bash", "cURL", "Linux"],
+}
+
+const externalLinkDict: LinkDict = {
+  "savethebees": ["isaacchacko.co", "http://isaacchacko.co"],
+  "eulerelo": ["eulerelo.vercel.app", "http://eulerelo.vercel.app"],
+  "autowal": null
 }
 
 const TECHNOLOGIES: TechnologyDict = {
@@ -63,6 +77,7 @@ export default function Home() {
   const [HTMLDict, setHTMLDict] = useState<HTMLDictType>(() =>
     repositories.reduce((acc, repo) => ({ ...acc, [repo]: "" }), {})
   );
+  const [hasExpanded, setHasExpanded] = useState(false);
 
   const [visibleDict, setVisibleDict] = useState<BooleanDict>(() =>
     repositories.reduce((acc, repo) => ({ ...acc, [repo]: false }), {})
@@ -70,10 +85,6 @@ export default function Home() {
 
   const setHTMLForRepo = (name: string, html: string) => {
     setHTMLDict(prev => ({ ...prev, [name]: html }));
-  };
-
-  const setVisible = (name: string, state: boolean) => {
-    setVisibleDict(prev => ({ ...prev, [name]: state }));
   };
 
   useEffect(() => {
@@ -142,29 +153,41 @@ export default function Home() {
           {repositories.map((name, index, arr) => (
             <div key={index} className='text-base leading-relaxed pointer-events-auto flex flex-col w-full max-w-4xl mx-auto p-4 md:p-8 mt-8 backdrop-blur-sm relative bg-(--spotify-background) rounded-lg shadow"'>
               <div className='flex flex-row gap-3 items-center justify-between'>
-                <div className='flex flex-row gap-2 items-center group'>
-                  <span className="font-black text-white text-2xl 2xl:text-4xl text-white text-bold cursor-pointer pb-2 underline underline-offset-5 text-(--primary-color) group-hover:text-white transition-colors duration-300">
-                    <a href={`http://github.com/isaacchacko/${name}`} target="_blank" rel="noopener noreferrer" className="">
-                      {titleDict[name]}
-                    </a>
-                  </span>
-                  <div onClick={() => {
+                <div className='flex flex-row gap-2 items-center group'
+                  onClick={() => {
                     setVisibleDict(prev =>
                       ({ ...prev, [name]: !prev[name] })
-                    )
-                  }} className='text-(--primary-color) group-hover:text-white underline transition-colors duration-300'>
+                    );
+                    setHasExpanded(true);
+                  }}>
+                  <span className="font-black text-2xl 2xl:text-4xl text-bold cursor-pointer pb-2 underline underline-offset-5 text-(--primary-color) group-hover:text-white transition-colors duration-300">
+                    {titleDict[name]}
+                  </span>
+                  <div className='text-(--primary-color) group-hover:text-white underline transition-colors duration-300'>
                     {visibleDict[name]
                       ? <FiChevronDown />
                       : <FiChevronRight />
                     }</div>
+                  <span className={` ${!hasExpanded && index == 0 ? "block" : "hidden"} animate-pulse`}>click me to learn more!</span>
                 </div>
 
-                <a href={`http://github.com/isaacchacko/${name}`} target="_blank" rel="noopener noreferrer" className="">
-                  <div className='hover:scale-110 transition-transform duration-300 rounded-lg flex flex-row gap-2 items-center border border-white px-3 py-1'>
-                    <FaGithub size={24} />
-                    <span>Open on GitHub</span>
-                  </div>
-                </a>
+                <div className='flex flex-col items-end gap-2'>
+                  <a href={`http://github.com/isaacchacko/${name}`} target="_blank" rel="noopener noreferrer" className="">
+                    <div className='hover:bg-(--primary-color) transition-colors duration-300 rounded-lg flex flex-row gap-2 items-center border border-white px-3 py-1'>
+                      <FaGithub size={24} />
+                      <span>isaacchacko/{name}</span>
+                    </div>
+                  </a>
+
+                  {externalLinkDict[name] !== null &&
+                    <a href={externalLinkDict[name][1]} target="_blank" rel="noopener noreferrer" className="">
+                      <div className='hover:bg-(--primary-color) transition-colors duration-300 rounded-lg flex flex-row gap-2 items-center border border-white px-3 py-1'>
+                        <TbExternalLink size={24} />
+                        <span>{externalLinkDict[name][0]}</span>
+                      </div>
+                    </a>}
+
+                </div>
 
               </div>
               <div className={` ${visibleDict[name] ? "" : "hidden"} w-full markdown-body quick-slide-down-fade-in `}>
@@ -188,9 +211,7 @@ export default function Home() {
         </div>
 
 
-        <footer className="absolute bottom-2 left-2 contactInfo">
-          <p>Copyright &copy; 2025 Isaac Chacko</p>
-        </footer>
+        <Footer ICON_WIDTH_HEIGHT={ICON_WIDTH_HEIGHT} />
       </div>
     </div>
   );

@@ -34,7 +34,20 @@ export default function ColorPaletteEditor({ hide = false, widthHeight = "" }: {
     COLOR_KEYS,
     DEFAULT_COLOR
   ) as [ColorDict, SetColorDict];
-  const [index, setIndex] = useState(ACCENT_COLORS.indexOf(`#${rgbHex(colorDict['primary-color'])}`));
+  const [index, setIndex] = useState(0);
+
+
+  function isRgbString(str: string) {
+    return typeof str === "string" && /^rgb\(\s*\d+,\s*\d+,\s*\d+\s*\)$/.test(str);
+  }
+
+  useEffect(() => {
+    const primary = colorDict['primary-color'];
+    if (isRgbString(primary)) {
+      const idx = ACCENT_COLORS.indexOf(`#${rgbHex(primary)}`);
+      setIndex(idx > -1 ? idx : 0);
+    }
+  }, []);
 
   const next = () => {
     setIndex((prev) => (prev + 1) % ACCENT_COLORS.length);

@@ -115,6 +115,12 @@ body {
   animation-delay: 200ms;
 }
 
+.slow-slide-down-fade-in {
+  animation: slideDownFadeIn 0.4s ease-out forwards;
+  opacity: 0;
+  animation-delay: 2000ms;
+}
+
 .wait-longer {
   animation-delay: 800ms;
 }
