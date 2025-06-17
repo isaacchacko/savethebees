@@ -1,98 +1,104 @@
 'use client'; // Required for client-side interactivity
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import Link from 'next/link';
 import ColorPaletteEditor from './ColorPaletteEditor';
 import SpotifyStatus from '@/components/SpotifyStatus';
+import DarkModeToggle from "./DarkModeToggle";
 
+// to check if we're at home
+import { useRouter } from 'next/router';
 
 const HamburgerIcon = ({ onClick }: { onClick: () => void }) => (
   <button onClick={onClick} className="lg:hidden">
-    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
     </svg>
   </button>
 );
 
-const BASE_CLASS_NAME = "hover:text-(--tertiary-color) font-bold text-xl transition-colors";
+const BASE_CLASS_NAME = "hover:text-(--tertiary-color) font-bold text-4xl transition-colors duration-300";
+const ICON_WIDTH_HEIGHT = "w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 lg:w-10 lg:h-10 ";
 
-interface NavbarProps {
-  showColorPalette?: boolean;
-  spotifyStatus?: boolean;
-  learnMorePath?: string;
-}
-
-export default function Navbar({
-  showColorPalette = true,
-  spotifyStatus = true,
-}: NavbarProps) {
+export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [navbarHeight, setNavbarHeight] = useState(0);
+  const [height, setHeight] = useState(0);
   const navRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
+  const isHome = mounted && window.location.pathname === "/";
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const updateNavbarHeight = () => {
-      if (navRef.current) {
-        setNavbarHeight(navRef.current.offsetHeight);
-      }
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
     };
-
-    updateNavbarHeight();
-    window.addEventListener('resize', updateNavbarHeight);
-
-    return () => window.removeEventListener('resize', updateNavbarHeight);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(
+    () => {
+      setMounted(true);
+    }, []);
+
+  useLayoutEffect(() => {
+    if (!navRef.current) return;
+
+    setHeight(navRef.current.getBoundingClientRect().height);
+
+    const observer = new ResizeObserver(entries => {
+      setHeight(entries[0].contentRect.height);
+    });
+
+    observer.observe(navRef.current);
+
+    return () => observer.disconnect();
+
+  }, [navRef.current]);
 
   return (
     <>
-      <div className="fixed top-0 left-0 right-0 z-50">
-        <nav 
-          ref={navRef}
-          className="cursor-pointer flex justify-between items-center p-4 bg-(--spotify-background)/80 backdrop-blur-sm border-b border-gray-500" 
-          style={{ pointerEvents: 'auto' }}
-        >
-          <div className="flex flex-row items-center relative mr-10">
-            <div className="hover:text-(--tertiary-color) transition-colors">
-              <Link href="/" className="hidden xl:block text-4xl font-bold">
-                <h1>Isaac Chacko</h1>
+      <div style={{ height }}>
+        <div className="fixed top-0 left-0 right-0 z-2" ref={navRef}>
+
+          <nav
+            className={`box-border cursor-pointer flex ${isHome ? "justify-end" : "justify-between"} lg:justify-start items-center p-4 px-8 gap-10 transition-colors duration-300 ${scrolled ? "bg-[rgba(20,20,20,0.7)] backdrop-blur-md shadow-lg" : "bg-transparent"}`} // bg-(--spotify-background)/80 backdrop-blur-sm border-b border-gray-500" 
+            style={{ pointerEvents: 'auto' }}
+          >
+
+            <div className={` ${isHome ? "hidden" : ""} flex flex-row items-center gap-3`}>
+              <Link href="/">
+                <svg className={`scale-80 hover:scale-100 duration-300 ${ICON_WIDTH_HEIGHT}`} viewBox="0 0 24 24" fill="none">
+                  <path fillRule="evenodd" clipRule="evenodd" d="M12 3.1875L21.4501 10.275L21.0001 11.625H20.25V20.25H3.75005V11.625H3.00005L2.55005 10.275L12 3.1875ZM5.25005 10.125V18.75H18.75V10.125L12 5.0625L5.25005 10.125Z" fill="#ffffff" />
+                </svg>
               </Link>
-              <Link href="/" className="block xl:hidden text-4xl font-bold">
-                <h1>IC</h1>
-              </Link>
+              <DarkModeToggle ICON_WIDTH_HEIGHT={ICON_WIDTH_HEIGHT} />
+              <ColorPaletteEditor widthHeight={ICON_WIDTH_HEIGHT} />
             </div>
-            {showColorPalette && <ColorPaletteEditor />}
-          </div>
 
-          {/* this doesn't take up space */}
-          <div className="absolute invisible w-0 h-0 pointer-events-none">
-            <ColorPaletteEditor />
-          </div>
+            <SpotifyStatus />
 
-          {spotifyStatus && (
-            <SpotifyStatus condensed={true} className="" />
-          )}
+            <div className="flex justify-between items-center gap-10">
+              <HamburgerIcon onClick={() => setIsMenuOpen(!isMenuOpen)} />
 
-          <div className="flex justify-between items-center gap-10 ml-10">
-            <HamburgerIcon onClick={() => setIsMenuOpen(!isMenuOpen)} />
-
-            <div className={`${isMenuOpen ? 'flex' : 'hidden'} lg:flex flex-col lg:flex-row absolute lg:relative top-full right-0 lg:top-auto lg:right-auto bg-(--spotify-background)/80 lg:bg-transparent p-4 lg:p-0 gap-4 lg:gap-10`}>
-              <Link href="/projects" className={BASE_CLASS_NAME}>
-                Projects
-              </Link>
-              <Link href="/tracking" className={BASE_CLASS_NAME}>
-                Tracking
-              </Link>
-              <Link href="/arch" className={BASE_CLASS_NAME}>
-                Arch
-              </Link>
-              <Link href="/about" className={BASE_CLASS_NAME}>
-                About
-              </Link>
+              <div className={`${isMenuOpen ? 'flex' : 'hidden'} lg:flex flex-col lg:flex-row absolute lg:relative top-full right-0 lg:top-auto lg:right-auto bg-(--spotify-background)/80 lg:bg-transparent p-4 lg:p-0 gap-4 lg:gap-10`}>
+                <Link href="/projects" className={BASE_CLASS_NAME}>
+                  Projects
+                </Link>
+                <Link href="/tracking" className={BASE_CLASS_NAME}>
+                  Tracking
+                </Link>
+                <Link href="/arch" className={BASE_CLASS_NAME}>
+                  Arch
+                </Link>
+                <Link href="/about" className={BASE_CLASS_NAME}>
+                  About
+                </Link>
+              </div>
             </div>
-          </div>
-        </nav>
+          </nav>
+        </div>
       </div>
-      <div style={{ marginTop: `${navbarHeight+50}px` }}></div>
     </>
   );
 }

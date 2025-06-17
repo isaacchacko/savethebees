@@ -2,7 +2,14 @@ import React, { useState, useEffect } from 'react';
 import HowWebsite from '@/components/HowWebsite';
 import FlyingTriangles from '@/components/FlyingTriangles';
 
-const InfoModal = () => {
+const InfoModal = (
+  {
+    className = ""
+  }:
+    {
+      className?: string;
+    }
+) => {
   const [isOpen, setIsOpen] = useState(false);
   const [componentKey, setComponentKey] = useState<keyof typeof componentMap | null>(null);
 
@@ -31,7 +38,7 @@ const InfoModal = () => {
 
   return (
     <>
-      <div className="flex flex-col italic lg:flex-row lg:divide-y-0 mt-10 gap-2 text-(--primary-color) font-black">
+      <div className={` ${className} flex flex-col italic lg:flex-row lg:divide-y-0 gap-2 text-(--primary-color) font-black`}>
         <a
           className="hover:underline pointer-events-auto cursor-pointer"
           onClick={() => openModal("HowWebsite")}

@@ -10,16 +10,10 @@ export default function Home() {
   const spawnRadius = 100;
 
   return (
-    <div className="relative font-sans mb-10"> {/* because the info modal is too close to ground */}
+    <div className="font-sans w-screen h-screen overflow-hidden flex justify-center items-center">
+      <Navbar />
       <CanvasBackground numBees={numBees} spawnRadius={spawnRadius} />
-
-      <div className="relative flex flex-col z-20 min-h-screen" style={{ pointerEvents: 'none' }}>
-        {/* Navigation Bar */}
-        <Navbar spotifyStatus={false} learnMorePath="/about" />
-
-        {/* Main Content Area */}
-        <Hero />
-      </div>
+      <Hero />
     </div>
 
   );

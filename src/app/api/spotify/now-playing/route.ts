@@ -149,8 +149,8 @@ export async function GET() {
   return NextResponse.json({
     is_playing: playbackData.is_playing,
     track: playbackData.item.name,
-    artist: playbackData.item.artists.map((a: { name: string }) => a.name).join(', '),
-    artist_uri: playbackData.item.artists.map((a: { uri: string }) => a.uri).join(', '),
+    artist: playbackData.item.artists.map((a: { name: string }) => a.name),
+    artist_uri: playbackData.item.artists.map((a: { uri: string }) => a.uri),
     album: playbackData.item.album.name,
     album_uri: playbackData.item.album.uri,
     image: playbackData.item.album.images[0]?.url,

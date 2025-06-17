@@ -6,6 +6,11 @@ import CanvasBackground from '@/components/CanvasBackground';
 import useResponsiveBees from '@/hooks/useResponsiveBees';
 import Navbar from "@/components/Navbar";
 
+import Footer from "@/components/Footer"
+const ICON_WIDTH_HEIGHT = "w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 lg:w-10 lg:h-10 ";
+
+import HeroAtLink from "@/components/HeroAtLink"
+
 export default function Home() {
   const numBees = useResponsiveBees();
   const spawnRadius = 100;
@@ -16,7 +21,7 @@ export default function Home() {
   return (
     <div className="relative font-sans">
       <CanvasBackground numBees={numBees} spawnRadius={spawnRadius} />
-      <Navbar showColorPalette={false} learnMorePath="/projects" />
+      <Navbar />
 
       <div className="slide-down-fade-in relative flex flex-col min-h-screen justify-start pointer-events-none">
 
@@ -27,8 +32,12 @@ export default function Home() {
               <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl text-(--primary-color) font-black pb-1 md:pb-6">
                 About Me
               </h2>
-              <p className="text-sm sm:text-base md:text-lg lg:text-xl">
-                I&apos;m Isaac. I&apos;m CS/Applied Math Engineering Honors @ TAMU and currently intern @ <a target="_blank" href="http://www.siso-eng.com" rel="noopener noreferrer" className="text-(--primary-color) underline underline-offset-2 hover:text-(--tertiary-color)">SISO</a>. On the side, I&apos;m developing for <a target="_blank" href='https://www.eulerelo.vercel.app' rel="noopener noreferrer" className="text-(--primary-color) underline underline-offset-2 hover:text-(--tertiary-color)">Eulerelo</a>, a competitive math platform. For fun, I play board games, train for the Cheveron marathon, and eat lots of Blue Bell.</p>
+              <span className="text-sm sm:text-base md:text-lg lg:text-xl">
+                I&apos;m Isaac. I&apos;m CS/Applied Math Engineering Honors{' '}
+                <HeroAtLink text="TAMU" href="https://www.tamu.edu" hasPeriod={false} />{' '}
+                and currently intern{' '}
+                <HeroAtLink text="SISO" href="https://www.siso-eng.com" hasPeriod={true} />{' '}
+                On the side, I&apos;m developing for <a target="_blank" href='https://www.eulerelo.vercel.app' rel="noopener noreferrer" className="font-bold text-(--primary-color) underline underline-offset-2 hover:text-white transition-color duration-300">Eulerelo</a>, a competitive math platform. For fun, I play board games, train for the Cheveron marathon, and eat lots of Blue Bell.</span>
             </div>
 
             {/* Flip Card Container */}
@@ -38,9 +47,8 @@ export default function Home() {
             >
               {/* Inner Card */}
               <div
-                className={`pointer-events-auto transition-transform duration-500 transform-style-preserve-3d ${
-                  isFlipped ? 'rotate-y-180' : ''
-                }`}
+                className={`pointer-events-auto transition-transform duration-500 transform-style-preserve-3d ${isFlipped ? 'rotate-y-180' : ''
+                  }`}
               >
                 {/* Front Side (Image) */}
                 <div className="backface-hidden">
@@ -64,9 +72,7 @@ export default function Home() {
           </div>
         </div>
 
-        <footer className="absolute bottom-2 left-2 contactInfo">
-          <p>Copyright &copy; 2025 Isaac Chacko</p>
-        </footer>
+        <Footer ICON_WIDTH_HEIGHT={ICON_WIDTH_HEIGHT} />
       </div>
     </div>
   );

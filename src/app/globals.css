@@ -5,13 +5,18 @@
 @layer theme {
   :root {
     --foreground: #ffffff;
-    --background: #323437;
+    /* --background: #323437; from original dark mode */
+    --background: #E6D29F;
     --primary-color: #10B981;
     --secondary-color: #059669;
     --tertiary-color: #047857;
     --default-primary-color: #10B981;
     --spotify-foreground: #1ED760;
     --spotify-background: #121212;
+  }
+
+  .dark {
+    --background: oklch(12.9% 0.042 264.695);
   }
 }
 
@@ -25,28 +30,38 @@ body {
   background: var(--background);
 }
 
-/* Allow pointer events through overlays */
-nav, .overlay-element {
-  pointer-events: none;
+.clickable-elements {
+  pointer-events: auto;
 }
 
-
 @keyframes drop-out {
-  0% { transform: translateY(0); opacity: 1; }
-  100% { transform: translateY(1.5rem); opacity: 0; }
+  0% {
+  transform: translateY(0);
+    opacity: 1;
+}
+  100% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
 }
 
 @keyframes drop-in {
-  0% { transform: translateY(-1.5rem); opacity: 0; }
-  100% { transform: translateY(0); opacity: 1; }
+  0% { 
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .animate-drop-out {
-  animation: drop-out 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: drop-out 0.5s ease-in-out forwards;
 }
 
 .animate-drop-in {
-  animation: drop-in 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: drop-in 0.5s ease-in-out forwards;
 }
 
 .invisible {
@@ -72,7 +87,7 @@ nav, .overlay-element {
 /* Define the keyframes */
 @keyframes slideDownFadeIn {
   0% {
-    transform: translateY(-20px); /* Start slightly above */
+    transform: translateY(20px); /* Start slightly above */
     opacity: 0; /* Fully transparent */
   }
   100% {
@@ -81,12 +96,29 @@ nav, .overlay-element {
   }
 }
 
+.title-slide-down-fade-in {
+  animation: slideDownFadeIn 0.4s ease-out forwards;
+  opacity: 0;
+  animation-delay: 500ms;
+}
+
 /* Create the animation class */
 .slide-down-fade-in {
-  animation: slideDownFadeIn 1.5s ease-out forwards;
-  opacity: 0; /* Start invisible */
-  animation-delay: 500ms; /* Match the JS delay */
-  
+  animation: slideDownFadeIn 0.4s ease-out forwards;
+  opacity: 0;
+  animation-delay: 1000ms;
+}
+
+.quick-slide-down-fade-in {
+  animation: slideDownFadeIn 0.4s ease-out forwards;
+  opacity: 0;
+  animation-delay: 200ms;
+}
+
+.slow-slide-down-fade-in {
+  animation: slideDownFadeIn 0.4s ease-out forwards;
+  opacity: 0;
+  animation-delay: 2000ms;
 }
 
 .wait-longer {
@@ -153,4 +185,156 @@ transform: rotateY(180deg);
 .info {
     border: 1000 solid rgba(0,0,0,0.5);
     background-clip: padding-box;
+}
+
+@keyframes scroll-x {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-scroll-x {
+  animation: scroll-x 10s linear infinite;
+}
+
+.markdown-body {
+  /* GitHub dark font stack */
+  color: #c9d1d9;
+  line-height: 1.6;
+  font-size: 18px;         /* Increased from 16px */
+  padding: 32px;
+  max-width: 900px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  word-break: break-word;
+}
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+  font-weight: 600;
+  margin-top: 1.5em;
+  margin-bottom: 1em;
+  line-height: 1.25;
+}
+
+.markdown-body h1 {
+  font-size: 2.25em;       /* Slightly larger for h1 */
+  border-bottom: 1px solid #30363d;
+  padding-bottom: 0.3em;
+  display: none;
+}
+.markdown-body h2 {
+  font-size: 1.75em;       /* Increased from 1.5em */
+  border-bottom: 1px solid #30363d;
+  padding-bottom: 0.3em;
+}
+.markdown-body h3 { font-size: 1.4em; }   /* Increased from 1.25em */
+.markdown-body h4 { font-size: 1.2em; }   /* Increased from 1.1em */
+.markdown-body h5 { font-size: 1.1em; }   /* Increased from 1em */
+.markdown-body h6 { font-size: 1em; color: #8b949e; } /* Increased from 0.9em */
+
+.markdown-body p {
+  margin-top: 0;
+  margin-bottom: 18px;     /* Slightly increased spacing */
+  /* font-size: 1.05em; */ /* Optional: uncomment to make p even larger */
+}
+
+.markdown-body ul,
+.markdown-body ol {
+  padding-left: 2em;
+  margin-bottom: 18px;     /* Slightly increased spacing */
+}
+
+.markdown-body li {
+  margin-bottom: 0.3em;    /* Slightly increased spacing */
+}
+
+.markdown-body blockquote {
+  color: #8b949e;
+  border-left: 0.25em solid #30363d;
+  padding: 0 1em;
+  margin: 0 0 18px 0;
+  background: #161b22;
+}
+
+.markdown-body code {
+  background: #161b22;
+  color: #ff7b72;
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  font-size: 90%;          /* Slightly larger code font */
+  font-family: SFMono-Regular,Consolas,"Liberation Mono",Menlo,Courier,monospace;
+}
+
+.markdown-body pre {
+  background: #161b22;
+  padding: 18px;
+  overflow: auto;
+  border-radius: 6px;
+  font-size: 90%;          /* Slightly larger pre font */
+  margin-bottom: 18px;
+}
+
+.markdown-body pre code {
+  background: none;
+  color: inherit;
+  font-size: inherit;
+  padding: 0;
+}
+
+.markdown-body table {
+  border-collapse: collapse;
+  margin-bottom: 18px;
+  width: 100%;
+}
+
+.markdown-body th,
+.markdown-body td {
+  border: 1px solid #30363d;
+  padding: 8px 15px;       /* Slightly increased padding */
+}
+
+.markdown-body th {
+  background: #161b22;
+  font-weight: 600;
+}
+
+.markdown-body tr:nth-child(even) {
+  background: #161b22;
+}
+
+.markdown-body a {
+  color: #58a6ff;
+  text-decoration: none;
+}
+
+.markdown-body a:hover {
+  text-decoration: underline;
+}
+
+.markdown-body img {
+  max-width: 100%;
+  background: #0d1117;
+}
+
+.markdown-body hr {
+  border: 0;
+  border-top: 1px solid #30363d;
+  margin: 28px 0;
+}
+
+.markdown-body .task-list-item {
+  list-style-type: none;
+}
+
+.markdown-body input[type="checkbox"] {
+  margin: 0 0.2em 0.25em -1.6em;
+  vertical-align: middle;
 }

@@ -1,118 +1,98 @@
 'use client';
-import { useState, useEffect, useRef } from "react";
 
-export default function TextCycler({
-  texts,
-  interval = 3000,
-  className = "",
-}: {
-  texts: string[];
-  interval?: number;
-  className?: string;
-}) {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [isExiting, setIsExiting] = useState(false);
-  const [containerWidth, setContainerWidth] = useState(566.167);
-  const textRef = useRef<HTMLDivElement>(null);
-  const resizeObserverRef = useRef<ResizeObserver | null>(null);
+import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
+import Link from 'next/link';
 
-  const updateWidth = () => {
-    if (textRef.current) {
-      const rect = textRef.current.getBoundingClientRect();
-      setContainerWidth(rect.width);
+export default function TextCycler(
+  {
+    texts,
+    hrefs,
+    isNewTabs,
+    interval = 5000,
+    divClassName = "",
+    textClassName = ""
+  }:
+    {
+      texts: string[];
+      hrefs: string[];
+      isNewTabs: boolean[];
+      interval?: number;
+      divClassName?: string;
+      textClassName?: string;
     }
-  };
+) {
+
+  const [index, setIndex] = useState(0);
+  const [isMoving, setIsMoving] = useState(false);
+
+  // black magic
+  const [containerWidth, setContainerWidth] = useState(0);
+  const [containerHeight, setContainerHeight] = useState(0);
+  const measureRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleResize = () => requestAnimationFrame(updateWidth);
-    window.addEventListener("resize", handleResize);
+    if (!measureRef.current) return
 
-    resizeObserverRef.current = new ResizeObserver(entries => {
-      for (const entry of entries) {
-        const { width } = entry.contentRect;
-        setContainerWidth(width);
-      }
+
+    setContainerWidth(measureRef.current.getBoundingClientRect().width);
+    setContainerHeight(measureRef.current.getBoundingClientRect().height);
+
+    const observer = new ResizeObserver(entries => {
+      setContainerWidth(entries[0].contentRect.width);
+      setContainerHeight(entries[0].contentRect.height);
     });
 
-    if (textRef.current) {
-      resizeObserverRef.current.observe(textRef.current);
-    }
+    observer.observe(measureRef.current);
 
-    return () => {
-      window.removeEventListener("resize", handleResize);
-      resizeObserverRef.current?.disconnect();
-    };
-  }, []);
+    return (() => {
+      observer.disconnect();
+    })
+
+  }, [measureRef.current]);
 
   useEffect(() => {
-    const measureNextWidth = (text: string) => {
-      if (!textRef.current) return 0;
-      const tempEl = document.createElement("div");
-      const styles = window.getComputedStyle(textRef.current);
 
-      // Copy relevant styles
-      tempEl.style.font = styles.font;
-      tempEl.style.fontSize = styles.fontSize;
-      tempEl.style.fontWeight = styles.fontWeight;
-      tempEl.style.letterSpacing = styles.letterSpacing;
-      tempEl.style.whiteSpace = "nowrap";
-      tempEl.style.visibility = "hidden";
-      tempEl.style.position = "absolute";
-      tempEl.style.left = "-9999px";
+    let timeout: ReturnType<typeof setTimeout> | undefined;
 
-      tempEl.textContent = text;
-      document.body.appendChild(tempEl);
-      const width = tempEl.getBoundingClientRect().width;
-      document.body.removeChild(tempEl);
-      return width;
+    const intervalID = setInterval(() => {
+      setIsMoving(true);
+      timeout = setTimeout(() => {
+        setIndex(prev => prev + 1);
+        setIsMoving(false);
+      }, 500);
+    }, interval);
+
+    return () => {
+      clearInterval(intervalID);
+      clearTimeout(timeout);
     };
-
-    const cycle = () => {
-      const nextIndex = (activeIndex + 1) % texts.length;
-      const nextText = texts[nextIndex];
-      const currentWidth = containerWidth;
-      const nextWidth = measureNextWidth(nextText);
-
-      if (nextWidth > currentWidth) {
-        // Longer text: Resize -> Animate -> Update
-        setContainerWidth(nextWidth);
-        setTimeout(() => {
-          setIsExiting(true);
-          setTimeout(() => {
-            setActiveIndex(nextIndex);
-            setIsExiting(false);
-          }, 500);
-        }, 300); // Match CSS transition duration
-      } else {
-        // Shorter/same text: Animate -> Update -> Resize
-        setIsExiting(true);
-        setTimeout(() => {
-          setActiveIndex(nextIndex);
-          setIsExiting(false);
-          requestAnimationFrame(updateWidth);
-        }, 500);
-      }
-    };
-
-    const intervalId = setInterval(cycle, interval);
-    return () => clearInterval(intervalId);
-  }, [texts, interval, activeIndex, containerWidth]);
+  }, [] // means that it will run on mount and umount
+  );
 
   return (
-    <div
-      className={`relative h-[1.2em] text-(--primary-color) items-center whitespace-nowrap transition-[width] duration-300 ${className}`}
-      style={{ width: containerWidth }}
-    >
-      <div 
-        ref={textRef}
-        className={`absolute ${isExiting ? "animate-drop-out" : ""}`}
-      >
-        {texts[activeIndex]}
+    <>
+      <span className={" fixed left-0 whitespace-nowrap opacity-0 " + textClassName} ref={measureRef}>{texts[index % texts.length]}</span>
+      <div className={"relative whitespace-nowrap h-[1em] " + divClassName}
+        style={{
+          width: containerWidth,
+          height: containerHeight,
+          transition: 'width 500ms ease-in-out, height 500ms ease-in-out'
+        }}>
+        <Link
+          href={hrefs[index % hrefs.length]}
+          target={isNewTabs[index % isNewTabs.length] ? "_blank" : ""}
+          className={` ${textClassName} absolute inset-0 ${isMoving ? 'animate-drop-out' : ''} hover:text-white transition-colors duration-300`}
+        >
+          {texts[index % texts.length]}
+        </Link>
+        <Link
+          href={hrefs[(index + 1) % hrefs.length]}
+          target={isNewTabs[(index + 1) % isNewTabs.length] ? "_blank" : ""}
+          className={` ${textClassName} absolute inset-0 ${isMoving ? 'animate-drop-in' : 'invisible'} hover:text-white transition-colors duration-300`}
+        >
+          {texts[(index + 1) % texts.length]}
+        </Link>
       </div>
-      
-      <div className={`absolute ${isExiting ? "animate-drop-in" : "invisible"}`}>
-        {texts[(activeIndex + 1) % texts.length]}
-      </div>
-    </div>
+    </>
   );
 }
