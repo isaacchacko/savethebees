@@ -83,6 +83,10 @@ export default function Home() {
     repositories.reduce((acc, repo) => ({ ...acc, [repo]: false }), {})
   );
 
+  const [fetchedDict, setFetchedDict] = useState<BooleanDict>(() =>
+    repositories.reduce((acc, repo) => ({ ...acc, [repo]: false }), {})
+  );
+
   const setHTMLForRepo = (name: string, html: string) => {
     setHTMLDict(prev => ({ ...prev, [name]: html }));
   };
@@ -101,7 +105,7 @@ export default function Home() {
           const json = await response.json();
           console.log(json.data);
           setHTMLForRepo(name, json.data);
-
+          setFetchedDict(prev => ({ ...prev, [name]: true }));
         }
 
 
@@ -173,7 +177,19 @@ export default function Home() {
 
                 <div className='flex flex-col items-end gap-2'>
                   <a href={`http://github.com/isaacchacko/${name}`} target="_blank" rel="noopener noreferrer" className="">
-                    <div className='hover:bg-(--primary-color) transition-colors duration-300 rounded-lg flex flex-row gap-2 items-center border border-white px-3 py-1'>
+                    <div className='
+                      hidden
+                      sm:flex
+    hover:bg-(--primary-color)
+    transition-colors duration-300 
+    rounded-lg 
+    flex flex-row 
+    gap-2 sm:gap-3 md:gap-4 
+    items-center 
+    border border-white 
+    px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2
+    text-base sm:text-lg md:text-xl
+'>
                       <FaGithub size={24} />
                       <span>isaacchacko/{name}</span>
                     </div>
@@ -181,9 +197,26 @@ export default function Home() {
 
                   {externalLinkDict[name] !== null &&
                     <a href={externalLinkDict[name][1]} target="_blank" rel="noopener noreferrer" className="">
-                      <div className='hover:bg-(--primary-color) transition-colors duration-300 rounded-lg flex flex-row gap-2 items-center border border-white px-3 py-1'>
-                        <TbExternalLink size={24} />
-                        <span>{externalLinkDict[name][0]}</span>
+                      <div
+                        className="
+                      hidden
+                      sm:flex
+    hover:bg-(--primary-color)
+    transition-colors duration-300 
+    rounded-lg 
+    flex flex-row 
+    gap-2 sm:gap-3 md:gap-4 
+    items-center 
+    border border-white 
+    px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2
+    text-base sm:text-lg md:text-xl
+  "
+                      >
+                        <TbExternalLink
+                          size={20} // base size
+                          className="sm:w-6 sm:h-6 md:w-7 md:h-7"
+                        />
+                        <span className="truncate">{externalLinkDict[name][0]}</span>
                       </div>
                     </a>}
 
@@ -203,6 +236,8 @@ export default function Home() {
                     </div>
                   ))}
                 </div>
+
+                {!fetchedDict[name] && <span className='my-3 animate-pulse italic'>loading..</span>}
                 <div dangerouslySetInnerHTML={{ __html: HTMLDict[name] }} >
                 </div>
               </div>)}
