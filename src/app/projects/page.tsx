@@ -224,6 +224,52 @@ export default function Home() {
 
               </div>
               {visibleDict[name] && (<div className={` w-full markdown-body quick-slide-down-fade-in `}>
+                <div className='flex flex-col items-end gap-2'>
+                  <a href={`http://github.com/isaacchacko/${name}`} target="_blank" rel="noopener noreferrer" className="">
+                    <div className='
+                      hidden
+                      sm:flex
+    hover:bg-(--primary-color)
+    transition-colors duration-300 
+    rounded-lg 
+    flex flex-row 
+    gap-2 sm:gap-3 md:gap-4 
+    items-center 
+    border border-white 
+    px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2
+    text-base sm:text-lg md:text-xl
+'>
+                      <FaGithub size={24} />
+                      <span>isaacchacko/{name}</span>
+                    </div>
+                  </a>
+
+                  {externalLinkDict[name] !== null &&
+                    <a href={externalLinkDict[name][1]} target="_blank" rel="noopener noreferrer" className="">
+                      <div
+                        className="
+                      hidden
+                      sm:flex
+    hover:bg-(--primary-color)
+    transition-colors duration-300 
+    rounded-lg 
+    flex flex-row 
+    gap-2 sm:gap-3 md:gap-4 
+    items-center 
+    border border-white 
+    px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2
+    text-base sm:text-lg md:text-xl
+  "
+                      >
+                        <TbExternalLink
+                          size={20} // base size
+                          className="sm:w-6 sm:h-6 md:w-7 md:h-7"
+                        />
+                        <span className="truncate">{externalLinkDict[name][0]}</span>
+                      </div>
+                    </a>}
+
+                </div>
 
                 <div className='flex flex-row items-center gap-3 flex-wrap justify-start my-3'>
                   {techStack[name].map((techName, techIndex, techArr) => (
