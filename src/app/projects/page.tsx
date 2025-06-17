@@ -227,8 +227,8 @@ export default function Home() {
                 <div className='flex flex-col items-end gap-2'>
                   <a href={`http://github.com/isaacchacko/${name}`} target="_blank" rel="noopener noreferrer" className="">
                     <div className='
-                      hidden
-                      sm:flex
+                      sm:hidden
+                      flex
     hover:bg-(--primary-color)
     transition-colors duration-300 
     rounded-lg 
@@ -248,8 +248,8 @@ export default function Home() {
                     <a href={externalLinkDict[name][1]} target="_blank" rel="noopener noreferrer" className="">
                       <div
                         className="
-                      hidden
-                      sm:flex
+                      sm:hidden
+                      flex
     hover:bg-(--primary-color)
     transition-colors duration-300 
     rounded-lg 
