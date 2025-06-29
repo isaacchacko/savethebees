@@ -51,8 +51,8 @@ const techStack: ChipDict = {
 }
 
 const externalLinkDict: LinkDict = {
-  "savethebees": ["isaacchacko.co", "http://isaacchacko.co"],
-  "eulerelo": ["eulerelo.vercel.app", "http://eulerelo.vercel.app"],
+  "savethebees": ["(this) website", "http://isaacchacko.co"],
+  "eulerelo": ["website", "http://eulerelo.up.railway.app"],
   "autowal": null
 }
 
