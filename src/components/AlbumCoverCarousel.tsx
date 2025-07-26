@@ -18,26 +18,26 @@ const Header = ({
   text,
   href = ""
 }: HeaderProps) => (
-    <div className="flex flex-row justify-between items-center gap-4">
-      {href !== "" ? (
-        <div className={className}>
-          <a
-            href={href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-black text-white sm:hover:underline cursor-pointer"
-          >
-            {text}
-          </a>
-        </div>
-      ) : (
-          <div className={className}>
-            <span>{text}</span>
-          </div>
-        )}
-      <SpotifyLogo />
-    </div>
-  );
+  <div className="flex flex-row justify-between items-center gap-4">
+    {href !== "" ? (
+      <div className={className}>
+        <a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-black text-white sm:hover:underline cursor-pointer"
+        >
+          {text}
+        </a>
+      </div>
+    ) : (
+      <div className={className}>
+        <span>{text}</span>
+      </div>
+    )}
+    <SpotifyLogo />
+  </div>
+);
 
 const AlbumCoverCarousel: React.FC = () => {
   const carouselRef = useRef<HTMLDivElement>(null);
@@ -98,9 +98,9 @@ const AlbumCoverCarousel: React.FC = () => {
       image.style.transform = `perspective(400px) rotate3d(1, -1, 0, ${rotateX}deg) rotate3d(1, 1, 0, ${rotateY}deg) scale(1.05)`;
     }
   };
-  
+
   useEffect(() => {
-  if (carouselRef.current) {
+    if (carouselRef.current) {
       carouselRef.current.scrollLeft = 0;
     }
   }, []);
@@ -141,9 +141,8 @@ const AlbumCoverCarousel: React.FC = () => {
   return (
     <div className="px-4">
       <h2 className="font-black text-white text-2xl 2xl:text-4xl text-white cursor-pointer">
-        <Header text="Favorite Albums" href="https://open.spotify.com/playlist/4IlbP26s8HFFvcjoYW8oUD?si=4d2e1ef821fa4c8a"/>
+        <Header text="Favorite Albums" href="https://open.spotify.com/playlist/4IlbP26s8HFFvcjoYW8oUD?si=4d2e1ef821fa4c8a" />
       </h2>
-      <p>Because some things ARE judged by their cover.</p>
       <hr className="mt-5 mb-5"></hr>
       <div className="px-4">
         <div
