@@ -1,24 +1,39 @@
-# My Personal Website
+# Fate Sealed: GMTK Game Jam 2025
 
-![A screenshot of my website](https://raw.githubusercontent.com/isaacchacko/savethebees/main/public/summer-2025-hero.png "My personal website landing! Circa Summer 2025")
+![Main Menu](https://raw.githubusercontent.com/isaacchacko/fate-sealed/5c25e7b68c7e9148ecdad46d529373a66e2395f6/screenshots/main_menu.png)
+![Level One](https://raw.githubusercontent.com/isaacchacko/fate-sealed/5c25e7b68c7e9148ecdad46d529373a66e2395f6/screenshots/level_one.png)
+![Level Three](https://raw.githubusercontent.com/isaacchacko/fate-sealed/5c25e7b68c7e9148ecdad46d529373a66e2395f6/screenshots/level_three.png)
 
-![A screenshot of the projects on my website](https://raw.githubusercontent.com/isaacchacko/savethebees/main/public/summer-2025-projects.png "My personal projects! Circa Summer 2025")
+**This year's game jam theme is:** **Loop**!
 
-Howdy! Have fun playing around with an interactive boid simulation, learn about my music tastes, and discover my other projects at [isaacchacko.co](https://isaacchacko.co)!
+Made within 48 hours, _Fate Sealed_ is a puzzle-platformer inspired by games like _Braid_ and _Outer Wilds_, where the player can utilize fated time loops to dodge enemies and reach the portal.
 
-I made this website with **Next.js**, **Typescript**, **TailwindCSS**, **Redis Cloud Databases**, and **Vercel**.
+> _The world of **Fate Sealed** is full of deadly enemies that will hunt you down in an instant, and unfortunately you left your fists at home. But, using your ability to seal the fate of enemies around you, you can sneakily dodge their attacks, predict their movements, and even pit them against each other to progress through the levels._
 
-## Why was/is the repository called savethebees?
+---
 
-I initially made this repository with an intention to make a bee simulation through boids. But, after some time, I realized that my current simulation would look pretty _fly_ as a website background.
+## Credits
 
-## Fun Features
+### Development (alphabetically, by last name)
 
-- a boid simulation playing in the background, one which I will later turn into its own website for users to have fun and play around with the variables themselves.
-- a "Now Playing" showcasing the current song playing, courtesy of the Spotify API
-- a live look at my running mileage through the Strava API
-- live `README.md` embeds through GitHub API (you may be viewing this `README.md` through the embed right now!)
+- [Ishaan Bansal](https://github.com/IshaanBansal2006)
+- [Isaac Chacko](https://github.com/isaacchacko)
+- [Andrew John](https://github.com/a2g2j)
+- [William Lam](https://github.com/winterberrylavender)
+- [Boping Li](https://github.com/plokerno)
+- [Ronil Shah](https://github.com/ronilmshah)
+- [Allen Thomas](https://github.com/AllenA28)
 
-All in all, I aspire for this website to be (for the most part) autonomous, where when I grow, it grows with me.
+### Creative Lead
 
-Hope you liked learning about me, and always remember to save the bees!
+- [Annie Li](https://github.com/liannie3)
+
+### Utilized Asset Packs
+
+- [Spikes by Omniclause](https://omniclause.itch.io/spikes)
+- [SunnyLand by ansimuz](https://ansimuz.itch.io/sunny-land-pixel-game-art)
+- [RPG Type Retro by syvalia](https://syyvvalia.itch.io/rpg-type-retro-16x16-animated-speech-icons)
+
+### Fonts
+
+- [Yoster Island by codeman38](https://www.1001fonts.com/yoster-island-font.html)
