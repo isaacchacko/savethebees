@@ -41,19 +41,22 @@ interface BooleanDict {
 const titleDict: TitleDict = {
   'savethebees': "My Personal Website",
   'eulerelo': "Eulerelo",
-  'autowal': "Autowal"
+  'autowal': "Autowal",
+  'fate-sealed': "Fate Sealed"
 }
 
 const techStack: ChipDict = {
   "savethebees": ["Next.js", "Typescript", "Tailwind CSS", "Redis", "Vercel"],
   "eulerelo": ["Next.js", "Typescript", "Tailwind CSS", "PrismaDB", "PostgreSQL"],
   "autowal": ["Python", "Bash", "cURL", "Linux"],
+  "fate-sealed": ["Godot"]
 }
 
 const externalLinkDict: LinkDict = {
   "savethebees": ["(this) website", "http://isaacchacko.co"],
   "eulerelo": ["website", "http://eulerelo.up.railway.app"],
-  "autowal": null
+  "autowal": null,
+  "fate-sealed": ["jam submission", "https://itch.io/jam/gmtk-2025/rate/3784643"]
 }
 
 const TECHNOLOGIES: TechnologyDict = {
@@ -68,12 +71,13 @@ const TECHNOLOGIES: TechnologyDict = {
   "Bash": "#4eaa25", // Green (Bash logo)
   "cURL": "#073551", // Official blue
   "Linux": "#1793d1", // Official yellow
+  "Godot": "#478cbf", // Official Godot Blue
 };
 
 export default function Home() {
   const numBees = useResponsiveBees();
   const spawnRadius = 100;
-  const repositories: string[] = ["autowal", "eulerelo", "savethebees"];
+  const repositories: string[] = ["fate-sealed", "autowal", "eulerelo", "savethebees"];
   const [HTMLDict, setHTMLDict] = useState<HTMLDictType>(() =>
     repositories.reduce((acc, repo) => ({ ...acc, [repo]: "" }), {})
   );
