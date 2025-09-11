@@ -37,7 +37,12 @@ export default function Home() {
                 <HeroAtLink text="TAMU" href="https://www.tamu.edu" hasPeriod={false} />{' '}
                 and currently intern{' '}
                 <HeroAtLink text="SISO" href="https://www.siso-eng.com" hasPeriod={true} />{' '}
-                On the side, I&apos;m developing for <a target="_blank" href='https://www.eulerelo.vercel.app' rel="noopener noreferrer" className="font-bold text-(--primary-color) underline underline-offset-2 hover:text-white transition-color duration-300">Eulerelo</a>, a competitive math platform. For fun, I play board games, train for the Cheveron marathon, and eat lots of Blue Bell.</span>
+                On the side, I&apos;m developing for <a target="_blank" href='https://www.eulerelo.com' rel="noopener noreferrer" className="font-bold text-(--primary-color) underline underline-offset-2 hover:text-white transition-color duration-300">Eulerelo</a>, a competitive math platform. For fun, I play board games, train for the Cheveron marathon, and eat lots of Blue Bell.</span>
+              <br></br>
+              <br></br>
+              <span className="text-sm sm:text-base md:text-lg lg:text-xl">
+                Want to learn more? Check out my <a target="_blank" href='https://www.linkedin.com/in/isaacchacko' rel="noopener noreferrer" className="font-bold text-(--primary-color) underline underline-offset-2 hover:text-white transition-color duration-300">Linkedin</a>, <a target="_blank" href='/Isaac_Chacko.pdf' rel="noopener noreferrer" className="font-bold text-(--primary-color) underline underline-offset-2 hover:text-white transition-color duration-300">Resume</a>, and <a target="_blank" href='https://www.github.com/isaacchacko' rel="noopener noreferrer" className="font-bold text-(--primary-color) underline underline-offset-2 hover:text-white transition-color duration-300">GitHub</a>, or for further questions, <a target="_blank" href='mailto:isaac.chacko05@tamu.edu' rel="noopener noreferrer" className="font-bold text-(--primary-color) underline underline-offset-2 hover:text-white transition-color duration-300">email me</a>.
+              </span>
             </div>
 
             {/* Flip Card Container */}

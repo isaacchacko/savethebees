@@ -28,10 +28,10 @@ export default function Home() {
           <TextCycler
             texts={[
               "Half-Marathon Runner",
-              "Software Developer",
-              "CD Enthusiast",
-              "Star Wars Fan",
-              "Data Engineer",
+              "Backend Developer",
+              "Laufey Listener",
+              "Longboard Lover",
+              "Database Engineer",
 
               // if you change "Zealot" to "User" instead of zealot overflow scroll bars appear for some
               // screen sizes...
@@ -59,10 +59,10 @@ export default function Home() {
 
         </h1>
         <div className=" text-center text-sm sm:text-md md:text-lg lg:text-xl slide-down-fade-in font-light">
-          I&apos;m currently studying CS{' '}
-          <HeroAtLink text="TAMU" href="https://www.tamu.edu" hasPeriod={false} />{' '}
-          and interning{' '}
-          <HeroAtLink text="SISO" href="https://www.siso-eng.com" hasPeriod={true} /> Previously at{' '}
+          I&apos;m currently studying CS and applied math{' '}
+          <HeroAtLink text="TAMU" href="https://www.tamu.edu" hasPeriod={false} />{'. '}
+          Previously interned {' '}
+          <HeroAtLink text="SISO" href="https://www.siso-eng.com" hasPeriod={false} /> and {' '}
           <HeroAtLink text="LUMINARE" href="https://luminare.io/" hasPeriod={true} />
         </div>
 
