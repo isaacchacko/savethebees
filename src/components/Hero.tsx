@@ -42,7 +42,7 @@ export default function Home() {
               "/tracking",
               "/projects",
               "/tracking",
-              "/projects",
+              "/about",
               "/arch"
             ]}
             isNewTabs={[
