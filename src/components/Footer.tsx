@@ -19,7 +19,7 @@ const Footer = ({ ICON_WIDTH_HEIGHT }: { ICON_WIDTH_HEIGHT: string }) => (
         <IconLink className={ICON_WIDTH_HEIGHT} IconComponent={FiGithub} href='https://www.github.com/isaacchacko' isNewTab={true} />
         <IconLink className={ICON_WIDTH_HEIGHT} IconComponent={BiMailSend} href='mailto:isaac.chacko05@tamu.edu' isNewTab={true} />
       </div>
-      <p className=''>Copyright &copy; 2025 Isaac Chacko</p>
+      <p className=''>Copyright &copy; 2026 Isaac Chacko</p>
     </div>
   </div>)
 
