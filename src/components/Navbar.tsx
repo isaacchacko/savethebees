@@ -58,7 +58,7 @@ export default function Navbar() {
 
   return (
     <>
-      <div style={{ height }}>
+      <div style={{}}>
         <div className="fixed top-0 left-0 right-0 z-2" ref={navRef}>
 
           <nav

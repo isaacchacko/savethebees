@@ -4,15 +4,16 @@ import CanvasBackground from '@/components/CanvasBackground';
 import useResponsiveBees from '@/hooks/useResponsiveBees';
 import Hero from '@/components/Hero';
 import Navbar from "@/components/Navbar";
+import ClickRevealImage from '@/components/ClickRevealImage';
 
 export default function Home() {
   const numBees = useResponsiveBees();
   const spawnRadius = 100;
 
   return (
-    <div className="font-sans w-screen h-screen overflow-hidden flex justify-center items-center">
+    <div className="">
+      <ClickRevealImage />
       <Navbar />
-      <CanvasBackground numBees={numBees} spawnRadius={spawnRadius} />
       <Hero />
     </div>
 

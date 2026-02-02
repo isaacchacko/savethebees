@@ -1,3 +1,6 @@
+'use client';
+
+import { useLayoutEffect, useRef, useState } from 'react';
 import TextCycler from './TextCycler'
 
 // hero text
@@ -14,76 +17,136 @@ import {
 } from 'react-icons/bi';
 import { FiGithub } from "react-icons/fi";
 import { AiOutlineLinkedin } from "react-icons/ai";
-
+import { it } from "@public/fonts"
 import DarkModeToggle from './DarkModeToggle';
 
 const ICON_WIDTH_HEIGHT = "w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 lg:w-10 lg:h-10 ";
 const HOWDY_TEXT_HEIGHT = "text-4xl md:text-4xl lg:text-6xl"
 export default function Home() {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const hiRef = useRef<HTMLSpanElement | null>(null);
+  const isaacRef = useRef<HTMLSpanElement | null>(null);
+  const [clipPath, setClipPath] = useState('circle(0px at 0px 0px)');
+  const [transitionEnabled, setTransitionEnabled] = useState(false);
+  const [showEllipsis, setShowEllipsis] = useState(true);
+
+  useLayoutEffect(() => {
+    const updateClip = () => {
+      if (!containerRef.current || !hiRef.current || !isaacRef.current) {
+        return;
+      }
+
+      const containerRect = containerRef.current.getBoundingClientRect();
+      const hiRect = hiRef.current.getBoundingClientRect();
+      const isaacRect = isaacRef.current.getBoundingClientRect();
+      const centerX = isaacRect.left - containerRect.left;
+      const centerY = isaacRect.bottom - containerRect.top;
+      const initialRadius = 8;
+
+      setTransitionEnabled(false);
+      setClipPath(`circle(${Math.ceil(initialRadius)}px at ${centerX}px ${centerY}px)`);
+      setShowEllipsis(true);
+
+      const corners: Array<[number, number]> = [
+        [0, 0],
+        [containerRect.width, 0],
+        [0, containerRect.height],
+        [containerRect.width, containerRect.height],
+      ];
+      const maxRadius = Math.max(
+        ...corners.map(([x, y]) => Math.hypot(x - centerX, y - centerY)),
+      );
+
+      window.requestAnimationFrame(() => {
+        setTransitionEnabled(true);
+        setClipPath(`circle(${Math.ceil(maxRadius)}px at ${centerX}px ${centerY}px)`);
+        setShowEllipsis(false);
+      });
+    };
+
+    updateClip();
+    window.addEventListener('resize', updateClip);
+
+    if (document.fonts?.ready) {
+      document.fonts.ready.then(updateClip);
+    }
+
+    return () => {
+      window.removeEventListener('resize', updateClip);
+    };
+  }, []);
+
   return (
-    <div className='w-1/2 sm:p-none flex flex-col items-center justify-center'>
-      <div className="flex flex-col items-center gap-3">
-        <h1 className={` text-center  ${HOWDY_TEXT_HEIGHT} title-slide-down-fade-in font-bold`}>
-          Howdy! I&apos;m a<br></br>
-          <TextCycler
-            texts={[
-              "Half-Marathon Runner",
-              "Backend Developer",
-              "Laufey Listener",
-              "Longboard Lover",
-              "Database Engineer",
-
-              // if you change "Zealot" to "User" instead of zealot overflow scroll bars appear for some
-              // screen sizes...
-              // i think it's because "User" is smaller than "Howdy! I'm" while "Zealot" isn't
-              "Linux Zealot"
-            ]}
-            hrefs={[
-              "/tracking",
-              "/projects",
-              "/tracking",
-              "/about",
-              "/arch"
-            ]}
-            isNewTabs={[
-              false,
-              false,
-              false,
-              false,
-              false
-            ]}
-
-            divClassName=" title-slide-down-fade-in inline-block "
-            textClassName={` text-center ${HOWDY_TEXT_HEIGHT} font-bold underline text-(--primary-color) `}
-          />
-
-        </h1>
-        <div className=" text-center text-sm sm:text-md md:text-lg lg:text-xl slide-down-fade-in font-light">
-          I&apos;m currently studying CS and applied math{' '}
-          <HeroAtLink text="TAMU" href="https://www.tamu.edu" hasPeriod={false} />{'. '}
-          Previously interned {' '}
-          <HeroAtLink text="SISO" href="https://www.siso-eng.com" hasPeriod={false} /> and {' '}
-          <HeroAtLink text="LUMINARE" href="https://luminare.io/" hasPeriod={true} />
-        </div>
-
-        <div className="slide-down-fade-in flex sm:flex-row flex-col items-center justify-center ">
-          <div className='flex'>
-            <IconLink className={ICON_WIDTH_HEIGHT} IconComponent={AiOutlineLinkedin} href='https://www.linkedin.com/in/isaacchacko' isNewTab={true} />
-            <IconLink className={ICON_WIDTH_HEIGHT} IconComponent={BiFile} href='/Isaac_Chacko.pdf' isNewTab={true} />
-            <IconLink className={ICON_WIDTH_HEIGHT} IconComponent={FiGithub} href='https://www.github.com/isaacchacko' isNewTab={true} />
-            <IconLink className={ICON_WIDTH_HEIGHT} IconComponent={BiMailSend} href='mailto:isaac.chacko05@tamu.edu' isNewTab={true} />
+    <>
+      <div
+        ref={containerRef}
+        className='w-screen h-screen overflow-hidden'
+        style={{
+          clipPath,
+          transition: transitionEnabled ? 'clip-path 1.2s cubic-bezier(0, 0, 0.58, 1)' : 'none',
+          willChange: 'clip-path',
+        }}
+      >
+        <div className='w-screen h-[66vh] flex flex-col justify-end relative'>
+          <div className='flex justify-start ml-3 mb-3 sm:ml-3 mb-3 lg:ml-5 lg:mb-5 inline relative z-10'>
+            <div className='flex flex-col items-start'>
+              <span
+                ref={hiRef}
+                className='inline-block font-semibold text-xl md:text-2xl lg:text-3xl xl:text-4xl select-none'
+              >
+                Howdy, I&apos;m{showEllipsis ? '...' : ''}
+              </span>
+              <span
+                ref={isaacRef}
+                className='font-black italic text-4xl md:text-6xl lg:text-8xl xl:text-9xl select-none'
+              >
+                Isaac Chacko
+              </span>
+            </div>
           </div>
-          <div className='hidden sm:block bg-white w-1 h-10 rounded-full mx-1'></div>
-          <div className='block sm:hidden bg-white w-40 h-1 rounded-full my-1'></div>
-          <div className='flex'>
+        </div>
+        <div className='w-screen h-[34vh] bg-[#181614] text-[#fdfbf9]'>
+          <div className='flex justify-center'>
+            <div className='w-[50vw] m-15 relative'>
+              <div className="relative inline-block">
+                {/* Text A (white or normal text) - hidden under reveal circle */}
+                <p
+                  id="hero-text-a"
+                  className={`${it.className} text-md md:text-xl lg:text-3xl xl:text-4xl relative z-10 reveal-mask-target select-none`}
+                  style={{
+                    WebkitMaskImage:
+                      'radial-gradient(circle at var(--reveal-cx, -999px) var(--reveal-cy, -999px), transparent 0, transparent var(--reveal-r, 0px), black calc(var(--reveal-r, 0px) + 1px))',
+                    maskImage:
+                      'radial-gradient(circle at var(--reveal-cx, -999px) var(--reveal-cy, -999px), transparent 0, transparent var(--reveal-r, 0px), black calc(var(--reveal-r, 0px) + 1px))',
+                    WebkitMaskRepeat: 'no-repeat',
+                    maskRepeat: 'no-repeat',
+                  }}
+                >
+                  I&apos;m a junior studying CS at Texas A&amp;M! I previously interned at{' '}
+                  <span className="hover:scale-90 inline font-black transition-all duration-300">SISO</span>{' '}
+                  and <span className="inline font-black transition-all duration-300">LUMINARE</span>.
+                </p>
 
-            <IconLink className={ICON_WIDTH_HEIGHT} IconComponent={BiRun} href='/tracking' isNewTab={false} />
-            <IconLink className={ICON_WIDTH_HEIGHT} IconComponent={BiDisc} href='/tracking' isNewTab={false} />
-            <DarkModeToggle ICON_WIDTH_HEIGHT={ICON_WIDTH_HEIGHT} />
-            <ColorPaletteEditor widthHeight={ICON_WIDTH_HEIGHT} />
+                {/* Text B (clipped background text, revealed inside circle) */}
+                <p
+                  id="junior-text"
+                  className={`${it.className} absolute inset-0 text-md md:text-xl lg:text-3xl xl:text-4xl text-transparent bg-clip-text select-none`}
+                  style={{
+                    backgroundImage: "url('/water-lily-pond-x.jpg')",
+                    backgroundSize: '100vw 100vh',
+                    backgroundPosition: '0 0',
+                    backgroundAttachment: 'fixed',
+                  }}
+                >
+                  I&apos;m a junior studying CS at Texas A&amp;M! I previously interned at{' '}
+                  <span className="hover:scale-90 inline font-black transition-all duration-300">SISO</span>{' '}
+                  and <span className="inline font-black transition-all duration-300">LUMINARE</span>.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

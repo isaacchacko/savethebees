@@ -14,7 +14,7 @@ export default function Home() {
   const spawnRadius = 100;
 
   return (
-    <div className="relative font-sans">
+    <div className="relative">
       <CanvasBackground numBees={numBees} spawnRadius={spawnRadius} />
 
       <div className="pointer-events-none relative flex flex-col min-h-screen justify-start">
