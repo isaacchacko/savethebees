@@ -12,9 +12,10 @@ export const pd = Playfair_Display({
   display: 'swap'
 })
 
-export const it = Bricolage_Grotesque({
+export const bricolage = Bricolage_Grotesque({
   subsets: ['latin'],
-  display: 'swap'
+  display: 'swap',
+  variable: '--font-bricolage'
 })
 
 export const gr = DM_Serif_Display({
@@ -22,3 +23,4 @@ export const gr = DM_Serif_Display({
   weight: '400',
   display: 'swap'
 })
+

@@ -59,43 +59,11 @@ export default function Navbar() {
   return (
     <>
       <div style={{}}>
-        <div className="fixed top-0 left-0 right-0 z-2" ref={navRef}>
+        <div className="fixed top-0 left-0 right-0 z-[100]" ref={navRef}>
 
           <nav
-            className={`box-border cursor-pointer flex ${isHome ? "justify-end" : "justify-between"} lg:justify-start items-center p-4 px-8 gap-10 transition-colors duration-300 ${scrolled ? "bg-[rgba(20,20,20,0.7)] backdrop-blur-md shadow-lg" : "bg-transparent"}`} // bg-(--spotify-background)/80 backdrop-blur-sm border-b border-gray-500" 
-            style={{ pointerEvents: 'auto' }}
+            className="flex justify-left mt-5 ml-5"
           >
-
-            <div className={` ${isHome ? "hidden" : ""} flex flex-row items-center gap-3`}>
-              <Link href="/">
-                <svg className={`scale-80 hover:scale-100 duration-300 ${ICON_WIDTH_HEIGHT}`} viewBox="0 0 24 24" fill="none">
-                  <path fillRule="evenodd" clipRule="evenodd" d="M12 3.1875L21.4501 10.275L21.0001 11.625H20.25V20.25H3.75005V11.625H3.00005L2.55005 10.275L12 3.1875ZM5.25005 10.125V18.75H18.75V10.125L12 5.0625L5.25005 10.125Z" fill="#ffffff" />
-                </svg>
-              </Link>
-              <DarkModeToggle ICON_WIDTH_HEIGHT={ICON_WIDTH_HEIGHT} />
-              <ColorPaletteEditor widthHeight={ICON_WIDTH_HEIGHT} />
-            </div>
-
-            <SpotifyStatus />
-
-            <div className="flex justify-between items-center gap-10">
-              <HamburgerIcon onClick={() => setIsMenuOpen(!isMenuOpen)} />
-
-              <div className={`${isMenuOpen ? 'flex' : 'hidden'} lg:flex flex-col lg:flex-row absolute lg:relative top-full right-0 lg:top-auto lg:right-auto bg-(--spotify-background)/80 lg:bg-transparent p-4 lg:p-0 gap-4 lg:gap-10`}>
-                <Link href="/projects" className={BASE_CLASS_NAME}>
-                  Projects
-                </Link>
-                <Link href="/tracking" className={BASE_CLASS_NAME}>
-                  Tracking
-                </Link>
-                <Link href="/arch" className={BASE_CLASS_NAME}>
-                  Arch
-                </Link>
-                <Link href="/about" className={BASE_CLASS_NAME}>
-                  About
-                </Link>
-              </div>
-            </div>
           </nav>
         </div>
       </div>

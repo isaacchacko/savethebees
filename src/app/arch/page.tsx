@@ -4,12 +4,10 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import Image from 'next/image';
-import CanvasBackground from '@/components/CanvasBackground';
-import useResponsiveBees from '@/hooks/useResponsiveBees';
 import Navbar from "@/components/Navbar";
-import RegionsOfInterest from '@/components/RegionsOfInterest'
+import RegionsOfInterest from '@/components/RegionsOfInterest';
+import Footer from "@/components/Footer";
 
-import Footer from "@/components/Footer"
 const ICON_WIDTH_HEIGHT = "w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 lg:w-10 lg:h-10 ";
 
 interface Area {
@@ -29,7 +27,7 @@ interface HeaderProps {
 }
 
 const Header = ({
-  className = "font-bold text-2xl 2xl:text-4xl text-white pb-2",
+  className = "font-bold text-2xl 2xl:text-4xl pb-2",
   text,
   href = "",
   id = ""
@@ -43,7 +41,7 @@ const Header = ({
           rel="noopener noreferrer"
 
           id={id}
-          className="font-black text-white sm:hover:underline cursor-pointer"
+          className="font-black sm:hover:underline cursor-pointer"
         >
           {text}
         </a>
@@ -56,9 +54,7 @@ const Header = ({
   </div>
 );
 
-export default function About() {
-  const numBees = useResponsiveBees();
-  const spawnRadius = 100;
+export default function Arch() {
   const scrollToSection = (targetId: string) => {
     const element = document.getElementById(targetId);
     if (element) {
@@ -75,13 +71,10 @@ export default function About() {
   ];
 
   return (
-    <div className="relative font-sans">
-      <CanvasBackground numBees={numBees} spawnRadius={spawnRadius} />
-
+    <div className="bg-(--background)">
       <Navbar />
-      <div className="slide-down-fade-in relative flex flex-col min-h-screen justify-start pointer-events-none">
-
-        <div className="flex flex-col w-full max-w-4xl mx-auto p-4 md:p-8 mt-8 backdrop-blur-sm relative bg-(--spotify-background) rounded-lg shadow pointer-events-auto">
+      <div className="relative flex flex-col min-h-screen justify-start">
+        <div className="flex flex-col w-full max-w-4xl mx-auto p-4 md:p-8 mt-8 relative bg-(--surface) rounded-lg shadow">
           <div className="text-base leading-loose text-center md:text-left">
             <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl text-(--primary-color) font-black pb-1 md:pb-6">
               Arch Linux &amp; Ricing
@@ -92,7 +85,7 @@ export default function About() {
           </div>
         </div>
 
-        <div className="flex flex-col w-full max-w-4xl mx-auto p-4 md:p-8 mt-8 backdrop-blur-sm relative bg-(--spotify-background) rounded-lg shadow pointer-events-auto">
+        <div className="flex flex-col w-full max-w-4xl mx-auto p-4 md:p-8 mt-8 relative bg-(--surface) rounded-lg shadow">
           <div className="text-base leading-loose text-center md:text-left">
             <Header text="My Rice" id="rice" />
             <p className="pb-4" >Click on the image to see the technology used.</p>
@@ -109,7 +102,7 @@ export default function About() {
           </div>
         </div>
 
-        <div className="flex flex-col w-full max-w-4xl mx-auto p-4 md:p-8 mt-8 backdrop-blur-sm relative bg-(--spotify-background) rounded-lg shadow pointer-events-auto">
+        <div className="flex flex-col w-full max-w-4xl mx-auto p-4 md:p-8 mt-8 relative bg-(--surface) rounded-lg shadow">
           <div className="text-base leading-loose text-center md:text-left">
             <Header
               text="Utilized Libraries/Frameworks"
@@ -119,10 +112,10 @@ export default function About() {
 
             <h2 id='ranger' className="text-2xl text-gray-300 font-medium italic mb-4">ranger</h2>
             <p className="text-lg leading-loose mb-4">
-              <a target="_blank" href='https://github.com/ranger/ranger' rel="noopener noreferrer" className="text-(--primary-color) underline underline-offset-2 hover:text-(--tertiary-color)">ranger</a> is a nifty file explorer for the command line. If loading a GUI to surf your files/moving your mouse to click them was too arduous for you, then ranger is your solution. It allows you to use vim-like keybindings to move around your file directory system, and can be mapped to preview various file types with your preferred file viewer. Although I still prefer to use the good ol' <code className="bg-gray-800 text-white rounded px-1 py-0.5 font-thin">cd</code> and <code className="bg-gray-800 text-white rounded px-1 py-0.5 font-thin">ls</code>, sometimes <code className="bg-gray-800 text-white rounded px-1 py-0.5 font-thin">ranger</code> matches my needs just a little bit more.
+              <a target="_blank" href='https://github.com/ranger/ranger' rel="noopener noreferrer" className="text-(--primary-color) underline underline-offset-2 hover:text-(--secondary-color)">ranger</a> is a nifty file explorer for the command line. If loading a GUI to surf your files/moving your mouse to click them was too arduous for you, then ranger is your solution. It allows you to use vim-like keybindings to move around your file directory system, and can be mapped to preview various file types with your preferred file viewer. Although I still prefer to use the good ol' <code className="bg-gray-200 rounded px-1 py-0.5 font-thin">cd</code> and <code className="bg-gray-200 rounded px-1 py-0.5 font-thin">ls</code>, sometimes <code className="bg-gray-200 rounded px-1 py-0.5 font-thin">ranger</code> matches my needs just a little bit more.
             </p>
             <button
-              className="bg-gray-600 hover:bg-(--tertiary-color) text-white font-bold py-2 px-4 rounded"
+              className="bg-(--primary-color) hover:bg-(--secondary-color) text-white font-bold py-2 px-4 rounded"
               onClick={() => scrollToSection('rice')}
             >
               Back to Top
@@ -135,7 +128,7 @@ export default function About() {
             </p>
 
             <button
-              className="bg-gray-600 hover:bg-(--tertiary-color) text-white font-bold py-2 px-4 rounded"
+              className="bg-(--primary-color) hover:bg-(--secondary-color) text-white font-bold py-2 px-4 rounded"
               onClick={() => scrollToSection('rice')}
             >
               Back to Top
@@ -144,11 +137,11 @@ export default function About() {
 
             <h2 id='cli-visualizer' className="text-2xl text-gray-300 font-medium italic mb-4">cli-visualizer</h2>
             <p className="text-lg leading-loose mb-4">
-              <a target="_blank" href='https://github.com/dpayne/cli-visualizer' rel="noopener noreferrer" className="text-(--primary-color) underline underline-offset-2 hover:text-(--tertiary-color)">cli-visualizer</a> is a TUI audio visualizer majorly written in C++. It listens to your audio output, defines its waveform, and then displays animations that are reactive to volumne, cadence, etc. It has a couple of modes (and also can simulate the <a target="_blank" href='https://en.wikipedia.org/wiki/Lorenz_system' rel="noopener noreferrer" className="text-(--primary-color) underline underline-offset-2 hover:text-(--tertiary-color)">Lorenz attractor</a>, go figure), but I just use it to look cool and to rice out :) . It uses the curses library to render the imagery, and is pretty optimized. Nothing more to say other than to check it out.
+              <a target="_blank" href='https://github.com/PosixAlchemist/cli-visualizer' rel="noopener noreferrer" className="text-(--primary-color) underline underline-offset-2 hover:text-(--tertiary-color)">cli-visualizer</a> is a TUI audio visualizer majorly written in C++. It listens to your audio output, defines its waveform, and then displays animations that are reactive to volumne, cadence, etc. It has a couple of modes (and also can simulate the <a target="_blank" href='https://en.wikipedia.org/wiki/Lorenz_system' rel="noopener noreferrer" className="text-(--primary-color) underline underline-offset-2 hover:text-(--tertiary-color)">Lorenz attractor</a>, go figure), but I just use it to look cool and to rice out :) . It uses the curses library to render the imagery, and is pretty optimized. Nothing more to say other than to check it out.
             </p>
 
             <button
-              className="bg-gray-600 hover:bg-(--tertiary-color) text-white font-bold py-2 px-4 rounded"
+              className="bg-(--primary-color) hover:bg-(--secondary-color) text-white font-bold py-2 px-4 rounded"
               onClick={() => scrollToSection('rice')}
             >
               Back to Top
@@ -161,7 +154,7 @@ export default function About() {
             </p>
 
             <button
-              className="bg-gray-600 hover:bg-(--tertiary-color) text-white font-bold py-2 px-4 rounded"
+              className="bg-(--primary-color) hover:bg-(--secondary-color) text-white font-bold py-2 px-4 rounded"
               onClick={() => scrollToSection('rice')}
             >
               Back to Top
@@ -174,7 +167,7 @@ export default function About() {
             </p>
 
             <button
-              className="bg-gray-600 hover:bg-(--tertiary-color) text-white font-bold py-2 px-4 rounded"
+              className="bg-(--primary-color) hover:bg-(--secondary-color) text-white font-bold py-2 px-4 rounded"
               onClick={() => scrollToSection('rice')}
             >
               Back to Top
@@ -182,7 +175,7 @@ export default function About() {
           </div>
         </div>
 
-        <div className="flex flex-col w-full max-w-4xl mx-auto p-4 md:p-8 mt-8 backdrop-blur-sm relative bg-(--spotify-background) rounded-lg shadow pointer-events-auto">
+        <div className="flex flex-col w-full max-w-4xl mx-auto p-4 md:p-8 mt-8 relative bg-(--surface) rounded-lg shadow">
           <div className="text-base leading-loose text-center md:text-left">
             <Header
               text="Libraries/Frameworks Not Mentioned"

@@ -65,9 +65,25 @@ const RunningStats = () => {
   }, []);
 
   function rgbToRgbaVariants(rgb: string): [string, string] {
+    // Handle hex colors
+    if (rgb.startsWith('#')) {
+      const hex = rgb.replace('#', '');
+      const r = parseInt(hex.substr(0, 2), 16);
+      const g = parseInt(hex.substr(2, 2), 16);
+      const b = parseInt(hex.substr(4, 2), 16);
+      return [
+        `rgba(${r}, ${g}, ${b}, 1)`,
+        `rgba(${r}, ${g}, ${b}, 0.6)`
+      ];
+    }
+    
     // Match "rgb(r, g, b)" and extract the numbers
     const match = rgb.match(/^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)$/);
-    if (!match) throw new Error("Invalid RGB format");
+    if (!match) {
+      // Return default black if format is invalid
+      console.warn(`Invalid RGB format: ${rgb}, using default black`);
+      return ['rgba(0, 0, 0, 1)', 'rgba(0, 0, 0, 0.6)'];
+    }
 
     const [r, g, b] = match.slice(1, 4).map(Number);
 
