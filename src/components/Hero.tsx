@@ -78,7 +78,20 @@ export default function Home() {
           <div className='flex'>
 
             <IconLink className={ICON_WIDTH_HEIGHT} IconComponent={BiRun} href='/tracking' isNewTab={false} />
-            <IconLink className={ICON_WIDTH_HEIGHT} IconComponent={BiDisc} href='/tracking' isNewTab={false} />
+            <a
+              href="https://aggier.ing"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex cursor-pointer scale-80 hover:scale-100 duration-300"
+            >
+              <img
+                src="/aggiering-white.svg"
+                alt="Aggie Ring"
+                width={32}
+                height={32}
+                className="shrink-0"
+              />
+            </a>
             <DarkModeToggle ICON_WIDTH_HEIGHT={ICON_WIDTH_HEIGHT} />
             <ColorPaletteEditor widthHeight={ICON_WIDTH_HEIGHT} />
           </div>
