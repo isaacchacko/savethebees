@@ -188,8 +188,9 @@ export default function Epicycle({
   paragraphCenterY,
   overrideCenterX,
   overrideScaleFactor,
-  scaleX = 1.5,
+  scaleX = 1,
   scaleY = 1,
+  embedded = false,
 }: {
   paragraphCenterY?: number | null;
   overrideCenterX?: number;
@@ -198,6 +199,8 @@ export default function Epicycle({
   scaleX?: number;
   /** Multiplier on vertical offset from center (Fourier space → screen). */
   scaleY?: number;
+  /** When true, fills a positioned parent instead of the full viewport. */
+  embedded?: boolean;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { terms, penUpMask } = useMemo(buildComplexTerms, []);
@@ -398,23 +401,24 @@ export default function Epicycle({
   }, [terms, penUpMask]);
 
   return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden">
-      <canvas ref={canvasRef} className="w-full h-full" />
-      <div className="absolute bottom-6 right-6 text-right select-none">
-        <p className="text-[10px] font-mono tracking-[0.18em] uppercase text-gray-400 dark:text-gray-500">
-          Lissajous · Fourier
-        </p>
-        <p className="text-[9px] font-mono text-gray-400/70 dark:text-gray-600">
-          One chain · complex 2048-DFT
-        </p>
-        <br />
-        <p className="text-[10px] font-mono tracking-[0.18em] uppercase text-gray-400 dark:text-gray-500">
-          Bitstream
-        </p>
-        <p className="text-[9px] font-mono text-gray-400/70 dark:text-gray-600">
-          Perlin Noise · 8 Octave
-        </p>
-      </div>
+    <div
+      className={
+        embedded
+          ? 'relative h-full w-full cursor-default rounded-2xl pointer-events-auto transition-[border-color] duration-200 ease-out hover:border-[color-mix(in_srgb,var(--accent),black_32%)] dark:hover:border-[color-mix(in_srgb,var(--accent),white_28%)]'
+          : 'pointer-events-none absolute inset-0 overflow-hidden'
+      }
+    >
+      <canvas ref={canvasRef} className="h-full w-full pointer-events-none" />
+      {!embedded && (
+        <div className="absolute bottom-6 right-6 text-right select-none">
+          <p className="text-[10px] font-mono tracking-[0.18em] uppercase text-gray-400 dark:text-gray-500">
+            Lissajous · Fourier
+          </p>
+          <p className="text-[9px] font-mono text-gray-400/70 dark:text-gray-600">
+            One chain · complex 2048-DFT
+          </p>
+        </div>
+      )}
     </div>
   );
 }

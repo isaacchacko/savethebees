@@ -2,7 +2,9 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import useResponsiveBees from '@/hooks/useResponsiveBees';
 import Hero from '@/components/Hero';
-import Navbar from "@/components/Navbar";
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+
 export default function Home() {
   const numBees = useResponsiveBees();
   const spawnRadius = 100;
@@ -12,6 +14,8 @@ export default function Home() {
     disabled ? 'none' : 'circle(0px at 0px 0px)'
   );
   const [transitionEnabled, setTransitionEnabled] = useState(false);
+  const [isHoveringMusic, setIsHoveringMusic] = useState(false);
+  const [linktreePathSegment, setLinktreePathSegment] = useState<string | null>(null);
 
   useLayoutEffect(() => {
     const updateClip = () => {
@@ -49,7 +53,8 @@ export default function Home() {
   }, []);
   return (
     <div className={disabled ? "bg-(--background)" : "bg-(--background) relative"}>
-      <div className="bg-(--background)"
+      <div
+        className="bg-(--background) flex h-screen min-h-0 flex-col overflow-hidden"
         ref={containerRef}
         style={{
           clipPath,
@@ -59,8 +64,15 @@ export default function Home() {
           willChange: 'clip-path',
         }}
       >
-        <Hero />
-        <Navbar />
+        <Navbar
+          isHoveringMusic={isHoveringMusic}
+          linktreePathSegment={linktreePathSegment}
+        />
+        <Hero
+          onMusicHoverChange={setIsHoveringMusic}
+          onLinktreePathHover={setLinktreePathSegment}
+        />
+        <Footer />
       </div>
     </div>
   );
