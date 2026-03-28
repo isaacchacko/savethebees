@@ -2,8 +2,6 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { MdPushPin } from 'react-icons/md';
-
 type PlaybackState = {
   is_playing: boolean;
   artist?: string | string[];
@@ -48,7 +46,7 @@ export function useSpotifyPlayback() {
   return playback;
 }
 
-export default function SpotifyNowPlaying({ isVisible = true, isPinned = false, onUnpin, navbarMode = false, onPin }: { isVisible?: boolean; isPinned?: boolean; onUnpin?: () => void; navbarMode?: boolean; onPin?: () => void }) {
+export default function SpotifyNowPlaying({ navbarMode = false }: { navbarMode?: boolean }) {
   const playback = useSpotifyPlayback();
   const [localProgress, setLocalProgress] = useState(0);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -184,13 +182,8 @@ export default function SpotifyNowPlaying({ isVisible = true, isPinned = false, 
   if (navbarMode) {
     if (!playback || !playback.track) {
       return (
-        <div className="flex items-center gap-3 text-sm text-gray-400 w-full">
+        <div className="flex items-center gap-3 text-sm text-gray-400 w-full" style={{ fontFamily: 'var(--font-bricolage)' }}>
           <span>not listening to anything right now</span>
-          {isPinned && (
-            <button onClick={onUnpin} className="ml-auto p-1 rounded hover:bg-gray-200 transition-colors text-gray-400 hover:text-gray-700 cursor-pointer" aria-label="Unpin">
-              <MdPushPin size={15} />
-            </button>
-          )}
         </div>
       );
     }
@@ -268,15 +261,6 @@ export default function SpotifyNowPlaying({ isVisible = true, isPinned = false, 
             <span>-{formatTime(remainingTime)}</span>
           </div>
         </div>
-
-        {/* Pin button */}
-        <button
-          onClick={isPinned ? onUnpin : onPin}
-          className={`flex-shrink-0 p-1.5 rounded-full hover:bg-gray-100 transition-all cursor-pointer ${isPinned ? 'text-gray-700' : 'text-gray-300 hover:text-gray-600'}`}
-          aria-label={isPinned ? 'Unpin' : 'Pin'}
-        >
-          <MdPushPin size={15} />
-        </button>
       </div>
     );
   }

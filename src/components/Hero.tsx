@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useEffect, useRef, useMemo } from 'react';
+import Link from 'next/link';
 import SpotifyNowPlaying, { useSpotifyPlayback } from '@/components/SpotifyNowPlaying';
 import HeroGlyphs from '@/components/HeroGlyphs';
 import HeroSplines from '@/components/HeroSplines';
-import HexRain from '@/components/HexRain';
-import TrefoilHero from '@/components/TrefoilHero';
+import Epicycle from '@/components/Epicycle';
 
 const URL_PATHS = [
   'arch',
@@ -13,7 +13,15 @@ const URL_PATHS = [
   'tracking',
   'about',
   'resume'
-];
+] as const;
+
+const MENU_LINKS: { href: string; label: string }[] = URL_PATHS.map((p) => ({
+  href: `/${p}`,
+  label: p,
+}));
+
+const HERO_BODY_LINK_CLASS =
+  'font-black underline-growing hover:text-[var(--accent)] transition-colors inline';
 
 const TypingPath = ({ isVisible, currentIndex, autoCycle = true }: { isVisible: boolean; currentIndex?: number; autoCycle?: boolean }) => {
   const [currentPathIndex, setCurrentPathIndex] = useState(0);
@@ -74,14 +82,12 @@ interface DebugBox { x: number; y: number; w: number; h: number }
 const Home = () => {
   const [isHoveringMusic, setIsHoveringMusic] = useState(false);
   const [isHoveringUrl, setIsHoveringUrl] = useState(false);
-  const [isPinned, setIsPinned] = useState(false);
   const [showHoverHint, setShowHoverHint] = useState(true);
   const [selectedPathIndex, setSelectedPathIndex] = useState(0);
   const [autoCycle, setAutoCycle] = useState(true);
   const [isDark, setIsDark] = useState(false);
-  const [paragraphCenterY, setParagraphCenterY] = useState<number | null>(null);
-  const paragraphRef = useRef<HTMLParagraphElement>(null);
-
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
   // ── debug bounding-box state ───────────────────────────────────────────────
   const [debugMode, setDebugMode] = useState(false);
   const [debugBox, setDebugBox] = useState<DebugBox | null>(null);
@@ -114,17 +120,6 @@ const Home = () => {
     document.documentElement.classList.toggle('dark', isDark);
   }, [isDark]);
 
-  useEffect(() => {
-    const measure = () => {
-      if (!paragraphRef.current) return;
-      const rect = paragraphRef.current.getBoundingClientRect();
-      setParagraphCenterY(rect.top + rect.height / 2);
-    };
-    measure();
-    window.addEventListener('resize', measure);
-    return () => window.removeEventListener('resize', measure);
-  }, []);
-
   const playback = useSpotifyPlayback();
   const isPlaying = playback?.is_playing && playback?.track;
 
@@ -156,19 +151,25 @@ const Home = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isHoveringUrl, selectedPathIndex]);
 
-  const handleMusicClick = () => {
-    setIsPinned(prev => !prev);
-  };
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onDoc = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMenuOpen(false);
+    };
+    document.addEventListener('mousedown', onDoc);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onDoc);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [menuOpen]);
 
-  const shouldShowSpotify = isHoveringMusic || isPinned;
-
-
-  const CrossSvg = () => (
-    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" style={{ flexShrink: 0 }}>
-      <line x1="11" y1="0" x2="11" y2="22" stroke="currentColor" strokeWidth="1.5" />
-      <line x1="0" y1="11" x2="22" y2="11" stroke="currentColor" strokeWidth="1.5" />
-    </svg>
-  );
+  const shouldShowSpotify = isHoveringMusic;
 
   // Light mode glyph: four-pointed asterisk
   const LightGlyph = () => (
@@ -196,8 +197,8 @@ const Home = () => {
 
   return (
     <div className='relative flex justify-center items-center min-h-screen overflow-hidden' style={{ pointerEvents: 'none' }}>
-      <TrefoilHero
-        paragraphCenterY={debugParams ? debugParams.cy : paragraphCenterY}
+      <Epicycle
+        paragraphCenterY={debugParams ? debugParams.cy : null}
         overrideCenterX={debugParams ? debugParams.cx : undefined}
         overrideScaleFactor={debugParams ? debugParams.scaleFactor : undefined}
       />
@@ -272,13 +273,11 @@ const Home = () => {
         </div>
       )}
 
-      {/* ── top navbar: cross · [url ⟷ spotify] · cross ── */}
+      {/* ── top navbar: [url ⟷ spotify] · theme · menu ── */}
       <div
         className='absolute top-0 left-0 right-0 flex items-center gap-4 px-6 py-6 text-reveal'
         style={{ pointerEvents: 'auto', animationDelay: '0.2s' }}
       >
-        <CrossSvg />
-
         {/* middle zone — url layer and spotify layer cross-fade */}
         <div className='flex-1 relative min-w-0 flex items-center'>
 
@@ -302,12 +301,7 @@ const Home = () => {
             className='absolute inset-0 flex items-center transition-opacity duration-300'
             style={{ opacity: shouldShowSpotify ? 1 : 0, pointerEvents: shouldShowSpotify ? 'auto' : 'none' }}
           >
-            <SpotifyNowPlaying
-              navbarMode
-              isPinned={isPinned}
-              onUnpin={() => setIsPinned(false)}
-              onPin={handleMusicClick}
-            />
+            <SpotifyNowPlaying navbarMode />
           </div>
         </div>
 
@@ -335,7 +329,55 @@ const Home = () => {
           </span>
         </button>
 
-        <CrossSvg />
+        <div className="relative flex-shrink-0" ref={menuRef}>
+          <button
+            type="button"
+            onClick={() => setMenuOpen((o) => !o)}
+            className="flex h-[22px] w-[22px] flex-col items-center justify-center gap-[3.25px] hover:opacity-60"
+            style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+            aria-expanded={menuOpen}
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+          >
+            <span
+              className="block h-[1.5px] w-[14px] shrink-0 rounded-full bg-current transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]"
+              style={{
+                transformOrigin: '50% 50%',
+                transform: menuOpen ? 'translateY(4.75px) rotate(45deg)' : 'translateY(0) rotate(0deg)',
+              }}
+            />
+            <span
+              className="block h-[1.5px] w-[14px] shrink-0 rounded-full bg-current transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]"
+              style={{
+                transform: menuOpen ? 'scaleX(0)' : 'scaleX(1)',
+                opacity: menuOpen ? 0 : 1,
+              }}
+            />
+            <span
+              className="block h-[1.5px] w-[14px] shrink-0 rounded-full bg-current transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]"
+              style={{
+                transformOrigin: '50% 50%',
+                transform: menuOpen ? 'translateY(-4.75px) rotate(-45deg)' : 'translateY(0) rotate(0deg)',
+              }}
+            />
+          </button>
+          {menuOpen && (
+            <nav
+              className="absolute top-full right-0 mt-2 py-2 min-w-[10rem] rounded-md border border-gray-600/40 bg-[rgba(15,15,15,0.92)] dark:bg-[rgba(12,12,12,0.94)] backdrop-blur-sm shadow-lg z-[60]"
+              style={{ pointerEvents: 'auto', animation: 'slideDownFadeIn 0.28s ease-out forwards' }}
+            >
+              {MENU_LINKS.map(({ href, label }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className="block px-4 py-2 text-sm font-mono tracking-wide text-gray-300 hover:bg-white/10 hover:text-white"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  /{label}
+                </Link>
+              ))}
+            </nav>
+          )}
+        </div>
 
         {/* Hint text — floats below the navbar, takes no space in it */}
         <span
@@ -350,30 +392,29 @@ const Home = () => {
         </span>
       </div>
 
-      {/* ── bottom crosses ── */}
-      <div className='absolute bottom-6 left-6 pointer-events-none'><CrossSvg /></div>
-      <div className='absolute bottom-6 right-6 pointer-events-none'><CrossSvg /></div>
-
       <div
         className='mx-[33vh] flex-1 overflow-hidden py-10 flex flex-col justify-center items-center text-center'
         style={{ pointerEvents: 'auto' }}
       >
-        <p ref={paragraphRef} className="leading-relaxed text-md md:text-xl lg:text-3xl xl:text-4xl relative z-10 reveal-mask-target select-none text-left w-full text-reveal" style={{ animationDelay: '0.4s', backgroundColor: 'rgba(255, 255, 255, 0.0)' }}>
+        <div className="relative z-10 w-full rounded-2xl bg-white/80 px-5 py-5 md:px-7 md:py-6 dark:bg-[color-mix(in_srgb,var(--surface)_88%,transparent)]">
+        <p
+          className="leading-relaxed text-sm md:text-base lg:text-xl xl:text-2xl reveal-mask-target select-none text-left w-full text-reveal"
+          style={{ animationDelay: '0.4s' }}
+        >
           Howdy! I'm a software engineer building at{' '}
           <a
             href="https://dryft.ai"
             target="_blank"
             rel="noopener noreferrer"
-            className='font-black underline-growing hover:text-[#264aff] transition-colors inline'
+            className={HERO_BODY_LINK_CLASS}
           >
             Dryft
           </a>
           . I like to listen to{' '}
           <span
-            className={`cursor-pointer hover:underline ${isPlaying ? 'spotify-pulse' : ''}`}
+            className={`cursor-default${isPlaying ? ' animate-pulse text-[var(--accent)]' : ''}`}
             onMouseEnter={() => setIsHoveringMusic(true)}
             onMouseLeave={() => setIsHoveringMusic(false)}
-            onClick={handleMusicClick}
           >
             music
           </span>
@@ -382,7 +423,7 @@ const Home = () => {
             href="/arch"
             target="_blank"
             rel="noopener noreferrer"
-            className='font-black underline-growing hover:text-gray-400 transition-colors inline'
+            className={HERO_BODY_LINK_CLASS}
           >
             dotfiles
           </a>
@@ -392,28 +433,24 @@ const Home = () => {
             href="https://tidaltamu.com"
             target="_blank"
             rel="noopener noreferrer"
-            className='font-black underline-growing hover:text-[#20293e] transition-colors inline'
+            className={HERO_BODY_LINK_CLASS}
           >
             TIDAL
           </a>
 
-          . Prev at{' '}
+          .<br />
+          Previously at{' '}
           <a
             href="https://siso-eng.com"
             target="_blank"
             rel="noopener noreferrer"
-            className='font-black underline-growing hover:text-[#312683] transition-colors inline'
+            className={HERO_BODY_LINK_CLASS}
           >
             SISO
           </a>
           .
         </p>
-        <HexRain
-          rows={70}
-          cols={30}
-          startDelay={2000}
-          style={{ position: 'absolute', top: 0, left: `70%`, zIndex: 0 }}
-        />
+        </div>
         <HeroGlyphs />
       </div>
     </div >

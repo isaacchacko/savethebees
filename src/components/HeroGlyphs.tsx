@@ -16,21 +16,6 @@ const HOVER_COLORS = {
   email: '#EF4444',
 };
 
-const shimmy = (el: HTMLElement) => {
-  gsap.killTweensOf(el);
-  gsap.to(el, {
-    keyframes: [
-      { rotation: -16, x: -4, duration: 0.07 },
-      { rotation: 16, x: 4, duration: 0.07 },
-      { rotation: -12, x: -3, duration: 0.07 },
-      { rotation: 12, x: 3, duration: 0.07 },
-      { rotation: -7, x: -2, duration: 0.07 },
-      { rotation: 0, x: 0, duration: 0.07 },
-    ],
-    ease: 'none',
-  });
-};
-
 const HeroGlyphs = () => {
   const [copiedEmail, setCopiedEmail] = useState(false);
 
@@ -41,7 +26,6 @@ const HeroGlyphs = () => {
 
   const enter = (el: HTMLElement | null, color: string) => {
     if (!el) return;
-    shimmy(el);
     gsap.to(el, { color, duration: 0.2, ease: 'power2.out' });
   };
 

@@ -2,12 +2,6 @@
 
 import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import Link from 'next/link';
-import ColorPaletteEditor from './ColorPaletteEditor';
-import SpotifyStatus from '@/components/SpotifyStatus';
-import DarkModeToggle from "./DarkModeToggle";
-
-// to check if we're at home
-import { useRouter } from 'next/router';
 
 const HamburgerIcon = ({ onClick }: { onClick: () => void }) => (
   <button onClick={onClick} className="lg:hidden">

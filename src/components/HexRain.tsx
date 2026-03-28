@@ -3,7 +3,7 @@
 import { useState, useEffect, CSSProperties } from 'react';
 import { PRECOMP_FRAMES, getCell } from './hexrain-data';
 
-const LINE_H  = 12; // px per row
+const LINE_H = 13; // px per row
 const TICK_MS = 40;
 
 interface HexRainProps {
@@ -23,7 +23,7 @@ export default function HexRain({
   style,
   className,
 }: HexRainProps) {
-  const [started,  setStarted]  = useState(false);
+  const [started, setStarted] = useState(false);
   const [frameIdx, setFrameIdx] = useState(0);
 
   useEffect(() => {

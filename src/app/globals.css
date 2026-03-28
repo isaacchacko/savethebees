@@ -7,12 +7,12 @@
     --foreground: #181614;
     --background: #fdfbf9;
     --surface: #ffffff;
-    --accent: #c0fe05;
+    --accent: #dc2626;
     --primary-color: #181614;
     --secondary-color: #059669;
     --tertiary-color: #047857;
     --default-primary-color: #10B981;
-    --spotify-foreground: #c0fe05;
+    --spotify-foreground: #dc2626;
     --spotify-background: #121212;
   }
 }
@@ -21,9 +21,9 @@ html.dark {
   --background: #181614;
   --foreground: #fdfbf9;
   --surface: #201e1b;
-  --accent: #7ba300;
+  --accent: #f87171;
   --primary-color: #fdfbf9;
-  --spotify-foreground: #7ba300;
+  --spotify-foreground: #f87171;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -173,35 +173,6 @@ body {
 
 .quick-slide-down-fade-in {
   animation: slideDownFadeIn 0.4s ease-out forwards;
-}
-
-/* Spotify sheen animation - green shine from right to left */
-@keyframes spotifySheen {
-  0% {
-    background-position: 200% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-.spotify-pulse {
-  position: relative;
-  display: inline-block;
-  background: linear-gradient(
-    90deg,
-    currentColor 0%,
-    currentColor 30%,
-    var(--spotify-foreground) 50%,
-    currentColor 70%,
-    currentColor 100%
-  );
-  background-size: 200% 100%;
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: spotifySheen 3s linear infinite;
-  color: inherit; /* Fallback */
 }
 
 /* Text scrolling animation for Spotify component - back and forth */
