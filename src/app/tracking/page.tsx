@@ -5,8 +5,6 @@ import RunningStats from '@/components/RunningStats';
 import AlbumCoverCarousel from "@/components/AlbumCoverCarousel";
 import Footer from "@/components/Footer";
 
-const ICON_WIDTH_HEIGHT = "w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 lg:w-10 lg:h-10 ";
-
 export default function Tracking() {
   return (
     <div className="bg-(--background)">
@@ -43,6 +41,7 @@ export default function Tracking() {
           </div>
         </div>
 
+        <Footer />
       </div>
     </div>
   );

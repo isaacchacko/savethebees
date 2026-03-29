@@ -1,9 +1,6 @@
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
-const ICON_WIDTH_HEIGHT =
-  'w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 lg:w-10 lg:h-10 ';
-
 export default function NowPage() {
   return (
     <div className="bg-(--background) min-h-screen">
@@ -14,7 +11,7 @@ export default function NowPage() {
           A snapshot of what I&apos;m focused on lately. More soon.
         </p>
       </main>
-      <Footer ICON_WIDTH_HEIGHT={ICON_WIDTH_HEIGHT} />
+      <Footer />
     </div>
   );
 }

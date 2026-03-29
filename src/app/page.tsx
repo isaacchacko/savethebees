@@ -54,7 +54,7 @@ export default function Home() {
   return (
     <div className={disabled ? "bg-(--background)" : "bg-(--background) relative"}>
       <div
-        className="bg-(--background) flex h-screen min-h-0 flex-col overflow-hidden"
+        className=" bg-(--background) flex h-screen min-h-0 flex-col overflow-hidden"
         ref={containerRef}
         style={{
           clipPath,

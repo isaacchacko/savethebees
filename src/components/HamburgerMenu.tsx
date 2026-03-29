@@ -75,7 +75,7 @@ export default function HamburgerMenu() {
             <Link
               key={href}
               href={href}
-              className="group flex items-center gap-2 px-4 py-2 font-mono text-sm tracking-wide text-gray-800 hover:bg-black/[0.06] hover:text-[var(--foreground)] dark:text-gray-300 dark:hover:bg-white/10 dark:hover:text-white"
+              className="group flex items-center gap-2 px-4 py-2 font-mono text-sm tracking-wide text-gray-800 hover:bg-black/[0.06] hover:text-[var(--foreground)] dark:text-gray-300 dark:hover:bg-white/10 dark:hover:text-white uppercase"
               onClick={() => setMenuOpen(false)}
             >
               <span className={glyphWrapClass}>
@@ -95,7 +95,7 @@ export default function HamburgerMenu() {
               href={href}
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex items-center gap-2 px-4 py-2 font-mono text-sm tracking-wide text-gray-800 hover:bg-black/[0.06] hover:text-[var(--foreground)] dark:text-gray-300 dark:hover:bg-white/10 dark:hover:text-white"
+              className="group flex items-center gap-2 px-4 py-2 font-mono text-sm tracking-wide text-gray-800 hover:bg-black/[0.06] hover:text-[var(--foreground)] dark:text-gray-300 dark:hover:bg-white/10 dark:hover:text-white uppercase"
               onClick={() => setMenuOpen(false)}
             >
               <span className={glyphWrapClass}>

@@ -411,7 +411,7 @@ export default function Epicycle({
       <canvas ref={canvasRef} className="h-full w-full pointer-events-none" />
       {!embedded && (
         <div className="absolute bottom-6 right-6 text-right select-none">
-          <p className="text-[10px] font-mono tracking-[0.18em] uppercase text-gray-400 dark:text-gray-500">
+          <p className="text-[10px] font-mono uppercase text-gray-400 dark:text-gray-500">
             Lissajous · Fourier
           </p>
           <p className="text-[9px] font-mono text-gray-400/70 dark:text-gray-600">

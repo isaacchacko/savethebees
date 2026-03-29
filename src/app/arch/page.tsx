@@ -8,8 +8,6 @@ import Navbar from "@/components/Navbar";
 import RegionsOfInterest from '@/components/RegionsOfInterest';
 import Footer from "@/components/Footer";
 
-const ICON_WIDTH_HEIGHT = "w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 lg:w-10 lg:h-10 ";
-
 interface Area {
   x: number;
   y: number;
@@ -195,7 +193,7 @@ export default function Arch() {
           </div>
         </div>
 
-        <Footer ICON_WIDTH_HEIGHT={ICON_WIDTH_HEIGHT} />
+        <Footer />
       </div>
     </div>
 

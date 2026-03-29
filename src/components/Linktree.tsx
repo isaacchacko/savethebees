@@ -10,7 +10,7 @@ import { LinktreeGlyph } from '@/components/LinktreeGlyph';
 import { FiArrowUpRight } from 'react-icons/fi';
 
 const LABEL_CLASS =
-  'text-[10px] tracking-[0.12em] text-gray-600 dark:text-gray-300 md:text-xs uppercase';
+  'text-[10px] text-gray-600 dark:text-gray-300 md:text-xs uppercase';
 
 const SECTION_HEADING_CLASS =
   'mb-3 text-sm text-gray-500 dark:text-gray-400 md:text-base';

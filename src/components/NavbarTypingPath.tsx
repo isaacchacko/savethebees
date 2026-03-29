@@ -44,7 +44,7 @@ export default function NavbarTypingPath({ segment }: { segment: string | null }
   if (!isVisible) return null;
 
   return (
-    <span className="inline-block min-w-[60px] font-normal text-gray-400">
+    <span className="font-black inline-block min-w-[60px]">
       /{displayedText}
       {isTyping && <span className="animate-pulse">|</span>}
     </span>

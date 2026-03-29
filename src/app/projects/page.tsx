@@ -1,295 +1,139 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import Image from 'next/image';
-import Navbar from "@/components/Navbar";
+/**
+ * README fetch + previous UI: `@/components/projects/ProjectsReadmeLegacyView`
+ * Data: `@/data/projectsRepoMeta` · API: `/api/github/repo/[name]`
+ */
 
-// expand/collapse readme
-import { FiChevronRight, FiChevronDown } from "react-icons/fi";
-import { FaGithub } from 'react-icons/fa';
-import { TbExternalLink } from "react-icons/tb";
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import Project, { type ProjectProps } from '@/components/projects/Project';
 
-import Footer from "@/components/Footer"
-const ICON_WIDTH_HEIGHT = "w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 lg:w-10 lg:h-10 ";
+type ProjectEntry = ProjectProps & { sectionId: string; teaser: string };
 
-interface HTMLDictType {
-  [name: string]: string;
-}
+/** Matches `ProjectsReadmeLegacyView` hero card + body copy. */
+const INTRO_CARD_CLASS =
+  'rounded-2xl bg-white/80 dark:bg-[color-mix(in_srgb,var(--surface)_88%,transparent)]';
 
-interface ChipDict {
-  [name: string]: string[];
-}
+const HERO_BODY_LINK_CLASS =
+  'font-black underline-growing hover:text-[var(--accent)] transition-colors inline';
 
-interface TechnologyDict {
-  [name: string]: string;
-}
+const INTRO_BODY_CLASS =
+  'reveal-mask-target w-full text-left text-sm leading-relaxed text-reveal sm:text-[0.95rem] md:text-base lg:text-xl xl:text-2xl';
 
-interface TitleDict {
-  [name: string]: string;
-}
+const JUMP_KICKER_CLASS =
+  'text-xs font-semibold uppercase tracking-[0.14em] text-gray-500 dark:text-gray-400';
 
-interface LinkDict {
-  [name: string]: string[] | null;
-}
+const JUMP_LINK_CLASS =
+  'inline-flex min-h-11 items-center rounded-full border border-[color-mix(in_srgb,var(--foreground)_14%,transparent)] bg-[color-mix(in_srgb,var(--foreground)_4%,transparent)] px-3 py-2 text-sm font-black text-(--primary-color) transition-[color,background-color,border-color] hover:border-[color-mix(in_srgb,var(--accent)_45%,var(--foreground))] hover:bg-[color-mix(in_srgb,var(--accent)_10%,transparent)] hover:text-[var(--accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] sm:min-h-0 sm:py-1.5';
 
-interface BooleanDict {
-  [name: string]: boolean;
-}
+const PROJECTS: ProjectEntry[] = [
+  {
+    teaser: 'Agentic AI',
+    sectionId: 'fold-forge-ai',
+    ribbonName: 'HACKUTD 2025',
+    name: 'Fold Forge AI',
+    subtext: 'AI-powered protein analysis in seconds',
+    stack: ['nextjs', 'tailwindcss', 'python', 'nemotron'],
+    blurb:
+      'Unlock deep insights into protein structures, mutations, and drug targets with our advanced AI analysis platform.',
+    mediaSrc: '/projects/hackutd2025.png',
+    mediaAlt: 'HackUTD 2025',
+    needBorder: true,
+    githubHref: 'https://github.com/isaacchacko/FoldForge-AI',
+  },
+  {
+    teaser: "Browsers",
+    sectionId: 'rabbit',
+    ribbonName: 'HACKRICE 2025',
+    name: 'Rabbit',
+    subtext: 'The fastest way to browse knowledge',
+    stack: ['nextjs', 'tailwindcss', 'express', 'electron', 'gemini'],
+    blurb:
+      'Hop between sources, build knowledge graphs, and burrow deeper into topics. Rabbit transforms how you search and discover information online.',
+    mediaSrc: '/projects/hackrice2025.mp4',
+    mediaAlt: 'HackRice 2025: Rabbit demo video',
+    githubHref: 'https://github.com/isaacchacko/rabbit',
+  },
+  {
+    teaser: "Webrings",
+    sectionId: 'aggier-ing',
+    ribbonName: 'THE AGGIE CONNECTION',
+    name: 'Aggier.ing',
+    subtext: "Thanks and Gig' Em!",
+    stack: ['nextjs', 'tailwindcss', 'github', 'cloudflare'],
+    blurb: 'An unofficial webring for TAMU students/alumni to strengthen the Aggie connection!',
+    mediaSrc: '/projects/aggiering.png',
+    mediaAlt: 'Aggier.ing landing',
+    needBorder: true,
+    githubHref: 'https://github.com/isaacchacko/aggiering',
+    customHref: 'https://aggier.ing',
+    customLinkLabel: 'View aggier.ing',
+    isCustomLinkExternal: true,
+  },
+  {
+    teaser: "Terminals",
+    sectionId: 'heimdall',
+    ribbonName: 'REMOTE SHELL ACCESS',
+    name: 'Heimdall',
+    subtext: 'Remote shell access from your browser',
+    stack: ['react', 'vite', 'go', 'websockets'],
+    blurb:
+      "Connect to Isaac's laptop anytime, anywhere, from any device with a keyboard and an internet connection.",
+    mediaSrc: '/projects/heimdall-full.png',
+    mediaAlt: 'Heimdall Demo',
+    needBorder: false,
+    githubHref: 'https://github.com/isaacchacko/heimdall',
+    customHref: 'https://heimdalli.up.railway.app',
+    customLinkLabel: 'Try to login to my computer',
+    isCustomLinkExternal: true,
+  },
+];
 
-const titleDict: TitleDict = {
-  'savethebees': "My Personal Website",
-  'eulerelo': "Eulerelo",
-  'autowal': "Autowal",
-  'fate-sealed': "Fate Sealed"
-}
-
-const techStack: ChipDict = {
-  "savethebees": ["Next.js", "Typescript", "Tailwind CSS", "Redis", "Vercel"],
-  "eulerelo": ["Next.js", "Typescript", "Tailwind CSS", "PrismaDB", "PostgreSQL"],
-  "autowal": ["Python", "Bash", "cURL", "Linux"],
-  "fate-sealed": ["Godot"]
-}
-
-const externalLinkDict: LinkDict = {
-  "savethebees": ["(this) website", "http://isaacchacko.co"],
-  "eulerelo": ["website", "http://eulerelo.up.railway.app"],
-  "autowal": null,
-  "fate-sealed": ["jam submission", "https://itch.io/jam/gmtk-2025/rate/3784643"]
-}
-
-const TECHNOLOGIES: TechnologyDict = {
-  "Next.js": "#ffffff", // Official: black/white, using white
-  "Typescript": "#3178c6", // Official blue
-  "Tailwind CSS": "#38bdf8", // Official blue
-  "Redis": "#dc382d", // Official red
-  "Vercel": "#ffffff", // Official: black
-  "PrismaDB": "#0c344b", // Prisma's dark blue
-  "PostgreSQL": "#336791", // Official blue
-  "Python": "#3776ab", // Official blue
-  "Bash": "#4eaa25", // Green (Bash logo)
-  "cURL": "#073551", // Official blue
-  "Linux": "#1793d1", // Official yellow
-  "Godot": "#478cbf", // Official Godot Blue
-};
-
-export default function Projects() {
-  const repositories: string[] = ["fate-sealed", "autowal", "eulerelo", "savethebees"];
-  const [HTMLDict, setHTMLDict] = useState<HTMLDictType>(() =>
-    repositories.reduce((acc, repo) => ({ ...acc, [repo]: "" }), {})
-  );
-  const [hasExpanded, setHasExpanded] = useState(false);
-
-  const [visibleDict, setVisibleDict] = useState<BooleanDict>(() =>
-    repositories.reduce((acc, repo) => ({ ...acc, [repo]: false }), {})
-  );
-
-  const [fetchedDict, setFetchedDict] = useState<BooleanDict>(() =>
-    repositories.reduce((acc, repo) => ({ ...acc, [repo]: false }), {})
-  );
-
-  const setHTMLForRepo = (name: string, html: string) => {
-    setHTMLDict(prev => ({ ...prev, [name]: html }));
-  };
-
-  useEffect(() => {
-    async function fetchHTML() {
-
-      for (const name of repositories) {
-        const response = await fetch(`/api/github/repo/${name}`);
-
-        if (!response.ok) {
-          console.error(`Failed to fetch repository README for "${name}`)
-          continue;
-        } else {
-
-          const json = await response.json();
-          console.log(json.data);
-          setHTMLForRepo(name, json.data);
-          setFetchedDict(prev => ({ ...prev, [name]: true }));
-        }
-
-
-      }
-    }
-
-    fetchHTML();
-  }, []);
-
-  function getContrastYIQ(hexcolor: string) {
-    // Remove hash if present
-    hexcolor = hexcolor.replace('#', '');
-
-    // Parse r, g, b values
-    const r = parseInt(hexcolor.substr(0, 2), 16);
-    const g = parseInt(hexcolor.substr(2, 2), 16);
-    const b = parseInt(hexcolor.substr(4, 2), 16);
-
-    // YIQ formula
-    const yiq = (r * 299 + g * 587 + b * 114) / 1000;
-
-    // Return black for light backgrounds, white for dark backgrounds
-    return (yiq >= 128) ? '#000000' : '#ffffff';
-  }
-
-  useEffect(() => {
-    console.log(visibleDict);
-  }, [visibleDict]);
-
+export default function ProjectsPage() {
   return (
-    <div className="bg-(--background)">
+    <div className="flex h-dvh min-h-0 flex-col overflow-hidden bg-(--background)">
       <Navbar />
 
-      <div className="relative flex flex-col min-h-screen justify-start">
-        <div className="flex flex-col w-full max-w-4xl mx-auto p-4 md:p-8 mt-8 relative bg-(--surface) rounded-lg shadow">
-          <div className="text-base leading-relaxed text-center md:text-left">
-            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl text-(--primary-color) font-black pb-1 md:pb-6"> Projects
-            </h2>
-            <p className="text-sm sm:text-base md:text-lg lg:text-xl">
-              Although a complete list can be found on my <a target="_blank" href='https://github.com/isaacchacko' rel="noopener noreferrer" className="text-(--primary-color) underline underline-offset-2 hover:text-(--tertiary-color)">GitHub</a>, here&apos;s a brief list of my more notable projects.
+      <div className="flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto scroll-smooth pb-[max(0.5rem,env(safe-area-inset-bottom,0px))]">
+        <header className="shrink-0 px-3 pb-2 pt-3 sm:px-5 sm:pb-3 sm:pt-5">
+          <div className={`${INTRO_CARD_CLASS} px-3 py-4 sm:px-6 sm:py-5 md:px-7 md:py-6`}>
+            <p className={INTRO_BODY_CLASS}>
+              If you would want to peruse all of my projects, check out my{' '}
+              <a
+                href="https://github.com/isaacchacko/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={HERO_BODY_LINK_CLASS}
+              >
+                GitHub
+              </a>
+              . Otherwise, read more about some of the projects I deemed noteworthy!
             </p>
-          </div>
-        </div>
 
-
-        {repositories.map((name, index, arr) => (
-          <div key={index} className='text-base leading-relaxed flex flex-col w-full max-w-4xl mx-auto p-4 md:p-8 mt-8 relative bg-(--spotify-background) rounded-lg shadow'>
-            <div className='flex flex-row gap-3 items-center justify-between'>
-              <div className='flex flex-row gap-2 items-center group'
-                onClick={() => {
-                  setVisibleDict(prev =>
-                    ({ ...prev, [name]: !prev[name] })
-                  );
-                  setHasExpanded(true);
-                }}>
-                <span className="font-black text-2xl 2xl:text-4xl text-bold cursor-pointer pb-2 underline underline-offset-5 text-(--primary-color) group-hover:text-(--secondary-color) transition-colors duration-300">
-                  {titleDict[name]}
-                </span>
-                <div className='text-(--primary-color) group-hover:text-(--secondary-color) underline transition-colors duration-300'>
-                  {visibleDict[name]
-                    ? <FiChevronDown />
-                    : <FiChevronRight />
-                  }</div>
-                <span className={` ${!hasExpanded && index == 0 ? "block" : "hidden"} animate-pulse`}>click me to learn more!</span>
-              </div>
-
-              <div className='flex flex-col items-end gap-2'>
-                <a href={`http://github.com/isaacchacko/${name}`} target="_blank" rel="noopener noreferrer" className="">
-                  <div className='
-                      hidden
-                      sm:flex
-    hover:bg-(--primary-color)
-    transition-colors duration-300 
-    rounded-lg 
-    flex flex-row 
-    gap-2 sm:gap-3 md:gap-4 
-    items-center 
-    border border-white 
-    px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2
-    text-base sm:text-lg md:text-xl
-'>
-                    <FaGithub size={24} />
-                    <span>isaacchacko/{name}</span>
-                  </div>
-                </a>
-
-                {externalLinkDict[name] !== null &&
-                  <a href={externalLinkDict[name][1]} target="_blank" rel="noopener noreferrer" className="">
-                    <div
-                      className="
-                      hidden
-                      sm:flex
-    hover:bg-(--primary-color)
-    transition-colors duration-300 
-    rounded-lg 
-    flex flex-row 
-    gap-2 sm:gap-3 md:gap-4 
-    items-center 
-    border border-white 
-    px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2
-    text-base sm:text-lg md:text-xl
-  "
-                    >
-                      <TbExternalLink
-                        size={20} // base size
-                        className="sm:w-6 sm:h-6 md:w-7 md:h-7"
-                      />
-                      <span className="truncate">{externalLinkDict[name][0]}</span>
-                    </div>
-                  </a>}
-
-              </div>
-
-            </div>
-            {visibleDict[name] && (<div className={` w-full markdown-body quick-slide-down-fade-in `}>
-              <div className='flex flex-col items-end gap-2'>
-                <a href={`http://github.com/isaacchacko/${name}`} target="_blank" rel="noopener noreferrer" className="">
-                  <div className='
-                      sm:hidden
-                      flex
-    hover:bg-(--primary-color)
-    transition-colors duration-300 
-    rounded-lg 
-    flex flex-row 
-    gap-2 sm:gap-3 md:gap-4 
-    items-center 
-    border border-white 
-    px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2
-    text-base sm:text-lg md:text-xl
-'>
-                    <FaGithub size={24} />
-                    <span>isaacchacko/{name}</span>
-                  </div>
-                </a>
-
-                {externalLinkDict[name] !== null &&
-                  <a href={externalLinkDict[name][1]} target="_blank" rel="noopener noreferrer" className="">
-                    <div
-                      className="
-                      sm:hidden
-                      flex
-    hover:bg-(--primary-color)
-    transition-colors duration-300 
-    rounded-lg 
-    flex flex-row 
-    gap-2 sm:gap-3 md:gap-4 
-    items-center 
-    border border-white 
-    px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2
-    text-base sm:text-lg md:text-xl
-  "
-                    >
-                      <TbExternalLink
-                        size={20} // base size
-                        className="sm:w-6 sm:h-6 md:w-7 md:h-7"
-                      />
-                      <span className="truncate">{externalLinkDict[name][0]}</span>
-                    </div>
-                  </a>}
-
-              </div>
-
-              <div className='flex flex-row items-center gap-3 flex-wrap justify-start my-3'>
-                {techStack[name].map((techName, techIndex, techArr) => (
-                  <div key={techIndex} className={`hover:scale-110 transition-transform duration-300 inline-block px-3 py-1 rounded-full font-semibold text-sm`}
-                    style={{
-                      background: TECHNOLOGIES[techName],
-                      color: getContrastYIQ(TECHNOLOGIES[techName]),
-                    }}>
-                    {techName}
-                  </div>
+            <nav aria-label="Jump to project" className="mt-5 border-t border-[color-mix(in_srgb,var(--foreground)_12%,transparent)] pt-4 sm:mt-6 sm:pt-5">
+              <p className={`${JUMP_KICKER_CLASS} mb-3`}>Jump to a project about</p>
+              <ul className="flex flex-row flex-wrap gap-2 sm:gap-x-2 sm:gap-y-2">
+                {PROJECTS.map(({ sectionId, teaser, name }) => (
+                  <li key={sectionId}>
+                    <a href={`#${sectionId}`} className={JUMP_LINK_CLASS} title={name}>
+                      {teaser}
+                    </a>
+                  </li>
                 ))}
-              </div>
-
-              {!fetchedDict[name] && <span className='my-3 animate-pulse italic'>loading..</span>}
-              <div dangerouslySetInnerHTML={{ __html: HTMLDict[name] }} >
-              </div>
-            </div>)}
+              </ul>
+            </nav>
           </div>
-        ))}
+        </header>
+
+        <div className="flex w-full flex-col divide-y divide-[color-mix(in_srgb,var(--foreground)_12%,transparent)]">
+          {PROJECTS.map(({ sectionId, teaser, ...project }) => (
+            <Project key={sectionId} sectionId={sectionId} {...project} />
+          ))}
+        </div>
       </div>
 
-
-      <Footer ICON_WIDTH_HEIGHT={ICON_WIDTH_HEIGHT} />
+      <Footer />
     </div>
   );
 }

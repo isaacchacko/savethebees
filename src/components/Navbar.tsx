@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import SpotifyNowPlaying from '@/components/SpotifyNowPlaying';
 import HamburgerMenu from '@/components/HamburgerMenu';
 import NavbarTypingPath from '@/components/NavbarTypingPath';
@@ -36,6 +38,10 @@ export default function Navbar({
   isHoveringMusic = false,
   linktreePathSegment = null,
 }: NavbarProps) {
+  const pathname = usePathname();
+  const routePathSegment =
+    pathname && pathname !== '/' ? pathname.slice(1) : null;
+
   const [isDark, setIsDark] = useState(() => {
     if (typeof document === 'undefined') return false;
     return document.documentElement.classList.contains('dark');
@@ -47,7 +53,7 @@ export default function Navbar({
   const shouldShowSpotify = isHoveringMusic;
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-[100]">
+    <div className="sticky top-0 z-[100] w-full shrink-0 bg-(--background)">
       <div
         className="flex items-center gap-3 px-4 py-4 text-reveal sm:gap-4 sm:px-6 sm:py-6"
         style={{ animationDelay: '0.2s' }}
@@ -57,10 +63,19 @@ export default function Navbar({
             className="relative w-full transition-opacity duration-300"
             style={{ opacity: shouldShowSpotify ? 0 : 1, pointerEvents: shouldShowSpotify ? 'none' : 'auto' }}
           >
-            <span className="select-none text-base font-black leading-tight sm:text-lg md:text-2xl lg:text-4xl xl:text-5xl">
+            <Link
+              href="/"
+              className="min-w-0 select-none text-base font-black leading-tight text-[var(--primary-color)] transition-colors hover:text-[var(--accent)] sm:text-lg md:text-2xl lg:text-4xl xl:text-5xl"
+            >
               isaacchacko.com
-              <NavbarTypingPath segment={linktreePathSegment} />
-            </span>
+              {linktreePathSegment != null ? (
+                <NavbarTypingPath segment={linktreePathSegment} />
+              ) : routePathSegment != null ? (
+                <span className="font-black inline-block min-w-[60px]">
+                  /{routePathSegment}
+                </span>
+              ) : null}
+            </Link>
           </div>
 
           <div

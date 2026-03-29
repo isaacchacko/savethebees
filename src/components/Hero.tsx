@@ -22,10 +22,10 @@ const Home = ({ onMusicHoverChange, onLinktreePathHover }: HeroProps) => {
       style={{ pointerEvents: 'none' }}
     >
       <div
-        className="flex min-h-0 flex-1 flex-col justify-center overflow-x-hidden overflow-y-auto px-4 pb-10 pt-20 text-center sm:px-6 sm:pb-12 sm:pt-24 md:px-10 md:py-12 lg:mx-auto lg:max-w-[min(100%,96rem)] lg:px-[min(8vw,4rem)] lg:py-10 xl:px-[min(33vh,12rem)]"
+        className="flex min-h-0 flex-1 flex-col justify-center overflow-x-hidden overflow-y-auto px-4 pb-10 pt-4 text-center sm:px-6 sm:pb-12 sm:pt-6 md:px-10 md:py-12 lg:mx-auto lg:max-w-[min(100%,96rem)] lg:px-[min(8vw,4rem)] lg:py-10 xl:px-[min(33vh,12rem)]"
         style={{ pointerEvents: 'auto' }}
       >
-        <div className="relative z-10 w-full rounded-2xl bg-white/80 px-4 py-5 sm:px-6 md:px-7 md:py-6 dark:bg-[color-mix(in_srgb,var(--surface)_88%,transparent)]">
+        <div className="relative z-10 w-full px-4 py-5 sm:px-6 md:px-7 md:py-6">
           <div className="flex w-full flex-col gap-8 lg:flex-row lg:items-start lg:justify-between lg:gap-8">
             <div className="order-2 flex min-w-0 flex-1 flex-col items-stretch gap-8 lg:order-1 lg:items-center lg:gap-10">
               <p

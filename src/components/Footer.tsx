@@ -1,9 +1,3 @@
-import IconLink from '@/components/IconLink';
-
-import { AiOutlineLinkedin } from 'react-icons/ai';
-import { FiGithub } from 'react-icons/fi';
-import { BiFile, BiMailSend } from 'react-icons/bi';
-
 /** CC BY / stack credit (was inline in Hero). */
 export function SiteAttributionFooter() {
   return (
@@ -31,55 +25,10 @@ export function SiteAttributionFooter() {
   );
 }
 
-type FooterProps = {
-  /**
-   * Icon row + copyright. Omit on the home page to show only {@link SiteAttributionFooter}
-   * (CC BY / stack credit moved out of Hero).
-   */
-  ICON_WIDTH_HEIGHT?: string;
-};
-
-const Footer = ({ ICON_WIDTH_HEIGHT }: FooterProps) => (
-  <div className="flex shrink-0 flex-col items-center">
-    {ICON_WIDTH_HEIGHT ? (
-      <div className="flex flex-row justify-center">
-        <div
-          style={{ pointerEvents: 'auto' }}
-          className="contactInfo h-30 flex flex-col items-center justify-end gap-3 py-5"
-        >
-          <div className="flex flex-row gap-5">
-            <IconLink
-              className={ICON_WIDTH_HEIGHT}
-              IconComponent={AiOutlineLinkedin}
-              href="https://www.linkedin.com/in/isaacchacko"
-              isNewTab={true}
-            />
-            <IconLink
-              className={ICON_WIDTH_HEIGHT}
-              IconComponent={BiFile}
-              href="/Isaac_Chacko.pdf"
-              isNewTab={true}
-            />
-            <IconLink
-              className={ICON_WIDTH_HEIGHT}
-              IconComponent={FiGithub}
-              href="https://www.github.com/isaacchacko"
-              isNewTab={true}
-            />
-            <IconLink
-              className={ICON_WIDTH_HEIGHT}
-              IconComponent={BiMailSend}
-              href="mailto:isaac.chacko05@tamu.edu"
-              isNewTab={true}
-            />
-          </div>
-          <p>Copyright &copy; 2026 Isaac Chacko</p>
-        </div>
-      </div>
-    ) : (
+export default function Footer() {
+  return (
+    <div className="flex shrink-0 flex-col items-center">
       <SiteAttributionFooter />
-    )}
-  </div>
-);
-
-export default Footer;
+    </div>
+  );
+}

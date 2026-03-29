@@ -6,8 +6,6 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import HeroAtLink from "@/components/HeroAtLink";
 
-const ICON_WIDTH_HEIGHT = "w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 lg:w-10 lg:h-10 ";
-
 export default function About() {
   // State to track whether the card is flipped
   const [isFlipped, setIsFlipped] = useState(false);
@@ -17,7 +15,6 @@ export default function About() {
       <Navbar />
 
       <div className="relative flex flex-col min-h-screen justify-start">
-
         <div className="flex flex-col w-full max-w-4xl mx-auto p-4 md:p-8 my-8 relative bg-(--surface) rounded-lg shadow">
           <div className="flex flex-col-reverse md:flex-row items-center justify-between gap-8">
             {/* About Me Text */}
@@ -66,7 +63,7 @@ export default function About() {
           </div>
         </div>
 
-        <Footer ICON_WIDTH_HEIGHT={ICON_WIDTH_HEIGHT} />
+        <Footer />
       </div>
     </div>
   );
