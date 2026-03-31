@@ -6,7 +6,10 @@ const nextConfig: NextConfig = {
   },
   eslint: {
     ignoreDuringBuilds: true
-  }
+  },
+  async redirects() {
+    return [{ source: '/tracking', destination: '/running', permanent: true }];
+  },
 };
 
 export default nextConfig;

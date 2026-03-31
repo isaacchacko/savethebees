@@ -1,80 +1,126 @@
 'use client';
 
-import { useState } from 'react';
 import Image from 'next/image';
-import CanvasBackground from '@/components/CanvasBackground';
-import useResponsiveBees from '@/hooks/useResponsiveBees';
-import Navbar from "@/components/Navbar";
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 
-import Footer from "@/components/Footer"
-const ICON_WIDTH_HEIGHT = "w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 lg:w-10 lg:h-10 ";
+const linkClass =
+  'font-semibold text-(--accent) underline decoration-2 underline-offset-[3px] transition-colors hover:text-(--foreground)';
 
-import HeroAtLink from "@/components/HeroAtLink"
+/** Matches hero image caption overlay (`Hero.tsx`). */
+const ABOUT_IMAGE_CAPTION_BAR_CLASS =
+  'pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-black px-2 py-1 text-center opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100 sm:px-2.5 sm:py-1.5 md:px-3 md:py-2 lg:px-3.5 lg:py-2 xl:px-4 xl:py-2.5 2xl:px-4 2xl:py-3';
+const ABOUT_IMAGE_CAPTION_TEXT_CLASS =
+  'select-none font-mono text-[0.5rem] tracking-[0.05em] text-white sm:text-[0.55rem] sm:tracking-[0.07em] md:text-[0.625rem] md:tracking-[0.08em] lg:text-xs lg:tracking-[0.09em] xl:text-xs xl:tracking-[0.09em] 2xl:text-sm 2xl:tracking-[0.1em]';
 
-export default function Home() {
-  const numBees = useResponsiveBees();
-  const spawnRadius = 100;
-
-  // State to track whether the card is flipped
-  const [isFlipped, setIsFlipped] = useState(false);
-
+export default function About() {
   return (
-    <div className="relative font-sans">
-      <CanvasBackground numBees={numBees} spawnRadius={spawnRadius} />
+    <div className="relative min-h-screen bg-(--background)">
       <Navbar />
-
-      <div className="slide-down-fade-in relative flex flex-col min-h-screen justify-start pointer-events-none">
-
-        <div className="flex flex-col w-full max-w-4xl mx-auto p-4 md:p-8 my-8 backdrop-blur-sm relative bg-(--spotify-background) rounded-lg shadow">
-          <div className="flex flex-col-reverse md:flex-row items-center justify-between gap-8">
-            {/* About Me Text */}
-            <div className="pointer-events-auto text-base leading-relaxed text-center md:text-left">
-              <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl text-(--primary-color) font-black pb-1 md:pb-6">
-                About Me
-              </h2>
-              <span className="text-sm sm:text-base md:text-lg lg:text-xl">
-                Howdy! My biggest passion outside of school is attending (and occasionally winning) hackathons. This semester, I've spent most of my weekends at hackathons (check out my <a target="_blank" href='https://www.devpost.com/isaacchacko' rel="noopener noreferrer" className="font-bold text-(--primary-color) underline underline-offset-2 hover:text-white transition-color duration-300">devpost!</a>) and also help organize hackathons <HeroAtLink text="TIDAL" href="https://tidaltamu.com/" hasPeriod={false} />. Outside of hackathons, I like to take math classes out of my league, attempt to board around campus, and eat lots of Blue Bell.</span>
-              <br></br>
-              <br></br>
-              <span className="text-sm sm:text-base md:text-lg lg:text-xl">
-                Want to learn morn? Check out my <a target="_blank" href='/Isaac_Chacko.pdf' rel="noopener noreferrer" className="font-bold text-(--primary-color) underline underline-offset-2 hover:text-white transition-color duration-300">resume</a>, <a target="_blank" href='https://www.linkedin.com/in/isaacchacko' rel="noopener noreferrer" className="font-bold text-(--primary-color) underline underline-offset-2 hover:text-white transition-color duration-300">Linkedin</a>, and <a target="_blank" href='https://www.github.com/isaacchacko' rel="noopener noreferrer" className="font-bold text-(--primary-color) underline underline-offset-2 hover:text-white transition-color duration-300">GitHub</a>, or for further questions, <a target="_blank" href='mailto:isaac.chacko05@tamu.edu' rel="noopener noreferrer" className="font-bold text-(--primary-color) underline underline-offset-2 hover:text-white transition-color duration-300">email me</a>.
-              </span>
-            </div>
-
-            {/* Flip Card Container */}
-            <div
-              className="pointer-events-none relative perspective w-[250px] sm:w-[400px] md:w-[600px] lg:w-[800px]"
-              onClick={() => setIsFlipped(!isFlipped)}
-            >
-              {/* Inner Card */}
-              <div
-                className={`pointer-events-auto transition-transform duration-500 transform-style-preserve-3d ${isFlipped ? 'rotate-y-180' : ''
-                  }`}
-              >
-                {/* Front Side (Image) */}
-                <div className="backface-hidden">
-                  <Image
-                    src="/profile-picture.jpg"
-                    alt="Your Name"
-                    width={1500}
-                    height={1500}
-                    className="rounded-lg object-cover scale-90 hover:scale-100 transition-transform duration-300 ring-3 ring-(--tertiary-color)"
-                  />
-                </div>
-
-                {/* Back Side (Blurb Text) */}
-                <div className="absolute inset-0 bg-(--tertiary-color) rounded-lg flex items-center justify-center backface-hidden rotate-y-180">
-                  <p className="text-center px-4 text-sm sm:text-base md:text-lg lg:text-xl">
-                    ICDC @ Disney Land, April 2024.
-                  </p>
-                </div>
+      <main className="relative z-10 mx-auto w-full max-w-4xl px-4 pb-20 pt-8 sm:px-6 sm:pb-24 sm:pt-10 md:px-8 lg:max-w-5xl lg:pt-14">
+        <div className="mb-10 flex flex-col justify-around space-y-4 sm:mb-12 sm:flex-row lg:mb-14">
+          <div className="relative flex flex-col justify-center">
+            <header className="relative z-10 space-y-4">
+              <h1 className="text-balance text-3xl font-black tracking-tight text-(--primary-color) sm:text-4xl md:text-5xl">
+                About me
+              </h1>
+              <p className="text-base leading-relaxed text-[var(--foreground)] sm:text-lg md:leading-[1.65]">
+                Hackathons, organizing, and everything in between.
+              </p>
+            </header>
+          </div>
+          <div className="flex flex-row justify-center">
+            <div className="group relative overflow-hidden rounded-lg ring-2 ring-[color-mix(in_srgb,var(--foreground)_12%,transparent)] transition-transform duration-300 hover:scale-[1.02]">
+              <Image
+                src="/profile-picture.jpg"
+                alt="Isaac Chacko"
+                width={256}
+                height={256}
+                className="object-cover"
+              />
+              <div className={ABOUT_IMAGE_CAPTION_BAR_CLASS} aria-hidden>
+                <span className={ABOUT_IMAGE_CAPTION_TEXT_CLASS}>
+                  CALIFORNIA ADVENTURE
+                </span>
               </div>
             </div>
           </div>
         </div>
 
-        <Footer ICON_WIDTH_HEIGHT={ICON_WIDTH_HEIGHT} />
-      </div>
+
+        <article className="space-y-10 text-[var(--foreground)] sm:space-y-12">
+          <section className="space-y-3">
+            <p className="text-base leading-relaxed sm:text-lg md:leading-[1.65]">
+              Howdy! My biggest passion outside of school is attending (and
+              occasionally winning) hackathons. I like to spend most of my weekends either <span className='italic'>at</span> hackathons (check out my{' '}
+              <a
+                href="https://www.devpost.com/isaacchacko"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={linkClass}
+              >
+                Devpost
+              </a>
+              ) or <span className='italic'>organizing</span> hackathons at{' '}
+              <a
+                href="https://tidaltamu.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={linkClass}
+              >
+                tidalTAMU
+              </a>
+              . Outside of hackathons, I like to take math classes out of my
+              league, board around campus, and eat lots of Blue
+              Bell.
+            </p>
+          </section>
+
+          <section className="space-y-3">
+            <h2 className="text-2xl font-bold tracking-tight text-(--primary-color) sm:text-3xl">
+              Links &amp; contact
+            </h2>
+            <p className="text-base leading-relaxed sm:text-lg md:leading-[1.65]">
+              Want to learn more? Check out my{' '}
+              <a
+                href="/Isaac_Chacko.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={linkClass}
+              >
+                resume
+              </a>
+              ,{' '}
+              <a
+                href="https://www.linkedin.com/in/isaacchacko"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={linkClass}
+              >
+                LinkedIn
+              </a>
+              , and{' '}
+              <a
+                href="https://www.github.com/isaacchacko"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={linkClass}
+              >
+                GitHub
+              </a>
+              , or for further questions,{' '}
+              <a
+                href="mailto:isaac.chacko05@tamu.edu"
+                className={linkClass}
+              >
+                email me
+              </a>
+              .
+            </p>
+          </section>
+        </article>
+      </main>
+      <Footer />
     </div>
   );
 }

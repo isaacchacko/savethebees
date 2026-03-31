@@ -1,8 +1,7 @@
-import { Mansalva } from 'next/font/google';
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import './globals.css';
-import { gr } from "@public/fonts";
+import { bricolage, dmSerifDisplay } from "@public/fonts";
 
 export default function RootLayout({
   children,
@@ -10,10 +9,9 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={gr.className}>
+    <html lang="en" className={`${bricolage.variable} ${dmSerifDisplay.variable}`}>
       <Analytics />
       <body>
-        {/* Shared base for all layouts */}
         {children}
       </body>
     </html>

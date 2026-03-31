@@ -9,7 +9,13 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: [],
+        sans: [
+          'var(--font-bricolage)',
+          'ui-sans-serif',
+          'system-ui',
+          'sans-serif',
+        ],
+        serif: ['ui-serif', 'Georgia', 'Times New Roman', 'serif'],
       },
       dropShadow: {
         glow: [

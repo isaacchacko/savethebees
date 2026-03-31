@@ -105,47 +105,69 @@ export async function GET() {
     }
   }
 
-  let playbackData;
+  // Release lock before the slow Spotify request so concurrent /now-playing polls do not block each other.
+  try {
+    await lock.release();
+  } catch (releaseError: unknown) {
+    if (releaseError instanceof Error) {
+      console.error('Error releasing lock:', releaseError.message);
+      return NextResponse.json({ error: 'Failed to release lock: ' + releaseError.message }, { status: 500 });
+    }
+    console.error('Error releasing lock:', releaseError);
+    return NextResponse.json({ error: 'Failed to release lock: Unknown error' }, { status: 500 });
+  }
+
+  let playbackData: {
+    is_playing?: boolean;
+    progress_ms?: number;
+    item: {
+      name: string;
+      artists: Array<{ name: string; uri: string }>;
+      album: { name: string; uri: string; images: Array<{ url: string }> };
+      duration_ms: number;
+      explicit: boolean;
+      popularity: number;
+      external_urls: { spotify: string };
+    } | null;
+  };
 
   try {
-    // Fetch currently playing track from Spotify API
     const response = await fetch('https://api.spotify.com/v1/me/player/currently-playing', {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
     });
 
+    // Nothing playing: 204 has no body — must not call .json() (would throw and become 500).
+    if (response.status === 204 || response.status === 202) {
+      return NextResponse.json({ is_playing: false });
+    }
+
     if (!response.ok) {
       throw new Error(`Failed to fetch currently playing track, status code: ${response.status}`);
     }
 
-    playbackData = await response.json();
+    const text = await response.text();
+    if (!text.trim()) {
+      return NextResponse.json({ is_playing: false });
+    }
+
+    playbackData = JSON.parse(text);
+
+    if (!playbackData.item) {
+      return NextResponse.json({
+        is_playing: playbackData.is_playing ?? false,
+      });
+    }
   } catch (fetchError: unknown) {
     if (fetchError instanceof Error) {
       console.error('Error fetching currently playing track:', fetchError.message);
-      await lock.release(); // Ensure lock is released
       return NextResponse.json({ error: 'Failed to fetch currently playing track: ' + fetchError.message }, { status: 500 });
-    } else {
-      console.error('Error fetching currently playing track:', fetchError);
-      await lock.release(); // Ensure lock is released
-      return NextResponse.json({ error: 'Failed to fetch currently playing track: Unknown error' }, { status: 500 });
     }
+    console.error('Error fetching currently playing track:', fetchError);
+    return NextResponse.json({ error: 'Failed to fetch currently playing track: Unknown error' }, { status: 500 });
   }
 
-  try {
-    // Release the lock after processing
-    await lock.release();
-  } catch (releaseError: unknown) {
-    if (releaseError instanceof Error) {
-      console.error('Error releasing lock:', releaseError.message);
-      return NextResponse.json({ error: 'Failed to release lock: ' + releaseError.message }, { status: 500 });
-    } else {
-      console.error('Error releasing lock:', releaseError);
-      return NextResponse.json({ error: 'Failed to release lock: Unknown error' }, { status: 500 });
-    }
-  }
-
-  // Return playback data in the expected format
   return NextResponse.json({
     is_playing: playbackData.is_playing,
     track: playbackData.item.name,

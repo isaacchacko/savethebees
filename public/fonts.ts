@@ -1,23 +1,27 @@
 
-import { Mansalva, Playfair_Display, Inter, Gabarito } from 'next/font/google'
+import { DM_Serif_Display, Playfair_Display, Bricolage_Grotesque, Prata } from 'next/font/google'
 
-export const ms = Mansalva({
-  weight: "400",
+/** DM Serif Display — CSS variable only; wired on `<html>` in `layout.tsx` for optional future use. */
+export const dmSerifDisplay = DM_Serif_Display({
   subsets: ['latin'],
-  display: 'swap'
+  weight: '400',
+  display: 'swap',
+  variable: '--font-dm-serif-display',
 })
+
+/** @deprecated Use {@link dmSerifDisplay} */
+export const ms = dmSerifDisplay
 
 export const pd = Playfair_Display({
   subsets: ['latin'],
-  display: 'swap'
+  display: 'swap',
 })
 
-export const it = Inter({
+export const bricolage = Bricolage_Grotesque({
   subsets: ['latin'],
-  display: 'swap'
+  display: 'swap',
+  variable: '--font-bricolage',
 })
 
-export const gr = Gabarito({
-  subsets: ['latin'],
-  display: 'swap'
-})
+/** @deprecated Use {@link dmSerifDisplay} */
+export const gr = dmSerifDisplay
