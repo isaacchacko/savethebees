@@ -4,8 +4,10 @@ import useResponsiveBees from '@/hooks/useResponsiveBees';
 import Hero from '@/components/Hero';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { useSpotifyPlayback } from '@/components/SpotifyNowPlaying';
 
 export default function Home() {
+  const spotifyPlayback = useSpotifyPlayback();
   const numBees = useResponsiveBees();
   const spawnRadius = 100;
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -54,7 +56,7 @@ export default function Home() {
   return (
     <div className={disabled ? "bg-(--background)" : "bg-(--background) relative"}>
       <div
-        className=" bg-(--background) flex h-screen min-h-0 flex-col overflow-hidden"
+        className="bg-(--background) flex min-h-screen min-h-0 flex-col overflow-x-hidden"
         ref={containerRef}
         style={{
           clipPath,
@@ -65,10 +67,12 @@ export default function Home() {
         }}
       >
         <Navbar
+          spotifyPlayback={spotifyPlayback}
           isHoveringMusic={isHoveringMusic}
           linktreePathSegment={linktreePathSegment}
         />
         <Hero
+          playback={spotifyPlayback}
           onMusicHoverChange={setIsHoveringMusic}
           onLinktreePathHover={setLinktreePathSegment}
         />

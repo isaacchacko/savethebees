@@ -178,7 +178,7 @@ export default function Project({
   const mediaModalKey = `${sectionId ?? name}-media-modal`;
 
   const ribbonBarClass =
-    'sticky top-0 z-20 w-full shrink-0 border-b border-[color-mix(in_srgb,var(--foreground)_12%,transparent)] bg-[var(--background)] py-2 shadow-sm sm:py-3 md:py-4 lg:py-5 ' +
+    'sticky top-0 z-20 w-full shrink-0 border-b border-[color-mix(in_srgb,var(--foreground)_12%,transparent)] bg-[var(--background)] shadow-sm ' +
     'relative isolate [transform:translateZ(0)] ' +
     "before:pointer-events-none before:absolute before:inset-x-0 before:-top-1 before:z-[1] before:h-1 before:bg-[var(--background)] before:content-[''] " +
     "after:pointer-events-none after:absolute after:inset-x-0 after:-bottom-1 after:z-[1] after:h-1 after:bg-[var(--background)] after:content-['']";
@@ -194,7 +194,7 @@ export default function Project({
       </div>
 
       <div className="flex w-full shrink-0 flex-col gap-0 lg:flex-row lg:gap-0">
-        <aside className="flex w-full shrink-0 flex-col gap-4 px-4 pb-6 pt-5 sm:gap-5 sm:px-5 sm:pb-8 sm:pt-6 lg:w-[25vw] lg:gap-6 lg:px-4 lg:pb-12 lg:pt-8">
+        <aside className="flex w-full shrink-0 flex-col gap-4 px-3 pb-6 pt-5 sm:gap-5 sm:px-6 sm:pb-8 sm:pt-6 lg:w-1/2 lg:gap-6 lg:pb-12 lg:pt-8">
           <div className="space-y-2">
             <h1
               id={titleId}
@@ -221,16 +221,17 @@ export default function Project({
               href={githubHref}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex min-h-11 w-fit items-center py-2 text-sm italic text-gray-500 transition-colors hover:text-[var(--accent)] dark:text-gray-400 sm:min-h-0 sm:py-0"
+              className="inline-flex w-fit items-center text-sm italic text-gray-500 transition-colors hover:text-[var(--accent)] dark:text-gray-400"
             >
               View on GitHub
+              <FiArrowUpRight className="h-3.5 w-3.5 shrink-0" aria-hidden />
             </a>
             {customLink ? (
               <a
                 href={customLink.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex min-h-11 w-fit items-center gap-1 py-2 text-sm italic text-gray-500 transition-colors hover:text-[var(--accent)] dark:text-gray-400 sm:min-h-0 sm:py-0"
+                className="inline-flex w-fit items-center text-sm italic text-gray-500 transition-colors hover:text-[var(--accent)] dark:text-gray-400"
               >
                 {customLink.label}
                 {isCustomLinkExternal ? (
@@ -241,8 +242,8 @@ export default function Project({
           </div>
         </aside>
 
-        <div className="flex w-full shrink-0 flex-col lg:w-[75vw]">
-          <div className="mx-4 mb-8 mt-0 flex flex-col justify-center sm:mx-6 lg:m-8 lg:mt-8">
+        <div className="flex w-full shrink-0 flex-col lg:w-1/2">
+          <div className="mx-3 mb-8 mt-0 flex flex-col justify-center sm:mx-6 lg:mx-6 lg:mb-12 lg:mt-8">
             <div className="flex flex-row justify-center">
               {kind === 'video' ? (
                 <div className={`${mediaFrameClass} relative max-w-full`}>

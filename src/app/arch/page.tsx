@@ -1,201 +1,244 @@
-
 'use client';
 
-import Link from 'next/link';
-import { useState } from 'react';
-import Image from 'next/image';
-import Navbar from "@/components/Navbar";
-import RegionsOfInterest from '@/components/RegionsOfInterest';
-import Footer from "@/components/Footer";
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 
-interface Area {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  label: string;
-  targetId: string;
-}
+/** Place `main.mp4` (or change this path) under `public/arch/`. */
+const ARCH_VIDEO_SRC = '/arch/rice.mp4';
 
-interface HeaderProps {
-  className?: string;
-  text: string; // Define the type here
-  href?: string;
-  id?: string;
-}
+const linkClass =
+  'font-semibold text-(--accent) underline decoration-2 underline-offset-[3px] transition-colors hover:text-(--foreground)';
 
-const Header = ({
-  className = "font-bold text-2xl 2xl:text-4xl pb-2",
-  text,
-  href = "",
-  id = ""
-}: HeaderProps) => (
-  <div className="flex flex-row justify-between items-center gap-4">
-    {href !== "" ? (
-      <div className={className + "cursor-pointer"}>
-        <a
-          href={href}
-          target="_blank"
-          rel="noopener noreferrer"
-
-          id={id}
-          className="font-black sm:hover:underline cursor-pointer"
-        >
-          {text}
-        </a>
-      </div>
-    ) : (
-      <div className={className} id={id}>
-        <span>{text}</span>
-      </div>
-    )}
-  </div>
-);
-
-export default function Arch() {
-  const scrollToSection = (targetId: string) => {
-    const element = document.getElementById(targetId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  const areas: Area[] = [
-    { x: 5.5, y: 1, width: 44.5, height: 46.5, label: 'ranger', targetId: 'ranger' },
-    { x: 50.5, y: 1, width: 21.5, height: 46.5, label: 'neofetch (deprecated)', targetId: 'neofetch' },
-    { x: 73, y: 1, width: 21.5, height: 46.5, label: 'cli-visualizer', targetId: 'cli-visualizer' },
-    { x: 5.5, y: 48.5, width: 89, height: 47, label: 'lazyvim', targetId: 'lazyvim' },
-    { x: 5, y: 97.5, width: 90, height: 2.5, label: 'bumblebee-status', targetId: 'bumblebee-status' },
-  ];
-
+export default function ArchPage() {
   return (
-    <div className="bg-(--background)">
+    <div className="min-h-screen bg-(--background)">
       <Navbar />
-      <div className="relative flex flex-col min-h-screen justify-start">
-        <div className="flex flex-col w-full max-w-4xl mx-auto p-4 md:p-8 mt-8 relative bg-(--surface) rounded-lg shadow">
-          <div className="text-base leading-loose text-center md:text-left">
-            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl text-(--primary-color) font-black pb-1 md:pb-6">
-              Arch Linux &amp; Ricing
+      <main className="mx-auto w-full max-w-4xl px-4 pb-20 pt-8 sm:px-6 sm:pb-24 sm:pt-10 md:px-8 lg:max-w-5xl lg:pt-14">
+        {/* Opening blurb */}
+        <header className="mb-10 space-y-4 sm:mb-12 lg:mb-14">
+          <h1 className="text-balance text-3xl font-black tracking-tight text-(--primary-color) sm:text-4xl md:text-5xl">
+            Arch Linux &amp; ricing
+          </h1>
+          <p className="text-base leading-relaxed text-[var(--foreground)] sm:text-lg md:leading-[1.65]">
+            Check out my setup!
+          </p>
+        </header>
+
+        {/* Main content: video */}
+        <section
+          className="mb-12 sm:mb-14 lg:mb-16"
+          aria-label="Arch rice walkthrough video"
+        >
+          <div className="overflow-hidden rounded-xl border border-[color-mix(in_srgb,var(--foreground)_14%,transparent)] shadow-[0_1px_3px_color-mix(in_srgb,var(--foreground)_8%,transparent)]">
+            <video
+              className="aspect-video w-full bg-black object-contain"
+              controls
+              playsInline
+              preload="metadata"
+            >
+              <source src={ARCH_VIDEO_SRC} type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        </section>
+
+        {/* Markdown-style body */}
+        <article className="space-y-10 text-[var(--foreground)] sm:space-y-12">
+          <section className="space-y-3">
+            <h2 className="text-2xl font-bold tracking-tight text-(--primary-color) sm:text-3xl">
+              Stack &amp; workflow
             </h2>
-            <p className="text-lg leading-loose mb-4">
-              Linux is an alternative operating system from your typical Windows or MacOS. Of the many reasons people switch to Linux is the extreme customizability thats possible. Linux ricing (a term coined from <a href='https://www.urbandictionary.com/define.php?term=ricing' target="_blank" rel="noopener noreferrer" className="text-(--primary-color) underline underline-offset-2 hover:text-(--tertiary-color)">car ricing</a>) is the nerd trend of customizing your operating system's aesthetic until it's completely distinct from anyone else (Source: <a href='https://www.reddit.com/r/unixporn/' target="_blank" rel="noopener noreferrer" className="text-(--primary-color) underline underline-offset-2 hover:text-(--tertiary-color)">redditors</a>). After customizing their computer, people like to compare their "rices" with other nerds. So, if you're one of those nerds out there, below is how I like my Arch Linux :) . Hover/Click over different sections of the image to view the technology/framework used to stylize my rice.
+            <ul className="list-disc space-y-2 pl-5 text-base leading-relaxed sm:text-lg md:leading-[1.65]">
+              <li>
+                OS:{' '}
+                <a
+                  href="https://archlinux.org/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={linkClass}
+                >
+                  Arch
+                </a>{' '}
+                with{' '}
+                <a
+                  href="https://hypr.land/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={linkClass}
+                >
+                  Hyprland
+                </a>{' '}
+              </li>
+              <li>
+                Terminal:{' '}
+                <a
+                  href="https://sw.kovidgoyal.net/kitty/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={linkClass}
+                >
+                  Kitty
+                </a>
+              </li>
+              <li>
+                IDE:{' '}
+                <a
+                  href="http://www.lazyvim.org/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={linkClass}
+                >
+                  LazyVim
+                </a>
+                , a batteries-included Neovim distribution
+              </li>
+              <li>
+                Status bar:{' '}
+                <a
+                  href="https://waybar.org/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={linkClass}
+                >
+                  waybar
+                </a>
+              </li>
+            </ul>
+          </section>
+
+          <section className="space-y-3">
+            <h2 className="text-2xl font-bold tracking-tight text-(--primary-color) sm:text-3xl">
+              Tools worth naming
+            </h2>
+            <ul className="list-disc space-y-2 pl-5 text-base leading-relaxed sm:text-lg md:leading-[1.65]">
+              <li>
+                <a
+                  href="https://yazi-rs.github.io/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={linkClass}
+                >
+                  yazi
+                </a>{' '}
+                for vim-style browsing in the terminal
+              </li>
+              <li>
+                <a
+                  href="https://github.com/lsd-rs/lsd"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={linkClass}
+                >
+                  lsd
+                </a>{' '}
+                as a batteries-included Neovim distribution.
+              </li>
+              <li>
+                <a
+                  href="https://github.com/fastfetch-cli/fastfetch"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={linkClass}
+                >
+                  fastfetch
+                </a>{' '}
+                to replace neofetch
+              </li>
+              <li>
+                <a
+                  href="https://github.com/nsxiv/nsxiv"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={linkClass}
+                >
+                  nsxiv
+                </a>{' '}
+                for my wallpaper selector
+              </li>
+              <li>
+                <a
+                  href="https://github.com/dylanaraps/pywal"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={linkClass}
+                >
+                  pywal
+                </a>{' '}
+                to generate color schemes
+              </li>
+            </ul>
+          </section>
+
+          <section className="space-y-3">
+            <h3 className="text-xl font-semibold text-(--primary-color) sm:text-2xl">
+              Wallpapers &amp; colors
+            </h3>
+            <p className="text-base leading-relaxed sm:text-lg md:leading-[1.65]">
+              I pull wallpapers from{' '}
+              <a
+                href="https://wallhaven.cc"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={linkClass}
+              >
+                wallhaven.cc
+              </a>{' '}
+              and sync palettes across apps.</p>
+          </section>
+
+          <section className="space-y-3">
+            <h3 className="text-xl font-semibold text-(--primary-color) sm:text-2xl">
+              More reading
+            </h3>
+            <ul className="list-disc space-y-2 pl-5 text-base leading-relaxed sm:text-lg md:leading-[1.65]">
+              <li className="text-base leading-relaxed sm:text-lg md:leading-[1.65]">
+                Curated setups and inspiration live on communities like{' '}
+                <a
+                  href="https://www.reddit.com/r/unixporn/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={linkClass}
+                >
+                  r/unixporn
+                </a>
+              </li>
+              <li className="text-base leading-relaxed sm:text-lg md:leading-[1.65]">
+                Nice nerd fonts and glyphs to choose from over at{' '}
+                <a
+                  href="https://www.nerdfonts.com/#home"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={linkClass}
+                >
+                  nerdfonts.com
+                </a>
+              </li>
+              <li className="text-base leading-relaxed sm:text-lg md:leading-[1.65]">
+                Nice neovim plugins and colorschemes at{' '}
+                <a
+                  href="https://nvim.store/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={linkClass}
+                >
+                  nvim.store
+                </a>
+              </li>
+            </ul>
+
+          </section>
+
+          <section className="space-y-3">
+            <h3 className="text-xl font-semibold text-(--primary-color) sm:text-2xl">
+              dotfiles?
+            </h3>
+            <p className="text-base leading-relaxed text-[var(--foreground)] sm:text-lg md:leading-[1.65]">
+              Sorry for gatekeeping my configuration files! I've never gotten around to cleaning them up and uploading them, so they&apos;re on request for now.
             </p>
-          </div>
-        </div>
-
-        <div className="flex flex-col w-full max-w-4xl mx-auto p-4 md:p-8 mt-8 relative bg-(--surface) rounded-lg shadow">
-          <div className="text-base leading-loose text-center md:text-left">
-            <Header text="My Rice" id="rice" />
-            <p className="pb-4" >Click on the image to see the technology used.</p>
-            <RegionsOfInterest
-              imageSrc="/i3_rice.png"
-              imageAlt="Your image description"
-              width={2000}
-              height={900}
-              divClassName="flex justify-center relative"
-              className="object-contain max-w-5/6 animate-appear"
-              areas={areas}
-              onAreaClick={scrollToSection}
-            />
-          </div>
-        </div>
-
-        <div className="flex flex-col w-full max-w-4xl mx-auto p-4 md:p-8 mt-8 relative bg-(--surface) rounded-lg shadow">
-          <div className="text-base leading-loose text-center md:text-left">
-            <Header
-              text="Utilized Libraries/Frameworks"
-            />
-
-            <hr className="mt-5 mb-5"></hr>
-
-            <h2 id='ranger' className="text-2xl text-gray-300 font-medium italic mb-4">ranger</h2>
-            <p className="text-lg leading-loose mb-4">
-              <a target="_blank" href='https://github.com/ranger/ranger' rel="noopener noreferrer" className="text-(--primary-color) underline underline-offset-2 hover:text-(--secondary-color)">ranger</a> is a nifty file explorer for the command line. If loading a GUI to surf your files/moving your mouse to click them was too arduous for you, then ranger is your solution. It allows you to use vim-like keybindings to move around your file directory system, and can be mapped to preview various file types with your preferred file viewer. Although I still prefer to use the good ol' <code className="bg-gray-200 rounded px-1 py-0.5 font-thin">cd</code> and <code className="bg-gray-200 rounded px-1 py-0.5 font-thin">ls</code>, sometimes <code className="bg-gray-200 rounded px-1 py-0.5 font-thin">ranger</code> matches my needs just a little bit more.
-            </p>
-            <button
-              className="bg-(--primary-color) hover:bg-(--secondary-color) text-white font-bold py-2 px-4 rounded"
-              onClick={() => scrollToSection('rice')}
-            >
-              Back to Top
-            </button>
-            <hr className="mt-5 mb-5"></hr>
-
-            <h2 id='neofetch' className="text-2xl text-gray-300 font-medium italic mb-4">neofetch</h2>
-            <p className="text-lg leading-loose mb-4">
-              <a target="_blank" href='https://github.com/dylanaraps/neofetch' rel="noopener noreferrer" className="text-(--primary-color) underline underline-offset-2 hover:text-(--tertiary-color)">neofetch</a> is the bread and butter of virtually all unix users, no matter what distribution. It's the emblem of any riced Linux distribution. Unfortunately, neofetch has stopped development, meaning that its outputs are not guaranteed to be true and it's bug fixes have been put on hold indefinitely. Regardless, I still use neofetch just to taste the nostalgia, and to remember how good we had it.
-            </p>
-
-            <button
-              className="bg-(--primary-color) hover:bg-(--secondary-color) text-white font-bold py-2 px-4 rounded"
-              onClick={() => scrollToSection('rice')}
-            >
-              Back to Top
-            </button>
-            <hr className="mt-5 mb-5"></hr>
-
-            <h2 id='cli-visualizer' className="text-2xl text-gray-300 font-medium italic mb-4">cli-visualizer</h2>
-            <p className="text-lg leading-loose mb-4">
-              <a target="_blank" href='https://github.com/PosixAlchemist/cli-visualizer' rel="noopener noreferrer" className="text-(--primary-color) underline underline-offset-2 hover:text-(--tertiary-color)">cli-visualizer</a> is a TUI audio visualizer majorly written in C++. It listens to your audio output, defines its waveform, and then displays animations that are reactive to volumne, cadence, etc. It has a couple of modes (and also can simulate the <a target="_blank" href='https://en.wikipedia.org/wiki/Lorenz_system' rel="noopener noreferrer" className="text-(--primary-color) underline underline-offset-2 hover:text-(--tertiary-color)">Lorenz attractor</a>, go figure), but I just use it to look cool and to rice out :) . It uses the curses library to render the imagery, and is pretty optimized. Nothing more to say other than to check it out.
-            </p>
-
-            <button
-              className="bg-(--primary-color) hover:bg-(--secondary-color) text-white font-bold py-2 px-4 rounded"
-              onClick={() => scrollToSection('rice')}
-            >
-              Back to Top
-            </button>
-            <hr className="mt-5 mb-5"></hr>
-
-            <h2 id='lazyvim' className="text-2xl text-gray-300 font-medium italic mb-4">lazyvim</h2>
-            <p className="text-lg leading-loose mb-4">
-              <a target="_blank" href='http://www.lazyvim.org/' rel="noopener noreferrer" className="text-(--primary-color) underline underline-offset-2 hover:text-(--tertiary-color)">lazyvim</a> is the one application that I recommend anyone who is trying to be productive and use their time wisely to learn. Lazyvim is essentially a pre-compiled build of Neovim, with all of the doohickeys and gadgets you could ever ask for, while also staying with the typical norms of Neovim. Lazyvim takes away the burdens of learning about the wild assortment of plugin managers and plugins you could be using with Neovim, and instead allows you to spend your time learning what's important: vim keybindings. Vim keybindings have gotten me out of more binds than I can count, and a lot of archaic applications still accept vim keybindings. Once you learn vim, you will never go back.
-            </p>
-
-            <button
-              className="bg-(--primary-color) hover:bg-(--secondary-color) text-white font-bold py-2 px-4 rounded"
-              onClick={() => scrollToSection('rice')}
-            >
-              Back to Top
-            </button>
-            <hr className="mt-5 mb-5"></hr>
-
-            <h2 id='bumblebee-status' className="text-2xl text-gray-300 font-medium italic mb-4">bumblebee-status</h2>
-            <p className="text-lg leading-loose mb-4">
-              <a target="_blank" href='https://github.com/tobi-wan-kenobi/bumblebee-status' rel="noopener noreferrer" className="text-(--primary-color) underline underline-offset-2 hover:text-(--tertiary-color)">bumblebee-status</a> is a extremely versatile taskbar framework that works (for the most part) out of the box. There's a large amount of built-in libraries that should house every conceivable functionality you might like. Even if you want some niche output for your special taskbar, the <a target="_blank" href='https://bumblebee-status.readthedocs.io/en/latest/' rel="noopener noreferrer" className="text-(--primary-color) underline underline-offset-2 hover:text-(--tertiary-color)">documentation</a> online is really accessible in terms of creating your own "modules" (the sections on the status bar). If you're not into <i>that</i> much customization, don't worry. All of the modules in my status bar came out of the box, so as long as your drivers are working properly, then bumblebee-status can work properly as well.
-            </p>
-
-            <button
-              className="bg-(--primary-color) hover:bg-(--secondary-color) text-white font-bold py-2 px-4 rounded"
-              onClick={() => scrollToSection('rice')}
-            >
-              Back to Top
-            </button>
-          </div>
-        </div>
-
-        <div className="flex flex-col w-full max-w-4xl mx-auto p-4 md:p-8 mt-8 relative bg-(--surface) rounded-lg shadow">
-          <div className="text-base leading-loose text-center md:text-left">
-            <Header
-              text="Libraries/Frameworks Not Mentioned"
-            />
-
-            <h2 id='wallhaven.cc' className="text-2xl text-gray-300 font-medium italic mb-4">wallhaven.cc</h2>
-            <p className="text-lg leading-loose mb-4">
-              <a target="_blank" href='https://www.wallhaven.cc' rel="noopener noreferrer" className="text-(--primary-color) underline underline-offset-2 hover:text-(--tertiary-color)">wallhaven</a> is a website catalogue of lots of amazing high-quality wallpapers for both desktop and mobile. With my current i3 setup, I've set it such that every reload of i3 will download a fresh wallpaper from their website (free API). Although their catalogue includes both SFW and NSFW content, their filters make it really easy to find what you're looking for.
-            </p>
-
-            <hr className="mt-5 mb-5"></hr>
-
-            <h2 id='autowal' className="text-2xl text-gray-300 font-medium italic mb-4">autowal</h2>
-            <p className="text-lg leading-loose mb-4">
-              <a target="_blank" href='https://github.com/isaacchacko/autowal' rel="noopener noreferrer" className="text-(--primary-color) underline underline-offset-2 hover:text-(--tertiary-color)">autowal</a> is what cinches my whole setup together. It's a command line tool I developed myself to marry the aesthetics of wallpapers from wallhaven.cc and the color palette tools of pywal. On a keybind/system boot, autowal polls wallhaven.cc for the newest wallpapers with high ratings, and then reactively generate the latest color palette and apply it to my system. This allows for literally any application on my computer to utilize the palette and thus reactively match the colors found in my background. I recommend autowal for anyone who wants an easy, quick-to-use tool to make your rice better. You should check it out on my GitHub!
-            </p>
-          </div>
-        </div>
-
-        <Footer />
-      </div>
+          </section>
+        </article>
+      </main>
+      <Footer />
     </div>
-
   );
 }

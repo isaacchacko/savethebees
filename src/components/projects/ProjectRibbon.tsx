@@ -74,7 +74,7 @@ export default function ProjectRibbon({ name }: ProjectRibbonProps) {
   const strokeW = fontSize <= 22 ? 1 : 1.25;
 
   return (
-    <div ref={containerRef} className="relative w-full overflow-hidden pl-2 mt-2 sm:pl-3 sm:mt-3">
+    <div ref={containerRef} className="relative w-full overflow-hidden pl-2 sm:pl-3">
       <svg
         className="block w-full text-black dark:text-white"
         width="100%"

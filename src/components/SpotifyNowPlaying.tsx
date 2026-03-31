@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-type PlaybackState = {
+export type PlaybackState = {
   is_playing: boolean;
   artist?: string | string[];
   track?: string;
@@ -28,7 +28,7 @@ export function useSpotifyPlayback() {
   useEffect(() => {
     const fetchPlaybackData = async () => {
       try {
-        const res = await fetch('/api/spotify/now-playing');
+        const res = await fetch('/api/spotify/now-playing', { cache: 'no-store' });
         if (!res.ok) throw new Error('Failed to fetch playback');
         const data = await res.json();
         setPlayback(data);
@@ -46,8 +46,13 @@ export function useSpotifyPlayback() {
   return playback;
 }
 
-export default function SpotifyNowPlaying({ navbarMode = false }: { navbarMode?: boolean }) {
-  const playback = useSpotifyPlayback();
+export default function SpotifyNowPlaying({
+  navbarMode = false,
+  playback,
+}: {
+  navbarMode?: boolean;
+  playback: PlaybackState | null;
+}) {
   const [localProgress, setLocalProgress] = useState(0);
   const trackRef = useRef<HTMLDivElement>(null);
   const artistRef = useRef<HTMLDivElement>(null);
@@ -152,8 +157,15 @@ export default function SpotifyNowPlaying({ navbarMode = false }: { navbarMode?:
     };
   }, [playback?.track, playback?.artist, playback?.album, SCROLL_SPEED]);
 
-  // Show message if not playing anything
+  // Empty state: navbar row vs full widget (navbar must be checked first)
   if (!playback || !playback.track) {
+    if (navbarMode) {
+      return (
+        <div className="flex items-center gap-3 text-sm text-gray-400 w-full" style={{ fontFamily: 'var(--font-bricolage)' }}>
+          <span>not listening to anything right now</span>
+        </div>
+      );
+    }
     return (
       <div className="mt-8 flex flex-col gap-3 max-w-md text-center p-6 rounded-xl">
         <div className="text-sm md:text-base text-gray-500">
@@ -180,14 +192,6 @@ export default function SpotifyNowPlaying({ navbarMode = false }: { navbarMode?:
 
   // ── compact horizontal navbar layout ────────────────────────────────────────
   if (navbarMode) {
-    if (!playback || !playback.track) {
-      return (
-        <div className="flex items-center gap-3 text-sm text-gray-400 w-full" style={{ fontFamily: 'var(--font-bricolage)' }}>
-          <span>not listening to anything right now</span>
-        </div>
-      );
-    }
-
     return (
       <div className="flex items-center gap-4 w-full min-w-0" style={{ fontFamily: 'var(--font-bricolage)' }}>
         {/* Album art */}
@@ -236,11 +240,11 @@ export default function SpotifyNowPlaying({ navbarMode = false }: { navbarMode?:
             >
               {Array.isArray(playback.artist) && playback.artist_uri
                 ? playback.artist.map((a, i) => (
-                    <span key={i}>
-                      <a href={`https://open.spotify.com/artist/${playback.artist_uri![i]?.split(':')[2]}`} target="_blank" rel="noopener noreferrer" className="hover:underline">{a}</a>
-                      {i < playback.artist.length - 1 && ', '}
-                    </span>
-                  ))
+                  <span key={i}>
+                    <a href={`https://open.spotify.com/artist/${playback.artist_uri![i]?.split(':')[2]}`} target="_blank" rel="noopener noreferrer" className="hover:underline">{a}</a>
+                    {playback.artist && i < playback.artist.length - 1 && ', '}
+                  </span>
+                ))
                 : <span>{artistName}</span>
               }
               {playback.album && <span> · {playback.album}</span>}
@@ -334,14 +338,14 @@ export default function SpotifyNowPlaying({ navbarMode = false }: { navbarMode?:
                 playback.artist.map((artist, index) => (
                   <span key={index}>
                     <a
-                      href={`https://open.spotify.com/artist/${playback.artist_uri[index]?.split(':')[2]}`}
+                      href={`https://open.spotify.com/artist/${playback.artist_uri![index]?.split(':')[2]}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="hover:underline"
                     >
                       {artist}
                     </a>
-                    {index < playback.artist.length - 1 && ', '}
+                    {index < playback.artist!.length - 1 && ', '}
                   </span>
                 ))
               ) : (

@@ -13,7 +13,7 @@ type ProjectEntry = ProjectProps & { sectionId: string; teaser: string };
 
 /** Matches `ProjectsReadmeLegacyView` hero card + body copy. */
 const INTRO_CARD_CLASS =
-  'rounded-2xl bg-white/80 dark:bg-[color-mix(in_srgb,var(--surface)_88%,transparent)]';
+  '';
 
 const HERO_BODY_LINK_CLASS =
   'font-black underline-growing hover:text-[var(--accent)] transition-colors inline';
@@ -96,40 +96,47 @@ export default function ProjectsPage() {
       <Navbar />
 
       <div className="flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto scroll-smooth pb-[max(0.5rem,env(safe-area-inset-bottom,0px))]">
-        <header className="shrink-0 px-3 pb-2 pt-3 sm:px-5 sm:pb-3 sm:pt-5">
-          <div className={`${INTRO_CARD_CLASS} px-3 py-4 sm:px-6 sm:py-5 md:px-7 md:py-6`}>
-            <p className={INTRO_BODY_CLASS}>
-              If you would want to peruse all of my projects, check out my{' '}
-              <a
-                href="https://github.com/isaacchacko/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className={HERO_BODY_LINK_CLASS}
-              >
-                GitHub
-              </a>
-              . Otherwise, read more about some of the projects I deemed noteworthy!
-            </p>
+        <div className='flex w-full justify-center'>
+          <div className="w-full sm:max-w-[75%] px-4 sm:px-6">
+            <header className="shrink-0 pb-2 pt-3 sm:pb-3 sm:pt-5">
+              <div className={`${INTRO_CARD_CLASS} px-3 py-4 sm:px-6 sm:py-5 md:px-7 md:py-6`}>
+                <p className={INTRO_BODY_CLASS}>
+                  If you would want to peruse all of my projects, check out my{' '}
+                  <a
+                    href="https://github.com/isaacchacko/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={HERO_BODY_LINK_CLASS}
+                  >
+                    GitHub
+                  </a>
+                  . Otherwise, read more about some of the projects I deemed noteworthy!
+                </p>
 
-            <nav aria-label="Jump to project" className="mt-5 border-t border-[color-mix(in_srgb,var(--foreground)_12%,transparent)] pt-4 sm:mt-6 sm:pt-5">
-              <p className={`${JUMP_KICKER_CLASS} mb-3`}>Jump to a project about</p>
-              <ul className="flex flex-row flex-wrap gap-2 sm:gap-x-2 sm:gap-y-2">
-                {PROJECTS.map(({ sectionId, teaser, name }) => (
-                  <li key={sectionId}>
-                    <a href={`#${sectionId}`} className={JUMP_LINK_CLASS} title={name}>
-                      {teaser}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </nav>
+                <nav aria-label="Jump to project" className="mt-5 border-t border-[color-mix(in_srgb,var(--foreground)_12%,transparent)] pt-4 sm:mt-6 sm:pt-5">
+                  <p className={`${JUMP_KICKER_CLASS} mb-3`}>Jump to a project about</p>
+                  <ul className="flex flex-row flex-wrap gap-2 sm:gap-x-2 sm:gap-y-2">
+                    {PROJECTS.map(({ sectionId, teaser, name }) => (
+                      <li key={sectionId}>
+                        <a href={`#${sectionId}`} className={JUMP_LINK_CLASS} title={name}>
+                          {teaser}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </nav>
+              </div>
+            </header>
+
+            <div className="flex w-full flex-col divide-y divide-[color-mix(in_srgb,var(--foreground)_12%,transparent)]">
+              {PROJECTS.map(
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars -- teaser: jump nav only
+                ({ sectionId, teaser, ...project }) => (
+                  <Project key={sectionId} sectionId={sectionId} {...project} />
+                ),
+              )}
+            </div>
           </div>
-        </header>
-
-        <div className="flex w-full flex-col divide-y divide-[color-mix(in_srgb,var(--foreground)_12%,transparent)]">
-          {PROJECTS.map(({ sectionId, teaser, ...project }) => (
-            <Project key={sectionId} sectionId={sectionId} {...project} />
-          ))}
         </div>
       </div>
 

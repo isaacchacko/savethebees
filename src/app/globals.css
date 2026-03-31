@@ -7,12 +7,12 @@
     --foreground: #181614;
     --background: #fdfbf9;
     --surface: #ffffff;
-    --accent: #dc2626;
+--accent: #546ee3;
     --primary-color: #181614;
     --secondary-color: #059669;
     --tertiary-color: #047857;
     --default-primary-color: #10B981;
-    --spotify-foreground: #dc2626;
+--spotify-foreground: #546ee3;
     --spotify-background: #121212;
   }
 }
@@ -21,9 +21,9 @@ html.dark {
   --background: #181614;
   --foreground: #fdfbf9;
   --surface: #201e1b;
-  --accent: #f87171;
+--accent: #90a2f1;
   --primary-color: #fdfbf9;
-  --spotify-foreground: #f87171;
+ --spotify-foreground: #90a2f1;
 }
 
 @media (prefers-color-scheme: dark) {

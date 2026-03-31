@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import SpotifyNowPlaying from '@/components/SpotifyNowPlaying';
+import SpotifyNowPlaying, { type PlaybackState } from '@/components/SpotifyNowPlaying';
 import HamburgerMenu from '@/components/HamburgerMenu';
 import NavbarTypingPath from '@/components/NavbarTypingPath';
 
@@ -28,6 +28,8 @@ const DarkGlyph = () => (
 );
 
 export type NavbarProps = {
+  /** From home page `useSpotifyPlayback()`; omit on other routes (no polling). */
+  spotifyPlayback?: PlaybackState | null;
   /** When true, URL bar cross-fades to Spotify (home: hover “music” in hero copy). */
   isHoveringMusic?: boolean;
   /** Segment after domain for typing animation (Linktree internal link hover only). */
@@ -35,6 +37,7 @@ export type NavbarProps = {
 };
 
 export default function Navbar({
+  spotifyPlayback = null,
   isHoveringMusic = false,
   linktreePathSegment = null,
 }: NavbarProps) {
@@ -65,9 +68,9 @@ export default function Navbar({
           >
             <Link
               href="/"
-              className="min-w-0 select-none text-base font-black leading-tight text-[var(--primary-color)] transition-colors hover:text-[var(--accent)] sm:text-lg md:text-2xl lg:text-4xl xl:text-5xl"
+              className="group min-w-0 select-none text-base font-black leading-tight text-[var(--primary-color)] sm:text-lg md:text-2xl lg:text-4xl xl:text-5xl"
             >
-              isaacchacko.com
+              <span className="transition-colors group-hover:text-[var(--accent)]">isaacchacko.com</span>
               {linktreePathSegment != null ? (
                 <NavbarTypingPath segment={linktreePathSegment} />
               ) : routePathSegment != null ? (
@@ -82,7 +85,7 @@ export default function Navbar({
             className="absolute inset-0 flex items-center transition-opacity duration-300"
             style={{ opacity: shouldShowSpotify ? 1 : 0, pointerEvents: shouldShowSpotify ? 'auto' : 'none' }}
           >
-            <SpotifyNowPlaying navbarMode />
+            <SpotifyNowPlaying navbarMode playback={spotifyPlayback} />
           </div>
         </div>
 
