@@ -199,7 +199,7 @@ export default function ArchPage() {
                   rel="noopener noreferrer"
                   className={linkClass}
                 >
-                  r/unixporn
+                  reddit
                 </a>
               </li>
               <li className="text-base leading-relaxed sm:text-lg md:leading-[1.65]">
