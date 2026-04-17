@@ -2,6 +2,25 @@ import { NextResponse } from 'next/server';
 import Redis from 'ioredis';
 import { createLock } from '@microfleet/ioredis-lock';
 
+const CORS_HEADERS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET,OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
+
+function jsonWithCors(
+  body: unknown,
+  init?: Parameters<typeof NextResponse.json>[1]
+) {
+  return NextResponse.json(body, {
+    ...init,
+    headers: {
+      ...CORS_HEADERS,
+      ...(init?.headers || {}),
+    },
+  });
+}
+
 const redis = new Redis({
   host: process.env.REDIS_HOSTNAME,
   port: parseInt(process.env.REDIS_PORT || '6379', 10),
@@ -14,6 +33,13 @@ const lock = createLock(redis, {
   delay: 100,      // Delay between retries in milliseconds
 });
 
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: CORS_HEADERS,
+  });
+}
+
 export async function GET() {
   let accessToken: string | null = null;
   let refreshToken: string | null = null;
@@ -25,10 +51,10 @@ export async function GET() {
   } catch (lockError: unknown) {
     if (lockError instanceof Error) {
       console.error('Error acquiring lock:', lockError.message);
-      return NextResponse.json({ error: 'Failed to acquire lock: ' + lockError.message }, { status: 500 });
+      return jsonWithCors({ error: 'Failed to acquire lock: ' + lockError.message }, { status: 500 });
     } else {
       console.error('Error acquiring lock:', lockError);
-      return NextResponse.json({ error: 'Failed to acquire lock: Unknown error' }, { status: 500 });
+      return jsonWithCors({ error: 'Failed to acquire lock: Unknown error' }, { status: 500 });
     }
   }
 
@@ -45,11 +71,11 @@ export async function GET() {
     if (redisError instanceof Error) {
       console.error('Error retrieving tokens from Redis:', redisError.message);
       await lock.release(); // Ensure lock is released
-      return NextResponse.json({ error: 'Failed to retrieve tokens: ' + redisError.message }, { status: 500 });
+      return jsonWithCors({ error: 'Failed to retrieve tokens: ' + redisError.message }, { status: 500 });
     } else {
       console.error('Error retrieving tokens from Redis:', redisError);
       await lock.release(); // Ensure lock is released
-      return NextResponse.json({ error: 'Failed to retrieve tokens: Unknown error' }, { status: 500 });
+      return jsonWithCors({ error: 'Failed to retrieve tokens: Unknown error' }, { status: 500 });
     }
   }
 
@@ -96,11 +122,11 @@ export async function GET() {
       if (refreshError instanceof Error) {
         console.error('Error refreshing token:', refreshError.message);
         await lock.release(); // Ensure lock is released
-        return NextResponse.json({ error: 'Failed to refresh token: ' + refreshError.message }, { status: 500 });
+        return jsonWithCors({ error: 'Failed to refresh token: ' + refreshError.message }, { status: 500 });
       } else {
         console.error('Error refreshing token:', refreshError);
         await lock.release(); // Ensure lock is released
-        return NextResponse.json({ error: 'Failed to refresh token: Unknown error' }, { status: 500 });
+        return jsonWithCors({ error: 'Failed to refresh token: Unknown error' }, { status: 500 });
       }
     }
   }
@@ -111,10 +137,10 @@ export async function GET() {
   } catch (releaseError: unknown) {
     if (releaseError instanceof Error) {
       console.error('Error releasing lock:', releaseError.message);
-      return NextResponse.json({ error: 'Failed to release lock: ' + releaseError.message }, { status: 500 });
+      return jsonWithCors({ error: 'Failed to release lock: ' + releaseError.message }, { status: 500 });
     }
     console.error('Error releasing lock:', releaseError);
-    return NextResponse.json({ error: 'Failed to release lock: Unknown error' }, { status: 500 });
+    return jsonWithCors({ error: 'Failed to release lock: Unknown error' }, { status: 500 });
   }
 
   let playbackData: {
@@ -140,7 +166,7 @@ export async function GET() {
 
     // Nothing playing: 204 has no body — must not call .json() (would throw and become 500).
     if (response.status === 204 || response.status === 202) {
-      return NextResponse.json({ is_playing: false });
+      return jsonWithCors({ is_playing: false });
     }
 
     if (!response.ok) {
@@ -149,26 +175,26 @@ export async function GET() {
 
     const text = await response.text();
     if (!text.trim()) {
-      return NextResponse.json({ is_playing: false });
+      return jsonWithCors({ is_playing: false });
     }
 
     playbackData = JSON.parse(text);
 
     if (!playbackData.item) {
-      return NextResponse.json({
+      return jsonWithCors({
         is_playing: playbackData.is_playing ?? false,
       });
     }
   } catch (fetchError: unknown) {
     if (fetchError instanceof Error) {
       console.error('Error fetching currently playing track:', fetchError.message);
-      return NextResponse.json({ error: 'Failed to fetch currently playing track: ' + fetchError.message }, { status: 500 });
+      return jsonWithCors({ error: 'Failed to fetch currently playing track: ' + fetchError.message }, { status: 500 });
     }
     console.error('Error fetching currently playing track:', fetchError);
-    return NextResponse.json({ error: 'Failed to fetch currently playing track: Unknown error' }, { status: 500 });
+    return jsonWithCors({ error: 'Failed to fetch currently playing track: Unknown error' }, { status: 500 });
   }
 
-  return NextResponse.json({
+  return jsonWithCors({
     is_playing: playbackData.is_playing,
     track: playbackData.item.name,
     artist: playbackData.item.artists.map((a: { name: string }) => a.name),
