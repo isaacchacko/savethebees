@@ -1,455 +1,216 @@
-/* globals.css */
 @import "tailwindcss";
 @config "../../tailwind.config.js";
 
-@layer theme {
-  :root {
-    --foreground: #181614;
-    --background: #fdfbf9;
-    --surface: #ffffff;
---accent: #546ee3;
-    --primary-color: #181614;
-    --secondary-color: #059669;
-    --tertiary-color: #047857;
-    --default-primary-color: #10B981;
---spotify-foreground: #546ee3;
-    --spotify-background: #121212;
-  }
+:root {
+  --background: #eaf4fb;
+  --surface: #f7fbfd;
+  --foreground: #1a2733;
+  --muted: #5a6b7a;
+  --accent: #3a7bb8;
+  --border: #cfe0ec;
+
+  --primary-color: var(--foreground);
+  --spotify-foreground: var(--accent);
+  --spotify-background: var(--surface);
 }
 
-html.dark {
-  --background: #181614;
-  --foreground: #fdfbf9;
-  --surface: #201e1b;
---accent: #90a2f1;
-  --primary-color: #fdfbf9;
- --spotify-foreground: #90a2f1;
+* {
+  box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-  }
+html {
+  scrollbar-gutter: stable;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--background);
+  color: var(--foreground);
 }
 
 body {
-  font-family: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
-  color: var(--foreground);
-  background: var(--background);
-  transition: background 0.4s ease, color 0.4s ease;
+  font-family: var(--font-newsreader), Georgia, "Times New Roman", Times, serif;
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
 }
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-newsreader), Georgia, "Times New Roman", Times, serif;
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 1.4em 0 0.5em;
+}
+
+h1 {
+  font-size: 3.25rem;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.2rem; }
 
 p {
-  font-family: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+  margin: 0 0 1em;
 }
 
-/** Explicit Bricolage where inheritance would otherwise differ. */
-.font-bricolage {
-  font-family: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+a {
+  color: var(--foreground);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
-.clickable-elements {
-  pointer-events: auto;
+a:hover {
+  color: var(--accent);
 }
 
-@keyframes drop-out {
-  0% {
-  transform: translateY(0);
-    opacity: 1;
-}
-  100% {
-    transform: translateY(100%);
-    opacity: 0;
-  }
+nav a {
+  color: var(--accent);
 }
 
-@keyframes drop-in {
-  0% { 
-    transform: translateY(-100%);
-    opacity: 0;
-  }
-  100% {
-    transform: translateY(0);
-    opacity: 1;
-  }
+nav a:hover {
+  color: var(--foreground);
 }
 
-.animate-drop-out {
-  animation: drop-out 0.5s ease-in-out forwards;
+hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 2rem 0;
 }
 
-.animate-drop-in {
-  animation: drop-in 0.5s ease-in-out forwards;
+code, pre {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.9em;
 }
 
-.invisible {
-  visibility: hidden;
+pre {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 1rem;
+  overflow-x: auto;
 }
 
-/* spotify progress bar */
-.progress-bar-thumb {
-  width: 12px;
-  height: 12px;
-  background: white;
-  border-radius: 50%;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  opacity: 0;
-  transition: opacity 0.2s;
+code {
+  background: var(--surface);
+  padding: 0.1em 0.35em;
+  border: 1px solid var(--border);
 }
 
-.progress-bar-container:hover .progress-bar-thumb {
-  opacity: 1;
+pre code {
+  background: none;
+  border: 0;
+  padding: 0;
 }
 
-
-/* Define the keyframes */
-@keyframes slideDownFadeIn {
-  0% {
-    transform: translateY(20px); /* Start slightly above */
-    opacity: 0; /* Fully transparent */
-  }
-  100% {
-    transform: translateY(0); /* End at original position */
-    opacity: 1; /* Fully visible */
-  }
+img {
+  max-width: 100%;
+  height: auto;
 }
 
-/* Text reveal animation on page load */
-@keyframes textReveal {
-  0% {
-    opacity: 0;
-    transform: translateY(15px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
+ul, ol {
+  padding-left: 1.4em;
 }
 
-.text-reveal {
-  animation: textReveal 0.6s ease-out forwards;
-  opacity: 0;
+ul {
+  list-style: disc;
 }
 
-.hero-glyph {
-  color: var(--primary-color);
+ul ul {
+  list-style: circle;
 }
 
-/* Hex rain — vertical (falls downward) */
-@keyframes hexRainFallV {
-  from { transform: translateY(-50%); }
-  to   { transform: translateY(0); }
+ol {
+  list-style: decimal;
 }
 
-
-/* Growing underline animation */
-.underline-growing {
-  position: relative;
-  text-decoration: none;
-  display: inline;
-  white-space: nowrap;
+blockquote {
+  margin: 1em 0;
+  padding: 0.2em 1em;
+  border-left: 3px solid var(--border);
+  color: var(--muted);
 }
 
-.underline-growing::after {
+summary {
+  display: block;
+  list-style: none;
+  cursor: pointer;
+}
+
+summary::-webkit-details-marker,
+summary::marker {
+  display: none;
   content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 0;
-  height: 2px;
-  background-color: currentColor;
-  transition: width 0.3s ease-out;
 }
 
-.underline-growing:hover::after {
-  width: 100%;
-}
-
-.title-slide-down-fade-in {
-  animation: slideDownFadeIn 0.4s ease-out forwards;
-  opacity: 0;
-  animation-delay: 500ms;
-}
-
-/* Create the animation class */
-.slide-down-fade-in {
-  animation: slideDownFadeIn 0.4s ease-out forwards;
-  opacity: 0;
-  animation-delay: 1000ms;
-}
-
-.quick-slide-down-fade-in {
-  animation: slideDownFadeIn 0.4s ease-out forwards;
-}
-
-/* Text scrolling animation for Spotify component - back and forth */
-/* Uses variable duration but constant speed (linear timing) */
-/* Keyframes: 10% pause, 40% scroll forward, 20% pause, 30% scroll back */
-@keyframes scrollTextBackForth {
-  0%, 10% {
-    transform: translateX(0);
-  }
-  50% {
-    transform: translateX(var(--scroll-amount, 0));
-  }
-  70% {
-    transform: translateX(var(--scroll-amount, 0));
-  }
-  100% {
-    transform: translateX(0);
-  }
-}
-
-.animate-scroll-text {
+/* Quartz-style hover preview popover */
+.hover-preview {
+  position: relative;
   display: inline-block;
 }
 
-.slow-slide-down-fade-in {
-  animation: slideDownFadeIn 0.4s ease-out forwards;
-  opacity: 0;
-  animation-delay: 2000ms;
+/* inline copy-to-clipboard button */
+.copy-btn {
+  color: var(--muted);
+  transition: color 0.15s ease;
 }
 
-.wait-longer {
-  animation-delay: 800ms;
-}
-
-/* Add these styles globally or via @layer */
-.perspective {
-  perspective: 1000px;
-}
-
-.transform-style-preserve-3d {
-  transform-style: preserve-3d;
-}
-
-.backface-hidden {
-  backface-visibility: hidden;
-}
-
-.rotate-y-180 {
-transform: rotateY(180deg);
-}
-
-.scroll {
-  scroll-snap-type: x mandatory;
-  scroll-behavior: auto; /* Default behavior */
-}
-
-.scroll:hover {
-  scroll-behavior: smooth; /* Smooth behavior on hover */
-  cursor: grab; /* Change cursor to indicate dragging */
-}
-
-.scroll:active {
-  cursor: grabbing; /* Change cursor while dragging */
-}
-
-.scrollbar-thin::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-.scrollbar-thin::-webkit-scrollbar-thumb {
-  background-color: #ccc;
-  border-radius: 10px;
-}
-
-.scrollbar-thin::-webkit-scrollbar-track {
-  background-color: #eee;
-}
-
-@keyframes border-pulsate {
-    0%   { border-color: rgba(30, 215, 96, 0.9); }
-    50%  { border-color: rgba(30, 215, 96, 0.3); }
-    100%   { border-color: rgba(30, 215, 96, 0.9); }
-}
-
-.pulse-border {
-    border: 3px solid;
-    border-color: #1ED760;
-    animation: border-pulsate 2s ease-in-out infinite;
-}
-
-.info {
-    border: 1000 solid rgba(0,0,0,0.5);
-    background-clip: padding-box;
-}
-
-@keyframes scroll-x {
-  0% {
-    transform: translateX(100%);
-  }
-  100% {
-    transform: translateX(-100%);
-  }
-}
-
-.animate-scroll-x {
-  animation: scroll-x 10s linear infinite;
-}
-
-/* README HTML on /projects — body text matches hero (Bricolage); headings use global h* (DM Serif). */
-.markdown-body {
-  font-family: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
-  color: var(--foreground);
-  line-height: 1.65;
-  font-size: 0.95rem;
-  padding: 0;
-  max-width: none;
-  margin: 0;
-  box-sizing: border-box;
-  word-break: break-word;
-}
-
-@media (min-width: 640px) {
-  .markdown-body {
-    font-size: 1rem;
-  }
-}
-
-.markdown-body h1,
-.markdown-body h2,
-.markdown-body h3,
-.markdown-body h4,
-.markdown-body h5,
-.markdown-body h6 {
-  font-weight: 600;
-  margin-top: 1.35em;
-  margin-bottom: 0.65em;
-  line-height: 1.25;
+.copy-btn:hover {
   color: var(--foreground);
 }
 
-.markdown-body h1 {
-  font-size: 1.85em;
-  border-bottom: 1px solid color-mix(in srgb, var(--foreground) 18%, transparent);
-  padding-bottom: 0.3em;
-  display: none;
-}
-
-.markdown-body h2 {
-  font-size: 1.45em;
-  border-bottom: 1px solid color-mix(in srgb, var(--foreground) 18%, transparent);
-  padding-bottom: 0.3em;
-}
-
-.markdown-body h3 {
-  font-size: 1.25em;
-}
-
-.markdown-body h4 {
-  font-size: 1.1em;
-}
-
-.markdown-body h5 {
-  font-size: 1.05em;
-}
-
-.markdown-body h6 {
-  font-size: 1em;
-  color: color-mix(in srgb, var(--foreground) 65%, transparent);
-}
-
-.markdown-body p {
-  margin-top: 0;
-  margin-bottom: 1rem;
-}
-
-.markdown-body ul,
-.markdown-body ol {
-  padding-left: 1.5em;
-  margin-bottom: 1rem;
-}
-
-.markdown-body li {
-  margin-bottom: 0.35em;
-}
-
-.markdown-body blockquote {
-  color: color-mix(in srgb, var(--foreground) 72%, transparent);
-  border-left: 0.25em solid color-mix(in srgb, var(--foreground) 22%, transparent);
-  padding: 0 1em;
-  margin: 0 0 1rem 0;
-  background: color-mix(in srgb, var(--foreground) 5%, transparent);
-  border-radius: 0 4px 4px 0;
-}
-
-.markdown-body code {
-  background: color-mix(in srgb, var(--foreground) 8%, var(--surface));
+.copy-btn[data-copied="true"] {
   color: var(--accent);
-  padding: 0.15em 0.4em;
-  border-radius: 4px;
-  font-size: 88%;
-  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
 }
 
-.markdown-body pre {
-  background: color-mix(in srgb, var(--foreground) 7%, var(--background));
-  padding: 1rem 1.1rem;
-  overflow: auto;
-  border-radius: 8px;
-  font-size: 88%;
-  margin-bottom: 1rem;
-  border: 1px solid color-mix(in srgb, var(--foreground) 12%, transparent);
-}
-
-.markdown-body pre code {
-  background: none;
+/* standard formatting for any text that reveals a hover preview */
+.hover-preview-trigger {
+  display: inline-block;
+  cursor: default;
   color: var(--foreground);
-  font-size: inherit;
-  padding: 0;
-}
-
-.markdown-body table {
-  border-collapse: collapse;
-  margin-bottom: 1rem;
-  width: 100%;
-}
-
-.markdown-body th,
-.markdown-body td {
-  border: 1px solid color-mix(in srgb, var(--foreground) 16%, transparent);
-  padding: 0.5rem 0.75rem;
-}
-
-.markdown-body th {
-  background: color-mix(in srgb, var(--foreground) 6%, var(--surface));
-  font-weight: 600;
-}
-
-.markdown-body tr:nth-child(even) {
-  background: color-mix(in srgb, var(--foreground) 4%, transparent);
-}
-
-.markdown-body a {
-  color: var(--accent);
-  font-weight: 700;
   text-decoration: underline;
+  text-decoration-style: dotted;
   text-underline-offset: 3px;
-  transition: color 0.2s ease;
 }
 
-.markdown-body a:hover {
-  color: color-mix(in srgb, var(--accent) 85%, var(--foreground));
+.hover-preview .popover {
+  z-index: 999;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  display: block;
+  /* transparent bridge so moving from trigger into the box keeps it open */
+  padding-top: 0.5rem;
+  overflow: visible;
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    opacity 0.3s ease,
+    visibility 0.3s ease;
 }
 
-.markdown-body img {
-  max-width: 100%;
-  border-radius: 6px;
-  background: color-mix(in srgb, var(--foreground) 6%, var(--background));
+.hover-preview .popover[data-open="true"] {
+  visibility: visible;
+  opacity: 1;
+  transition:
+    opacity 0.2s ease 500ms,
+    visibility 0.2s ease;
 }
 
-.markdown-body hr {
-  border: 0;
-  border-top: 1px solid color-mix(in srgb, var(--foreground) 18%, transparent);
-  margin: 1.5rem 0;
-}
-
-.markdown-body .task-list-item {
-  list-style-type: none;
-}
-
-.markdown-body input[type="checkbox"] {
-  margin: 0 0.2em 0.25em -1.6em;
-  vertical-align: middle;
+.hover-preview .popover-inner {
+  display: block;
+  position: relative;
+  width: min(30rem, 85vw);
+  max-height: min(20rem, 60vh);
+  padding: 1rem;
+  font-weight: initial;
+  font-style: initial;
+  line-height: normal;
+  white-space: normal;
+  border: 1px solid var(--border);
+  background-color: var(--surface);
+  border-radius: 5px;
+  box-shadow: 6px 6px 36px 0 rgba(0, 0, 0, 0.25);
+  overflow: auto;
 }
