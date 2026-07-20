@@ -38,7 +38,7 @@ export default function NowPage() {
 
         <hr />
 
-        <h3>07/19/2026</h3>
+        <h3>03/31/2026</h3>
         <ul>
           <li>
             school: almost done with this semester, just keeping my grades up
