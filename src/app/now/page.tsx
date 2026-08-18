@@ -26,6 +26,16 @@ export default function NowPage() {
           .
         </p>
 
+        <h3>08/18/2026</h3>
+        <ul>
+          <li>
+            had my friends visit me in sf + went to muir woods!
+          </li>
+          <li>another onsite soon</li>
+          <li>officially started my marathon training yesterday!</li>
+        </ul>
+
+        <hr />
         <h3>07/19/2026</h3>
         <ul>
           <li>
@@ -35,8 +45,6 @@ export default function NowPage() {
           <li>going to suki&apos;s concert at stern grove soon!</li>
           <li>odyssey was so good. watched on 70mm</li>
         </ul>
-
-        <hr />
 
         <h3>03/31/2026</h3>
         <ul>
