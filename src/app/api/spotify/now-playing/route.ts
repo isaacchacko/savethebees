@@ -33,6 +33,63 @@ const lock = createLock(redis, {
   delay: 100,      // Delay between retries in milliseconds
 });
 
+/**
+ * The widget is decorative, so every failure degrades to "nothing playing"
+ * rather than a 500 — a dead token should not put an error on every page load.
+ * The cause is logged instead, which is where to look when it stops working.
+ */
+function notPlaying(context?: string, cause?: unknown) {
+  if (context) {
+    const detail = cause instanceof Error ? cause.message : cause;
+    console.error(`spotify/now-playing: ${context}`, detail ?? '');
+  }
+  return jsonWithCors({ is_playing: false });
+}
+
+async function refreshAccessToken(refreshToken: string) {
+  const authHeader = Buffer.from(
+    `${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`
+  ).toString('base64');
+
+  const response = await fetch('https://accounts.spotify.com/api/token', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      Authorization: `Basic ${authHeader}`,
+    },
+    body: new URLSearchParams({
+      grant_type: 'refresh_token',
+      refresh_token: refreshToken,
+    }),
+  });
+
+  if (!response.ok) {
+    // Spotify answers every refresh failure with 400, so the status alone
+    // cannot tell invalid_grant (dead refresh token) from invalid_client
+    // (bad id/secret). The body is the only thing that distinguishes them.
+    const body = await response.text();
+    let code = 'unknown';
+    try {
+      code = JSON.parse(body).error || code;
+    } catch {
+      // non-JSON body, so the raw text below is all there is to go on
+    }
+    throw new Error(`refresh rejected (${response.status} ${code}): ${body}`);
+  }
+
+  const { access_token, expires_in, refresh_token } = await response.json();
+
+  await redis.set('spotify_access_token', access_token);
+  await redis.set('spotify_expiry', String(Date.now() + expires_in * 1000));
+  // Spotify may hand back a rotated refresh token; dropping it would
+  // invalidate the stored one and break every later refresh.
+  if (refresh_token) {
+    await redis.set('spotify_refresh_token', refresh_token);
+  }
+
+  return access_token as string;
+}
+
 export async function OPTIONS() {
   return new NextResponse(null, {
     status: 204,
@@ -42,171 +99,85 @@ export async function OPTIONS() {
 
 export async function GET() {
   let accessToken: string | null = null;
-  let refreshToken: string | null = null;
-  let expiry: string | null = null;
 
   try {
-    // Acquire lock to prevent concurrent refresh attempts
+    // Lock so concurrent polls cannot each kick off their own refresh
     await lock.acquire('spotify_token_refresh');
-  } catch (lockError: unknown) {
-    if (lockError instanceof Error) {
-      console.error('Error acquiring lock:', lockError.message);
-      return jsonWithCors({ error: 'Failed to acquire lock: ' + lockError.message }, { status: 500 });
-    } else {
-      console.error('Error acquiring lock:', lockError);
-      return jsonWithCors({ error: 'Failed to acquire lock: Unknown error' }, { status: 500 });
-    }
+  } catch (err) {
+    return notPlaying('could not acquire refresh lock', err);
   }
 
   try {
-    // Retrieve tokens and expiry from Redis
     accessToken = await redis.get('spotify_access_token');
-    refreshToken = await redis.get('spotify_refresh_token');
-    expiry = await redis.get('spotify_expiry');
+    const refreshToken = await redis.get('spotify_refresh_token');
+    const expiry = await redis.get('spotify_expiry');
 
     if (!accessToken || !refreshToken || !expiry) {
-      throw new Error('Missing Spotify tokens or expiry in Redis');
+      throw new Error('no tokens in Redis — the site has not been authorized');
     }
-  } catch (redisError: unknown) {
-    if (redisError instanceof Error) {
-      console.error('Error retrieving tokens from Redis:', redisError.message);
-      await lock.release(); // Ensure lock is released
-      return jsonWithCors({ error: 'Failed to retrieve tokens: ' + redisError.message }, { status: 500 });
-    } else {
-      console.error('Error retrieving tokens from Redis:', redisError);
-      await lock.release(); // Ensure lock is released
-      return jsonWithCors({ error: 'Failed to retrieve tokens: Unknown error' }, { status: 500 });
+
+    if (Date.now() > parseInt(expiry, 10)) {
+      accessToken = await refreshAccessToken(refreshToken);
     }
-  }
-
-  const expiryTime = parseInt(expiry);
-
-  if (Date.now() > expiryTime) {
+  } catch (err) {
+    return notPlaying('token unavailable', err);
+  } finally {
+    // Released before the slow Spotify call so concurrent polls do not queue
     try {
-      // Refresh the access token
-      const authHeader = Buffer.from(
-        `${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`
-      ).toString('base64');
-
-      const response = await fetch('https://accounts.spotify.com/api/token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          Authorization: `Basic ${authHeader}`,
-        },
-        body: new URLSearchParams({
-          grant_type: 'refresh_token',
-          refresh_token: refreshToken,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to refresh token, status code: ${response.status}`);
-      }
-
-      const { access_token, expires_in } = await response.json();
-
-      try {
-        // Update Redis with new tokens and expiry time
-        await redis.set('spotify_access_token', access_token);
-        await redis.set('spotify_expiry', String(Date.now() + expires_in * 1000));
-        accessToken = access_token; // Update local variable with new token
-      } catch (redisUpdateError: unknown) {
-        if (redisUpdateError instanceof Error) {
-          throw new Error(`Failed to update Redis with refreshed token: ${redisUpdateError.message}`);
-        } else {
-          throw new Error(`Failed to update Redis with refreshed token: Unknown error`);
-        }
-      }
-    } catch (refreshError: unknown) {
-      if (refreshError instanceof Error) {
-        console.error('Error refreshing token:', refreshError.message);
-        await lock.release(); // Ensure lock is released
-        return jsonWithCors({ error: 'Failed to refresh token: ' + refreshError.message }, { status: 500 });
-      } else {
-        console.error('Error refreshing token:', refreshError);
-        await lock.release(); // Ensure lock is released
-        return jsonWithCors({ error: 'Failed to refresh token: Unknown error' }, { status: 500 });
-      }
+      await lock.release();
+    } catch (err) {
+      console.error('spotify/now-playing: lock release failed', err);
     }
   }
 
-  // Release lock before the slow Spotify request so concurrent /now-playing polls do not block each other.
   try {
-    await lock.release();
-  } catch (releaseError: unknown) {
-    if (releaseError instanceof Error) {
-      console.error('Error releasing lock:', releaseError.message);
-      return jsonWithCors({ error: 'Failed to release lock: ' + releaseError.message }, { status: 500 });
-    }
-    console.error('Error releasing lock:', releaseError);
-    return jsonWithCors({ error: 'Failed to release lock: Unknown error' }, { status: 500 });
-  }
+    const response = await fetch(
+      'https://api.spotify.com/v1/me/player/currently-playing',
+      { headers: { Authorization: `Bearer ${accessToken}` } }
+    );
 
-  let playbackData: {
-    is_playing?: boolean;
-    progress_ms?: number;
-    item: {
-      name: string;
-      artists: Array<{ name: string; uri: string }>;
-      album: { name: string; uri: string; images: Array<{ url: string }> };
-      duration_ms: number;
-      explicit: boolean;
-      popularity: number;
-      external_urls: { spotify: string };
-    } | null;
-  };
-
-  try {
-    const response = await fetch('https://api.spotify.com/v1/me/player/currently-playing', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-
-    // Nothing playing: 204 has no body — must not call .json() (would throw and become 500).
-    if (response.status === 204 || response.status === 202) {
-      return jsonWithCors({ is_playing: false });
-    }
+    // Nothing playing: 204 has no body, so calling .json() on it would throw
+    if (response.status === 204 || response.status === 202) return notPlaying();
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch currently playing track, status code: ${response.status}`);
+      throw new Error(`currently-playing returned ${response.status}`);
     }
 
     const text = await response.text();
-    if (!text.trim()) {
-      return jsonWithCors({ is_playing: false });
-    }
+    if (!text.trim()) return notPlaying();
 
-    playbackData = JSON.parse(text);
+    const playback = JSON.parse(text) as {
+      is_playing?: boolean;
+      progress_ms?: number;
+      item: {
+        name: string;
+        artists: Array<{ name: string; uri: string }>;
+        album: { name: string; uri: string; images: Array<{ url: string }> };
+        duration_ms: number;
+        explicit: boolean;
+        popularity: number;
+        external_urls: { spotify: string };
+      } | null;
+    };
 
-    if (!playbackData.item) {
-      return jsonWithCors({
-        is_playing: playbackData.is_playing ?? false,
-      });
-    }
-  } catch (fetchError: unknown) {
-    if (fetchError instanceof Error) {
-      console.error('Error fetching currently playing track:', fetchError.message);
-      return jsonWithCors({ error: 'Failed to fetch currently playing track: ' + fetchError.message }, { status: 500 });
-    }
-    console.error('Error fetching currently playing track:', fetchError);
-    return jsonWithCors({ error: 'Failed to fetch currently playing track: Unknown error' }, { status: 500 });
+    if (!playback.item) return notPlaying();
+
+    return jsonWithCors({
+      is_playing: playback.is_playing,
+      track: playback.item.name,
+      artist: playback.item.artists.map((a) => a.name),
+      artist_uri: playback.item.artists.map((a) => a.uri),
+      album: playback.item.album.name,
+      album_uri: playback.item.album.uri,
+      image: playback.item.album.images[0]?.url,
+      progress: playback.progress_ms,
+      duration: playback.item.duration_ms,
+      explicit: playback.item.explicit,
+      popularity: playback.item.popularity,
+      track_url: playback.item.external_urls.spotify,
+      external_url: playback.item.external_urls.spotify,
+    });
+  } catch (err) {
+    return notPlaying('could not fetch current track', err);
   }
-
-  return jsonWithCors({
-    is_playing: playbackData.is_playing,
-    track: playbackData.item.name,
-    artist: playbackData.item.artists.map((a: { name: string }) => a.name),
-    artist_uri: playbackData.item.artists.map((a: { uri: string }) => a.uri),
-    album: playbackData.item.album.name,
-    album_uri: playbackData.item.album.uri,
-    image: playbackData.item.album.images[0]?.url,
-    progress: playbackData.progress_ms,
-    duration: playbackData.item.duration_ms,
-    explicit: playbackData.item.explicit,
-    popularity: playbackData.item.popularity,
-    track_url: playbackData.item.external_urls.spotify,
-    external_url: playbackData.item.external_urls.spotify,
-  });
 }

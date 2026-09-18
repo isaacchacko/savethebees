@@ -1,6 +1,6 @@
 'use client';
 
-import { useSpotifyPlayback } from '@/components/SpotifyNowPlaying';
+import { useSpotifyPlayback } from '@/lib/useSpotifyPlayback';
 import HoverPreview from '@/components/HoverPreview';
 
 export default function NowPlaying() {
