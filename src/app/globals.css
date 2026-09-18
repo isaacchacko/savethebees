@@ -1,25 +1,112 @@
 @import "tailwindcss";
 @config "../../tailwind.config.js";
 
-:root {
-  --background: #eaf4fb;
-  --surface: #f7fbfd;
-  --foreground: #1a2733;
-  --muted: #5a6b7a;
-  --accent: #3a7bb8;
-  --border: #cfe0ec;
+/* The theme rotates every 5 minutes off the wall clock — see lib/themes.ts.
+   :root doubles as the no-JS fallback, so it repeats the first palette. */
+:root,
+[data-theme="pink"] {
+  --background: #ff5fa8;
+  --surface: #ff86c2;
+  --foreground: #1a0610;
+  --muted: #5c1636;
+  --accent: #3d0c24;
+  --accent-dim: #591236;
+  --border: #b3306e;
+  --selection: #1a0610;
+}
 
+[data-theme="banana"] {
+  --background: #ffd93b;
+  --surface: #ffe680;
+  --foreground: #241d00;
+  --muted: #5c4a00;
+  --accent: #3d3000;
+  --accent-dim: #574400;
+  --border: #c9a400;
+  --selection: #241d00;
+}
+
+[data-theme="dryft"] {
+  --background: #0b2545;
+  --surface: #12355e;
+  --foreground: #d6e8ff;
+  --muted: #7ea6d6;
+  --accent: #6fb3ff;
+  --accent-dim: #9ecbff;
+  --border: #1f4d85;
+  --selection: #6fb3ff;
+}
+
+[data-theme="maroon"] {
+  --background: #500000;
+  --surface: #6b1212;
+  --foreground: #f2e4e4;
+  --muted: #d09a9a;
+  --accent: #ff9e9e;
+  --accent-dim: #ffbdbd;
+  --border: #7d2626;
+  --selection: #ff9e9e;
+}
+
+[data-theme="matcha"] {
+  --background: #a3c585;
+  --surface: #bfd9a8;
+  --foreground: #12200a;
+  --muted: #2e441a;
+  --accent: #1f3311;
+  --accent-dim: #2e4a19;
+  --border: #6d9149;
+  --selection: #12200a;
+}
+
+:root {
   --primary-color: var(--foreground);
   --spotify-foreground: var(--accent);
   --spotify-background: var(--surface);
+}
+
+/* the 5-minute handover reads as a fade rather than a flash. links keep a
+   fast transition so hover still feels immediate. */
+*,
+*::before,
+*::after {
+  transition:
+    background-color 600ms ease,
+    border-color 600ms ease,
+    color 600ms ease;
+}
+
+a,
+.nav-links a,
+.copy-btn {
+  transition:
+    background-color 120ms ease,
+    color 120ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none;
+  }
 }
 
 * {
   box-sizing: border-box;
 }
 
+::selection {
+  background: var(--selection);
+  color: var(--background);
+}
+
+/* percentage rather than px so browser font-size preferences still scale it.
+   every other size is in rem, so this is the one dial for the whole site. */
 html {
+  font-size: 112.5%;
   scrollbar-gutter: stable;
+  scrollbar-color: var(--border) transparent;
 }
 
 html,
@@ -31,57 +118,76 @@ body {
 }
 
 body {
-  font-family: var(--font-newsreader), Georgia, "Times New Roman", Times, serif;
-  font-size: 17px;
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Consolas,
+    monospace;
   line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-newsreader), Georgia, "Times New Roman", Times, serif;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: inherit;
   font-weight: 700;
-  line-height: 1.25;
-  margin: 1.4em 0 0.5em;
+  line-height: 1.3;
+  letter-spacing: 0.02em;
+  margin: 2em 0 0.75em;
+  color: var(--accent);
 }
 
 h1 {
-  font-size: 3.25rem;
-  letter-spacing: -0.02em;
-  line-height: 1.05;
+  font-size: 1.6rem;
 }
-h2 { font-size: 1.5rem; }
-h3 { font-size: 1.2rem; }
+h2 {
+  font-size: 1.25rem;
+}
+h3 {
+  font-size: 1.05rem;
+}
+
+/* headings read as shell comments */
+h1::before,
+h2::before,
+h3::before {
+  content: "## ";
+  color: var(--muted);
+}
 
 p {
   margin: 0 0 1em;
 }
 
 a {
-  color: var(--foreground);
+  color: var(--accent-dim);
   text-decoration: underline;
+  text-decoration-style: dotted;
   text-underline-offset: 3px;
 }
 
 a:hover {
-  color: var(--accent);
+  background: var(--accent);
+  color: var(--background);
+  text-decoration: none;
 }
 
-nav a {
-  color: var(--accent);
-}
-
-nav a:hover {
-  color: var(--foreground);
+a:focus-visible,
+button:focus-visible,
+summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 hr {
   border: 0;
-  border-top: 1px solid var(--border);
+  border-top: 1px dashed var(--border);
   margin: 2rem 0;
 }
 
-code, pre {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+code,
+pre {
+  font-family: inherit;
   font-size: 0.9em;
 }
 
@@ -94,6 +200,7 @@ pre {
 
 code {
   background: var(--surface);
+  color: var(--accent-dim);
   padding: 0.1em 0.35em;
   border: 1px solid var(--border);
 }
@@ -102,6 +209,7 @@ pre code {
   background: none;
   border: 0;
   padding: 0;
+  color: inherit;
 }
 
 img {
@@ -109,16 +217,35 @@ img {
   height: auto;
 }
 
-ul, ol {
-  padding-left: 1.4em;
+ul,
+ol {
+  padding-left: 1.5em;
+  margin: 0 0 1em;
 }
 
+/* bullets as terminal list markers */
 ul {
-  list-style: disc;
+  list-style: none;
+  padding-left: 0;
+}
+
+ul li {
+  padding-left: 1.5em;
+  text-indent: -1.5em;
+}
+
+ul li::before {
+  content: "─ ";
+  color: var(--accent);
 }
 
 ul ul {
-  list-style: circle;
+  margin-top: 0.25em;
+  margin-bottom: 0;
+}
+
+ul ul li::before {
+  content: "· ";
 }
 
 ol {
@@ -128,8 +255,25 @@ ol {
 blockquote {
   margin: 1em 0;
   padding: 0.2em 1em;
-  border-left: 3px solid var(--border);
+  border-left: 2px solid var(--accent);
   color: var(--muted);
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 0 0 1em;
+}
+
+th,
+td {
+  border: 1px solid var(--border);
+  padding: 0.4em 0.7em;
+  text-align: left;
+}
+
+th {
+  color: var(--accent);
 }
 
 summary {
@@ -141,13 +285,137 @@ summary {
 summary::-webkit-details-marker,
 summary::marker {
   display: none;
-  content: '';
+  content: "";
 }
 
-/* Quartz-style hover preview popover */
-.hover-preview {
-  position: relative;
+/* ─────────────────────────────  terminal chrome  ───────────────────────── */
+
+.shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  max-width: 48rem;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 4rem;
+}
+
+/* the `user@host:path$ cmd` line each page opens with */
+.prompt {
+  margin: 0 0 1.5rem;
+  font-size: 0.95rem;
+  overflow-wrap: anywhere;
+}
+
+.prompt-user {
+  color: var(--accent);
+}
+
+.prompt-path {
+  color: var(--accent-dim);
+}
+
+.prompt-sigil {
+  color: var(--muted);
+}
+
+.prompt-cmd {
+  color: var(--foreground);
+}
+
+.cursor {
   display: inline-block;
+  width: 0.6em;
+  height: 1.05em;
+  background: var(--accent);
+  vertical-align: text-bottom;
+  animation: blink 1.1s steps(1, end) infinite;
+}
+
+@keyframes blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  50.01%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cursor {
+    animation: none;
+  }
+}
+
+/* the window titlebar that carries the nav */
+.titlebar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.titlebar-dots {
+  display: flex;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.titlebar-dot {
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background: var(--border);
+}
+
+.titlebar-dot[data-live="true"] {
+  background: var(--accent);
+}
+
+.nav-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.9rem;
+}
+
+.nav-links li {
+  padding: 0;
+  text-indent: 0;
+}
+
+.nav-links li::before {
+  content: none;
+}
+
+.nav-links a {
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.nav-links a::before {
+  content: "/";
+  color: var(--border);
+}
+
+.nav-links a:hover {
+  background: var(--accent);
+  color: var(--background);
+}
+
+/* both nav colors are dark now, so the current page inverts instead */
+.nav-links a[aria-current="page"] {
+  background: var(--foreground);
+  color: var(--surface);
 }
 
 /* inline copy-to-clipboard button */
@@ -157,18 +425,24 @@ summary::marker {
 }
 
 .copy-btn:hover {
-  color: var(--foreground);
+  color: var(--accent);
 }
 
 .copy-btn[data-copied="true"] {
   color: var(--accent);
 }
 
+/* Quartz-style hover preview popover */
+.hover-preview {
+  position: relative;
+  display: inline-block;
+}
+
 /* standard formatting for any text that reveals a hover preview */
 .hover-preview-trigger {
   display: inline-block;
   cursor: default;
-  color: var(--foreground);
+  color: var(--accent-dim);
   text-decoration: underline;
   text-decoration-style: dotted;
   text-underline-offset: 3px;
@@ -208,9 +482,8 @@ summary::marker {
   font-style: initial;
   line-height: normal;
   white-space: normal;
-  border: 1px solid var(--border);
+  border: 1px solid var(--accent);
   background-color: var(--surface);
-  border-radius: 5px;
-  box-shadow: 6px 6px 36px 0 rgba(0, 0, 0, 0.25);
   overflow: auto;
+  box-shadow: 0 0 0 1px var(--background), 0 12px 40px rgba(0, 0, 0, 0.6);
 }

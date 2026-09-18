@@ -1,13 +1,9 @@
+'use client';
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import SfClock from "@/components/SfClock";
 
-export type NavbarProps = {
-  spotifyPlayback?: unknown;
-  isHoveringMusic?: boolean;
-  linktreePathSegment?: string | null;
-};
-
-// Pages get added back here one at a time as they are revamped.
 const LINKS: { href: string; label: string }[] = [
   { href: "/", label: "home" },
   { href: "/about", label: "about" },
@@ -16,36 +12,29 @@ const LINKS: { href: string; label: string }[] = [
   { href: "/learnings", label: "learnings" },
 ];
 
-export default function Navbar(_props: NavbarProps = {}) {
+export default function Navbar() {
+  const pathname = usePathname();
+
   return (
-    <nav
-      style={{
-        borderBottom: "1px solid var(--border)",
-        padding: "1rem 1.25rem",
-        display: "flex",
-        flexWrap: "wrap",
-        alignItems: "baseline",
-        gap: "1rem",
-      }}
-    >
-      <ul
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "1rem",
-          margin: 0,
-          padding: 0,
-          listStyle: "none",
-          fontSize: "0.95rem",
-        }}
-      >
+    <nav className="titlebar">
+      <span className="titlebar-dots" aria-hidden>
+        <span className="titlebar-dot" data-live="true" />
+        <span className="titlebar-dot" />
+        <span className="titlebar-dot" />
+      </span>
+      <ul className="nav-links">
         {LINKS.map((l) => (
           <li key={l.href}>
-            <Link href={l.href}>{l.label}</Link>
+            <Link
+              href={l.href}
+              aria-current={pathname === l.href ? "page" : undefined}
+            >
+              {l.label}
+            </Link>
           </li>
         ))}
       </ul>
-      <span style={{ marginLeft: "auto" }}>
+      <span style={{ marginLeft: "auto", fontSize: "0.9rem" }}>
         <SfClock />
       </span>
     </nav>

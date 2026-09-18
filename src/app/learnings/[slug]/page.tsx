@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import Shell from "@/components/Shell";
 import Markdown from "@/components/Markdown";
 import { getLearning, getLearningSlugs } from "@/lib/learnings";
 
@@ -32,11 +33,11 @@ export default async function LearningPage({
   if (!learning) notFound();
 
   return (
-    <>
-      <p style={{ marginTop: 0, color: "var(--muted)" }}>
+    <Shell cmd={`cat ${slug}.md`}>
+      <p style={{ marginTop: 0 }}>
         <Link href="/learnings">← learnings</Link>
       </p>
       <Markdown content={learning.content} />
-    </>
+    </Shell>
   );
 }
