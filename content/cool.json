@@ -1,0 +1,22 @@
+{
+  "lists": [
+    {
+      "id": "webrings",
+      "title": "cool webrings",
+      "description": "rings of sites that link to each other, the old way.",
+      "items": []
+    },
+    {
+      "id": "websites",
+      "title": "cool websites",
+      "description": "one-off pages worth the click.",
+      "items": []
+    },
+    {
+      "id": "technologies",
+      "title": "cool technologies",
+      "description": "things i want to build something with.",
+      "items": []
+    }
+  ]
+}

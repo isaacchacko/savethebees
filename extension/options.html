@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>cool — options</title>
+    <link rel="stylesheet" href="popup.css" />
+    <style>
+      body {
+        width: auto;
+        max-width: 34rem;
+        padding: 1.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <h1 style="color: var(--accent); font-size: 1rem">## cool</h1>
+    <p>
+      Commits to <code>content/cool.json</code> in your site repo. Needs a
+      <a
+        href="https://github.com/settings/personal-access-tokens/new"
+        target="_blank"
+        rel="noopener noreferrer"
+        >fine-grained token</a
+      >
+      scoped to that one repo with <strong>Contents: Read and write</strong>.
+    </p>
+
+    <label for="owner">owner</label>
+    <input id="owner" type="text" />
+
+    <label for="repo">repo</label>
+    <input id="repo" type="text" />
+
+    <label for="branch">branch</label>
+    <input id="branch" type="text" />
+
+    <label for="filePath">file path</label>
+    <input id="filePath" type="text" />
+
+    <label for="token">token</label>
+    <input id="token" type="password" placeholder="github_pat_…" />
+
+    <div style="display: flex; gap: 0.5rem; margin-top: 1rem">
+      <button type="button" id="save" class="primary" style="margin: 0">save</button>
+      <button type="button" id="test" class="primary" style="margin: 0">test</button>
+    </div>
+
+    <p id="status"></p>
+
+    <script type="module" src="options.js"></script>
+  </body>
+</html>

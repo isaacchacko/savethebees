@@ -1,0 +1,195 @@
+/* the "dryft" palette from the site's globals.css — the popup does not rotate */
+:root {
+  --background: #0b2545;
+  --surface: #12355e;
+  --foreground: #d6e8ff;
+  --muted: #7ea6d6;
+  --accent: #6fb3ff;
+  --border: #1f4d85;
+  --danger: #ff9e9e;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  width: 22rem;
+  margin: 0;
+  padding: 0.75rem;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.35rem;
+  border-bottom: 1px dashed var(--border);
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.tabs .right {
+  margin-left: auto;
+}
+
+button {
+  font: inherit;
+  color: var(--muted);
+  background: none;
+  border: 1px solid var(--border);
+  padding: 0.15rem 0.5rem;
+  cursor: pointer;
+}
+
+button:hover {
+  color: var(--background);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+button.on {
+  color: var(--background);
+  background: var(--foreground);
+  border-color: var(--foreground);
+}
+
+button.primary {
+  width: 100%;
+  margin-top: 0.75rem;
+  padding: 0.35rem;
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+button.danger:hover {
+  background: var(--danger);
+  border-color: var(--danger);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+label {
+  display: block;
+  margin-top: 0.5rem;
+  color: var(--muted);
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+}
+
+label::before {
+  content: "> ";
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  font: inherit;
+  color: var(--foreground);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 0.25rem 0.4rem;
+}
+
+input:focus,
+select:focus,
+button:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* ─────────────────────────────  manage view  ───────────────────────────── */
+
+.list {
+  border: 1px solid var(--border);
+  margin-bottom: 0.5rem;
+}
+
+.list-head {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.4rem;
+  background: var(--surface);
+}
+
+.list-head .name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--accent);
+  cursor: pointer;
+}
+
+.count {
+  color: var(--muted);
+}
+
+.items {
+  margin: 0;
+  padding: 0.25rem 0.4rem;
+  list-style: none;
+}
+
+.items li {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.15rem 0;
+}
+
+.items .name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.items .name::before,
+.empty::before {
+  content: "─ ";
+  color: var(--accent);
+}
+
+.empty {
+  padding: 0.25rem 0.4rem;
+  color: var(--muted);
+}
+
+.editor {
+  padding: 0.4rem;
+  border-top: 1px dashed var(--border);
+}
+
+.editor .row {
+  display: flex;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+}
+
+.editor .row button {
+  flex: 1;
+}
+
+#status {
+  margin: 0.75rem 0 0;
+  min-height: 1.5em;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+#status[data-tone="error"] {
+  color: var(--danger);
+}
+
+#status[data-tone="ok"] {
+  color: var(--accent);
+}

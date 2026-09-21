@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <nav class="tabs">
+      <button type="button" data-view="add" class="on">add</button>
+      <button type="button" data-view="manage">manage</button>
+      <button type="button" id="settings" class="right" title="options">opts</button>
+    </nav>
+
+    <section id="view-add">
+      <label for="list">list</label>
+      <select id="list"></select>
+
+      <div id="new-list-row" hidden>
+        <label for="new-list">new list name</label>
+        <input id="new-list" type="text" placeholder="cool webrings" />
+      </div>
+
+      <label for="title">title</label>
+      <input id="title" type="text" />
+
+      <label for="url">url</label>
+      <input id="url" type="text" />
+
+      <label for="note">note</label>
+      <input id="note" type="text" placeholder="optional" />
+
+      <button type="button" id="save" class="primary">save</button>
+    </section>
+
+    <section id="view-manage" hidden>
+      <div id="lists"></div>
+      <button type="button" id="add-list">+ new list</button>
+    </section>
+
+    <p id="status"></p>
+
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

@@ -10,6 +10,7 @@ const LINKS: { href: string; label: string }[] = [
   { href: "/now", label: "now" },
   { href: "/running", label: "running" },
   { href: "/learnings", label: "learnings" },
+  { href: "/cool", label: "cool" },
 ];
 
 export default function Navbar() {
