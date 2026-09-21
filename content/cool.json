@@ -10,7 +10,18 @@
       "id": "websites",
       "title": "cool websites",
       "description": "one-off pages worth the click.",
-      "items": []
+      "items": [
+        {
+          "id": "e1a289df-d3c9-44ad-9d75-e0be17590da6",
+          "title": "Lucas Jin",
+          "url": "https://www.lucasjin.ca/",
+          "note": "",
+          "added": "2026-09-21",
+          "shot": "/cool-shots/e1a289df-d3c9-44ad-9d75-e0be17590da6.webp",
+          "shotW": 640,
+          "shotH": 396
+        }
+      ]
     },
     {
       "id": "technologies",
