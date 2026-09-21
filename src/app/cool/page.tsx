@@ -1,3 +1,4 @@
+import HoverPreview from "@/components/HoverPreview";
 import Shell from "@/components/Shell";
 import { getCoolLists, type CoolItem } from "@/lib/cool";
 
@@ -16,15 +17,34 @@ function hostname(url: string): string {
 
 function Entry({ item }: { item: CoolItem }) {
   const host = hostname(item.url);
+  const link = item.url ? (
+    <a href={item.url} target="_blank" rel="noopener noreferrer">
+      {item.title}
+    </a>
+  ) : (
+    item.title
+  );
 
   return (
     <li>
-      {item.url ? (
-        <a href={item.url} target="_blank" rel="noopener noreferrer">
-          {item.title}
-        </a>
+      {item.shot ? (
+        <HoverPreview trigger={link}>
+          {/* width/height are the real pixel dimensions, so the popover can
+              measure itself before the image has loaded. next/image would put
+              the optimizer in front of a file the extension already shrank to
+              640px webp, so a plain img it is. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={item.shot}
+            alt=""
+            width={item.shotW || undefined}
+            height={item.shotH || undefined}
+            loading="lazy"
+            style={{ display: "block", width: "100%" }}
+          />
+        </HoverPreview>
       ) : (
-        item.title
+        link
       )}
       {host ? (
         <span style={{ color: "var(--muted)" }}> ({host})</span>
@@ -54,7 +74,7 @@ export default function CoolPage() {
             {list.items.length === 0 ? (
               <p style={{ color: "var(--muted)" }}>empty for now.</p>
             ) : (
-              <ul>
+              <ul className="cool-entries">
                 {list.items.map((item) => (
                   <Entry key={item.id} item={item} />
                 ))}

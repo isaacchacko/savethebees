@@ -9,6 +9,10 @@ export type CoolItem = {
   url: string;
   note: string;
   added: string;
+  /** Screenshot taken when the entry was saved, or "" for entries without one. */
+  shot: string;
+  shotW: number;
+  shotH: number;
 };
 
 export type CoolList = {
@@ -22,9 +26,13 @@ function str(value: unknown): string {
   return typeof value === "string" ? value : "";
 }
 
+function num(value: unknown): number {
+  return typeof value === "number" && Number.isFinite(value) ? value : 0;
+}
+
 function toItem(raw: unknown): CoolItem | null {
   if (typeof raw !== "object" || raw === null) return null;
-  const { id, title, url, note, added } = raw as Record<string, unknown>;
+  const { id, title, url, note, added, shot, shotW, shotH } = raw as Record<string, unknown>;
   if (!str(title) && !str(url)) return null;
   return {
     id: str(id) || str(url) || str(title),
@@ -32,6 +40,9 @@ function toItem(raw: unknown): CoolItem | null {
     url: str(url),
     note: str(note),
     added: str(added),
+    shot: str(shot),
+    shotW: num(shotW),
+    shotH: num(shotH),
   };
 }
 

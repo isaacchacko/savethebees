@@ -6,9 +6,12 @@ import {
   mutate,
   removeItem,
   removeList,
+  shotPath,
+  shotRemovals,
   updateItem,
   updateList,
 } from "./store.js";
+import { capture } from "./shot.js";
 
 const NEW_LIST = "__new__";
 
@@ -20,7 +23,11 @@ const titleInput = document.getElementById("title");
 const urlInput = document.getElementById("url");
 const noteInput = document.getElementById("note");
 const listsRoot = document.getElementById("lists");
+const useShot = document.getElementById("use-shot");
+const shotLabel = document.getElementById("shot-label");
+const shotPreview = document.getElementById("shot-preview");
 
+let shot = null; // {base64, width, height, bytes} for the tab the popup opened on
 let data = { lists: [] };
 let editing = null; // { listId, itemId? } — the row swapped for a form
 let arming = null; // key of the delete button waiting for a second click
@@ -46,10 +53,7 @@ function listById(id) {
 async function commit(message, apply, okMessage) {
   say("saving…");
   try {
-    data = await mutate(message, (draft) => {
-      apply(draft);
-      return draft;
-    });
+    data = await mutate(message, apply);
     editing = null;
     arming = null;
     creatingList = false;
@@ -87,6 +91,21 @@ async function prefillFromTab() {
   urlInput.value = tab.url || "";
 }
 
+async function grabShot() {
+  shot = await capture();
+  if (!shot) {
+    // chrome:// pages and the web store refuse capture — say so instead of
+    // leaving a checkbox that silently does nothing.
+    useShot.checked = false;
+    useShot.disabled = true;
+    shotLabel.textContent = "screenshot (this page can't be captured)";
+    return;
+  }
+  shotLabel.textContent = `screenshot (${Math.round(shot.bytes / 1024)} kb)`;
+  shotPreview.src = `data:image/webp;base64,${shot.base64}`;
+  shotPreview.hidden = false;
+}
+
 async function save() {
   const title = titleInput.value.trim();
   const url = urlInput.value.trim();
@@ -105,12 +124,14 @@ async function save() {
   const entry = { title: title || url, url, note: noteInput.value.trim() };
   const target = makingList ? newListTitle : listById(listSelect.value).title;
 
+  const attach = useShot.checked ? shot : null;
   let savedTo = listSelect.value;
   const ok = await commit(
     `cool: add "${entry.title}" to ${target}`,
-    (draft) => {
+    (draft, files) => {
       savedTo = makingList ? addList(draft, newListTitle) : listSelect.value;
-      addItem(draft, savedTo, entry);
+      const id = addItem(draft, savedTo, entry, attach);
+      if (attach) files.push({ path: shotPath(id), base64: attach.base64 });
     },
     `saved to ${target}`
   );
@@ -248,7 +269,7 @@ function renderItem(list, item) {
     deleteButton(`item:${item.id}`, "del", () =>
       commit(
         `cool: remove "${item.title}" from ${list.title}`,
-        (draft) => removeItem(draft, list.id, item.id),
+        (draft, files) => files.push(...shotRemovals([removeItem(draft, list.id, item.id)])),
         "removed"
       )
     ),
@@ -277,7 +298,7 @@ function renderList(list) {
     deleteButton(`list:${list.id}`, "del", () =>
       commit(
         `cool: delete list "${list.title}"`,
-        (draft) => removeList(draft, list.id),
+        (draft, files) => files.push(...shotRemovals(removeList(draft, list.id).items)),
         "list deleted"
       )
     ),
@@ -334,6 +355,7 @@ document.getElementById("add-list").onclick = () => {
     render();
   }
   await prefillFromTab();
+  await grabShot();
 
   say("loading lists…");
   try {

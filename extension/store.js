@@ -1,5 +1,9 @@
 // The single source of truth is content/cool.json on GitHub. Every mutation is
 // a read-modify-write commit, which Vercel picks up and rebuilds /cool from.
+//
+// Commits go through the git data API rather than the contents API because an
+// entry and its screenshot have to land together: two commits would mean two
+// builds, and a half-applied pair in between.
 
 const CONFIG_DEFAULTS = {
   owner: "isaacchacko",
@@ -10,6 +14,7 @@ const CONFIG_DEFAULTS = {
 };
 
 const CACHE_KEY = "cool";
+const SHOT_DIR = "public/cool-shots";
 
 export async function getConfig() {
   const { config } = await chrome.storage.local.get("config");
@@ -29,8 +34,8 @@ export async function getCached() {
   return stored[CACHE_KEY] || null;
 }
 
-async function setCached(data, sha) {
-  await chrome.storage.local.set({ [CACHE_KEY]: { data, sha } });
+async function setCached(data, head) {
+  await chrome.storage.local.set({ [CACHE_KEY]: { data, head } });
 }
 
 function encodeBase64(text) {
@@ -72,21 +77,38 @@ async function explain(response) {
   return `github: ${detail} (${response.status})`;
 }
 
-function contentsPath(config) {
-  return `/repos/${config.owner}/${config.repo}/contents/${config.filePath}`;
+function repoPath(config, suffix) {
+  return `/repos/${config.owner}/${config.repo}${suffix}`;
 }
 
-export async function fetchCool() {
-  const config = await getConfig();
+/** POST/PATCH helper: returns the parsed body, or the response when it failed. */
+async function send(config, path, method, payload) {
+  const response = await github(config, path, {
+    method,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!response.ok) return { failed: response };
+  return { body: await response.json() };
+}
+
+async function getHead(config) {
   const response = await github(
     config,
-    `${contentsPath(config)}?ref=${encodeURIComponent(config.branch)}`
+    repoPath(config, `/git/ref/heads/${config.branch}`)
+  );
+  if (!response.ok) throw new Error(await explain(response));
+  return (await response.json()).object.sha;
+}
+
+async function readCool(config, ref) {
+  const response = await github(
+    config,
+    `${repoPath(config, `/contents/${config.filePath}`)}?ref=${ref}`
   );
 
-  if (response.status === 404) {
-    // The file does not exist yet; the first commit will create it.
-    return { data: { lists: [] }, sha: null };
-  }
+  // The file does not exist yet; the first commit will create it.
+  if (response.status === 404) return { lists: [] };
   if (!response.ok) throw new Error(await explain(response));
 
   const body = await response.json();
@@ -100,45 +122,95 @@ export async function fetchCool() {
   } catch {
     throw new Error("cool.json on github is not valid JSON — fix it by hand");
   }
-  if (!Array.isArray(data.lists)) data = { lists: [] };
-
-  await setCached(data, body.sha);
-  return { data, sha: body.sha };
+  return Array.isArray(data.lists) ? data : { lists: [] };
 }
 
-async function commit(config, data, sha, message) {
-  return github(config, contentsPath(config), {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      message,
-      branch: config.branch,
-      content: encodeBase64(`${JSON.stringify(data, null, 2)}\n`),
-      ...(sha ? { sha } : {}),
-    }),
-  });
+export async function fetchCool() {
+  const config = await getConfig();
+  const head = await getHead(config);
+  const data = await readCool(config, head);
+  await setCached(data, head);
+  return { data, head };
 }
 
 /**
- * Read cool.json, hand it to `apply`, and commit what comes back. The sha makes
- * the write conditional, so a commit that landed elsewhere since the read is a
- * conflict rather than a silent overwrite — we re-read and reapply once.
+ * Build one commit containing every file, on top of `head`. The ref update is
+ * not forced, so a commit that landed since we read `head` makes this a
+ * non-fast-forward and github rejects it — which is the conflict signal.
+ * Returns the new commit sha, or null when it needs another try.
+ */
+async function commitFiles(config, head, files, message) {
+  const headCommit = await github(config, repoPath(config, `/git/commits/${head}`));
+  if (!headCommit.ok) throw new Error(await explain(headCommit));
+  const baseTree = (await headCommit.json()).tree.sha;
+
+  const tree = [];
+  for (const file of files) {
+    const entry = { path: file.path, mode: "100644", type: "blob" };
+    if (file.remove) {
+      tree.push({ ...entry, sha: null });
+    } else if (file.text !== undefined) {
+      tree.push({ ...entry, content: file.text });
+    } else {
+      const blob = await send(config, repoPath(config, "/git/blobs"), "POST", {
+        content: file.base64,
+        encoding: "base64",
+      });
+      if (blob.failed) throw new Error(await explain(blob.failed));
+      tree.push({ ...entry, sha: blob.body.sha });
+    }
+  }
+
+  const newTree = await send(config, repoPath(config, "/git/trees"), "POST", {
+    base_tree: baseTree,
+    tree,
+  });
+  if (newTree.failed) throw new Error(await explain(newTree.failed));
+
+  const commit = await send(config, repoPath(config, "/git/commits"), "POST", {
+    message,
+    tree: newTree.body.sha,
+    parents: [head],
+  });
+  if (commit.failed) throw new Error(await explain(commit.failed));
+
+  const ref = await send(
+    config,
+    repoPath(config, `/git/refs/heads/${config.branch}`),
+    "PATCH",
+    { sha: commit.body.sha, force: false }
+  );
+  if (ref.failed) {
+    if (ref.failed.status === 422 || ref.failed.status === 409) return null;
+    throw new Error(await explain(ref.failed));
+  }
+  return commit.body.sha;
+}
+
+/**
+ * Read cool.json, hand it to `apply`, and commit what comes back. `apply` gets
+ * a `files` array it can push extra blobs onto — `{path, base64}` to write one,
+ * `{path, remove: true}` to drop one — so a screenshot rides along in the same
+ * commit as the entry that points at it.
  */
 export async function mutate(message, apply) {
   const config = await getConfig();
 
   for (let attempt = 0; attempt < 2; attempt++) {
-    const { data, sha } = await fetchCool();
-    const next = apply(structuredClone(data));
-    const response = await commit(config, next, sha, message);
+    const { data, head } = await fetchCool();
+    const next = structuredClone(data);
+    const files = [];
+    apply(next, files);
 
-    if (response.ok) {
-      const body = await response.json();
-      await setCached(next, body.content.sha);
+    const sha = await commitFiles(
+      config,
+      head,
+      [{ path: config.filePath, text: `${JSON.stringify(next, null, 2)}\n` }, ...files],
+      message
+    );
+    if (sha) {
+      await setCached(next, sha);
       return next;
-    }
-    if (response.status !== 409 && response.status !== 422) {
-      throw new Error(await explain(response));
     }
   }
 
@@ -146,6 +218,15 @@ export async function mutate(message, apply) {
 }
 
 // ──────────────────────────────  pure helpers  ──────────────────────────────
+
+export function shotPath(id) {
+  return `${SHOT_DIR}/${id}.webp`;
+}
+
+/** The public/ prefix is how it is stored; the site serves it without one. */
+function shotUrl(id) {
+  return `/${SHOT_DIR.replace(/^public\//, "")}/${id}.webp`;
+}
 
 function slugify(text) {
   return (
@@ -180,18 +261,25 @@ export function updateList(data, listId, patch) {
   Object.assign(findList(data, listId), patch);
 }
 
+/** Returns the removed list so the caller can clean up its screenshots. */
 export function removeList(data, listId) {
-  data.lists = data.lists.filter((list) => list.id !== listId);
+  const list = findList(data, listId);
+  data.lists = data.lists.filter((candidate) => candidate.id !== listId);
+  return list;
 }
 
-export function addItem(data, listId, item) {
+/** `shot` is {base64, width, height} from shot.js, or null for no screenshot. */
+export function addItem(data, listId, item, shot = null) {
+  const id = crypto.randomUUID();
   findList(data, listId).items.unshift({
-    id: crypto.randomUUID(),
+    id,
     title: item.title.trim(),
     url: (item.url || "").trim(),
     note: (item.note || "").trim(),
     added: new Date().toISOString().slice(0, 10),
+    ...(shot ? { shot: shotUrl(id), shotW: shot.width, shotH: shot.height } : {}),
   });
+  return id;
 }
 
 export function updateItem(data, listId, itemId, patch) {
@@ -201,7 +289,17 @@ export function updateItem(data, listId, itemId, patch) {
   Object.assign(item, patch);
 }
 
+/** Returns the removed entry so the caller can drop its screenshot too. */
 export function removeItem(data, listId, itemId) {
   const list = findList(data, listId);
-  list.items = list.items.filter((item) => item.id !== itemId);
+  const item = list.items.find((candidate) => candidate.id === itemId);
+  list.items = list.items.filter((candidate) => candidate.id !== itemId);
+  return item;
+}
+
+/** Tree entries that delete whatever screenshots these entries point at. */
+export function shotRemovals(items) {
+  return items
+    .filter((item) => item?.shot)
+    .map((item) => ({ path: shotPath(item.id), remove: true }));
 }

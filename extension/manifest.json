@@ -2,8 +2,8 @@
   "manifest_version": 3,
   "name": "cool",
   "version": "1.0.0",
-  "description": "CRUD the lists on isaacchacko.co/cool, straight from Chrome.",
-  "permissions": ["storage", "contextMenus", "tabs", "notifications"],
+  "description": "CRUD the lists on isaacchacko.com/cool, straight from Chrome.",
+  "permissions": ["storage", "contextMenus", "activeTab", "notifications"],
   "host_permissions": ["https://api.github.com/*"],
   "background": {
     "service_worker": "background.js",

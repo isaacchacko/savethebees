@@ -1,6 +1,6 @@
 # cool — the Chrome extension
 
-CRUD for the lists on [/cool](https://isaacchacko.co/cool), from the browser.
+CRUD for the lists on [/cool](https://isaacchacko.com/cool), from the browser.
 
 There is no server in the loop. The extension edits `content/cool.json` in this
 repo directly through the GitHub contents API; Vercel sees the commit and
@@ -40,12 +40,31 @@ built from the cached lists; _refresh lists_ re-reads them from GitHub.
 **Manage tab** — create, rename, and delete lists; edit and delete entries.
 Delete asks twice: the button turns into `sure?` before it does anything.
 
+## Screenshots
+
+Saving a page also grabs its visible viewport, shrinks it to 640px webp
+(~30–50kb) and commits it to `public/cool-shots/<id>.webp`. The site shows it as
+a hover preview over the entry's title. Deleting an entry deletes its shot.
+
+Two cases get no screenshot, and both save fine without one:
+
+- **Right-clicking a link.** Only the tab in front of us can be captured, and
+  the linked page is not open.
+- **Pages Chrome refuses to capture** — `chrome://`, the web store, the pdf
+  viewer. The popup says so and greys the checkbox out.
+
+Uncheck **screenshot** in the popup to skip it for a single save.
+
 ## How a save works
 
-Read `cool.json` with its blob SHA, apply the change, `PUT` it back with that
-SHA. GitHub rejects the write if the file moved underneath us, in which case the
-extension re-reads and reapplies once. That keeps two quick saves — or a save
-racing a hand edit — from silently clobbering each other.
+Read the branch head, read `cool.json` at that commit, apply the change, then
+build one commit — json and screenshot together — on top of that head and
+update the ref without forcing. Github rejects a non-fast-forward, so a commit
+that landed since we read is a conflict rather than a silent overwrite; the
+extension re-reads and reapplies once.
+
+One commit per save matters for more than tidiness: two would mean two Vercel
+builds, and a window where an entry points at a screenshot that is not there.
 
 ## Files
 

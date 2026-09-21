@@ -105,6 +105,30 @@ button:focus-visible {
   outline-offset: 1px;
 }
 
+.check {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+}
+
+.check::before {
+  content: none;
+}
+
+.check input {
+  width: auto;
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+#shot-preview {
+  display: block;
+  width: 100%;
+  margin-top: 0.4rem;
+  border: 1px solid var(--border);
+}
+
 /* ─────────────────────────────  manage view  ───────────────────────────── */
 
 .list {

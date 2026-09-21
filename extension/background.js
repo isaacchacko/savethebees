@@ -1,4 +1,5 @@
-import { addItem, fetchCool, getCached, mutate } from "./store.js";
+import { addItem, fetchCool, getCached, mutate, shotPath } from "./store.js";
+import { capture } from "./shot.js";
 
 const ROOT = "cool-root";
 const LIST_PREFIX = "cool-list:";
@@ -87,9 +88,14 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 
     const listId = String(info.menuItemId).slice(LIST_PREFIX.length);
     const entry = entryFrom(info, tab);
-    await mutate(`cool: add "${entry.title}" to ${listId}`, (data) => {
-      addItem(data, listId, entry);
-      return data;
+
+    // Only the tab in front of us can be captured, so a right-clicked link —
+    // whose page is not open — gets saved without a screenshot.
+    const shot = info.linkUrl ? null : await capture();
+
+    await mutate(`cool: add "${entry.title}" to ${listId}`, (data, files) => {
+      const id = addItem(data, listId, entry, shot);
+      if (shot) files.push({ path: shotPath(id), base64: shot.base64 });
     });
     notify("cool", `added "${entry.title}" to ${listId}`);
   } catch (error) {

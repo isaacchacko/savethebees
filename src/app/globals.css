@@ -432,6 +432,25 @@ summary::marker {
   color: var(--accent);
 }
 
+/* The global list marker hangs via text-indent, which an inline-block trigger
+   cannot sit inside — it gets dragged out of line and wraps on its own. These
+   entries hang the marker with absolute positioning instead, and keep the
+   trigger inline so a long title still wraps like ordinary text. */
+.cool-entries li {
+  position: relative;
+  padding-left: 1.5em;
+  text-indent: 0;
+}
+
+.cool-entries li::before {
+  position: absolute;
+  left: 0;
+}
+
+.cool-entries .hover-preview {
+  display: inline;
+}
+
 /* Quartz-style hover preview popover */
 .hover-preview {
   position: relative;
