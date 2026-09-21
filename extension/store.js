@@ -57,6 +57,13 @@ async function github(config, path, init) {
   }
   return fetch(`https://api.github.com${path}`, {
     ...init,
+    // github answers with `Cache-Control: private, max-age=60`, so without this
+    // chrome serves a minute-old branch head back to us — and a commit built on
+    // a stale parent is rejected as a non-fast-forward. That reads exactly like
+    // someone else committing, except retrying cannot help, because the retry
+    // re-reads the same cached answer. Two saves inside a minute is normal use,
+    // so the reads have to skip the http cache.
+    cache: "no-store",
     headers: {
       Authorization: `Bearer ${config.token}`,
       Accept: "application/vnd.github+json",
@@ -196,7 +203,11 @@ async function commitFiles(config, head, files, message) {
 export async function mutate(message, apply) {
   const config = await getConfig();
 
-  for (let attempt = 0; attempt < 2; attempt++) {
+  // A few tries with a short backoff: a real conflict clears as soon as we read
+  // the ref the other commit left behind, and github's own replication can lag
+  // a write by a beat.
+  for (let attempt = 0; attempt < 4; attempt++) {
+    if (attempt) await new Promise((done) => setTimeout(done, 250 * attempt));
     const { data, head } = await fetchCool();
     const next = structuredClone(data);
     const files = [];

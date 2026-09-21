@@ -66,6 +66,15 @@ extension re-reads and reapplies once.
 One commit per save matters for more than tidiness: two would mean two Vercel
 builds, and a window where an entry points at a screenshot that is not there.
 
+Those reads are sent with `cache: "no-store"`. Github answers the branch head
+with `Cache-Control: private, max-age=60`, and a cached head is poison here: the
+commit gets built on a parent that is no longer the tip, github rejects it, and
+retrying re-reads the same stale answer. Saving twice inside a minute — delete
+something, then add it back — is enough to hit it.
+
+So `cool.json changed while saving` should now mean what it says: something
+really did commit underneath you. Try again.
+
 ## Files
 
 | file            | what it does                                             |
