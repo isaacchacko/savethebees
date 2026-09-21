@@ -27,7 +27,18 @@
       "id": "technologies",
       "title": "cool websites",
       "description": "frontend + product",
-      "items": []
+      "items": [
+        {
+          "id": "f9c2cca3-3193-44e6-84ac-1c28ed3d00a6",
+          "title": "vit",
+          "url": "https://vit-editor.vercel.app/",
+          "note": "",
+          "added": "2026-09-21",
+          "shot": "/cool-shots/f9c2cca3-3193-44e6-84ac-1c28ed3d00a6.webp",
+          "shotW": 640,
+          "shotH": 396
+        }
+      ]
     }
   ]
 }
