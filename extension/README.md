@@ -40,6 +40,13 @@ built from the cached lists; _refresh lists_ re-reads them from GitHub.
 **Manage tab** — create, rename, and delete lists; edit and delete entries.
 Delete asks twice: the button turns into `sure?` before it does anything.
 
+**Drag an entry onto another list** to move it there. A collapsed list is a
+target too, so you do not have to open it first; the one it already lives in is
+not, and will not light up. It lands at the top and that list opens so you can
+see it. Moving keeps the entry's id, so its screenshot stays where it is rather
+than being rewritten under a new name. There is no reordering within a list —
+only moving between them.
+
 ## It wears whatever the site is wearing
 
 The site picks its palette from the wall clock — `floor(now / 5min) % 5` over

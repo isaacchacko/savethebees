@@ -305,6 +305,22 @@ export function updateItem(data, listId, itemId, patch) {
   if (!item.label) delete item.label;
 }
 
+/**
+ * Moves an entry to another list. The id comes along, so the screenshot it
+ * points at stays where it is and no blob has to move with it.
+ */
+export function moveItem(data, fromListId, itemId, toListId) {
+  const from = findList(data, fromListId);
+  const to = findList(data, toListId);
+  const item = from.items.find((candidate) => candidate.id === itemId);
+  if (!item) throw new Error("that entry is gone");
+  if (from === to) return item;
+
+  from.items = from.items.filter((candidate) => candidate.id !== itemId);
+  to.items.unshift(item);
+  return item;
+}
+
 /** Returns the removed entry so the caller can drop its screenshot too. */
 export function removeItem(data, listId, itemId) {
   const list = findList(data, listId);

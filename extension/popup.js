@@ -3,6 +3,7 @@ import {
   addList,
   fetchCool,
   getCached,
+  moveItem,
   mutate,
   removeItem,
   removeList,
@@ -36,6 +37,7 @@ let data = { lists: [] };
 let editing = null; // { listId, itemId? } — the row swapped for a form
 let arming = null; // key of the delete button waiting for a second click
 let creatingList = false;
+let dragging = null; // {listId, itemId, title} while an entry is in flight
 const expanded = new Set();
 
 function say(message, tone = "") {
@@ -275,7 +277,7 @@ function renderItem(list, item) {
   }
 
   // shows the label when there is one, so the row reads like the site does
-  return el("li", { title: item.url }, [
+  const row = el("li", { title: item.url, draggable: true }, [
     el("span", { className: "name", textContent: item.label || item.title }),
     el("button", {
       textContent: "ed",
@@ -292,6 +294,23 @@ function renderItem(list, item) {
       )
     ),
   ]);
+
+  row.ondragstart = (event) => {
+    dragging = { listId: list.id, itemId: item.id, title: item.label || item.title };
+    event.dataTransfer.effectAllowed = "move";
+    // firefox and others ignore a drag with nothing on the transfer
+    event.dataTransfer.setData("text/plain", item.url || item.title);
+    row.classList.add("dragging");
+  };
+  row.ondragend = () => {
+    dragging = null;
+    row.classList.remove("dragging");
+    for (const node of listsRoot.querySelectorAll(".drop-target")) {
+      node.classList.remove("drop-target");
+    }
+  };
+
+  return row;
 }
 
 function renderList(list) {
@@ -329,7 +348,37 @@ function renderList(list) {
       : el("p", { className: "empty", textContent: "empty" })
     : null;
 
-  return el("div", { className: "list" }, [head, body, items]);
+  const box = el("div", { className: "list" }, [head, body, items]);
+
+  // A list is a drop target for any entry that is not already in it. Dropping
+  // on a collapsed one works too, so you do not have to open it first.
+  const canTake = () => dragging && dragging.listId !== list.id;
+
+  box.ondragover = (event) => {
+    if (!canTake()) return;
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+    box.classList.add("drop-target");
+  };
+  // moving over a child fires dragleave on the box; only a real exit counts
+  box.ondragleave = (event) => {
+    if (!box.contains(event.relatedTarget)) box.classList.remove("drop-target");
+  };
+  box.ondrop = (event) => {
+    if (!canTake()) return;
+    event.preventDefault();
+    const { listId, itemId, title } = dragging;
+    dragging = null;
+    box.classList.remove("drop-target");
+    expanded.add(list.id); // so you can see where it landed
+    commit(
+      `cool: move "${title}" to ${list.title}`,
+      (draft) => moveItem(draft, listId, itemId, list.id),
+      `moved to ${list.title}`
+    );
+  };
+
+  return box;
 }
 
 function renderManage() {

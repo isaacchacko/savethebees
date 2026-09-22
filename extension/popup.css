@@ -220,6 +220,11 @@ button:focus-visible {
 .list {
   border: 1px solid var(--border);
   margin-bottom: 0.5rem;
+  /* the border doubles as drag feedback, so it cannot use the 600ms handover */
+  transition:
+    background-color 600ms ease,
+    color 600ms ease,
+    border-color 120ms ease;
 }
 
 .list-head {
@@ -254,6 +259,25 @@ button:focus-visible {
   align-items: center;
   gap: 0.35rem;
   padding: 0.15rem 0;
+  cursor: grab;
+}
+
+.items li:active {
+  cursor: grabbing;
+}
+
+.items li.dragging {
+  opacity: 0.4;
+}
+
+/* the list an entry would land in */
+.list.drop-target {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.list.drop-target .list-head {
+  color: var(--accent);
 }
 
 .items .name {
