@@ -4,7 +4,19 @@
       "id": "webrings",
       "title": "cool webrings",
       "description": "rings of sites that link to each other, the old way.",
-      "items": []
+      "items": [
+        {
+          "id": "ddf2f2c8-390f-4a40-85cd-a733a69ade04",
+          "title": "aggier.ing",
+          "label": "aggier.ing",
+          "url": "https://www.aggier.ing/",
+          "note": "i wonder who made this",
+          "added": "2026-09-22",
+          "shot": "/cool-shots/ddf2f2c8-390f-4a40-85cd-a733a69ade04.webp",
+          "shotW": 640,
+          "shotH": 396
+        }
+      ]
     },
     {
       "id": "websites",
@@ -36,17 +48,6 @@
           "note": "my initial inspiration <3",
           "added": "2026-09-22",
           "shot": "/cool-shots/10da608e-ffc5-434a-9fdd-544f2285511b.webp",
-          "shotW": 640,
-          "shotH": 396
-        },
-        {
-          "id": "ddf2f2c8-390f-4a40-85cd-a733a69ade04",
-          "title": "aggier.ing",
-          "label": "aggier.ing",
-          "url": "https://www.aggier.ing/",
-          "note": "i wonder who made this",
-          "added": "2026-09-22",
-          "shot": "/cool-shots/ddf2f2c8-390f-4a40-85cd-a733a69ade04.webp",
           "shotW": 640,
           "shotH": 396
         },
