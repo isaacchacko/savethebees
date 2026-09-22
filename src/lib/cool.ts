@@ -6,6 +6,8 @@ const COOL_FILE = path.join(process.cwd(), "content/cool.json");
 export type CoolItem = {
   id: string;
   title: string;
+  /** What the link reads as, when the page's own title is not what you'd say. */
+  label: string;
   url: string;
   note: string;
   added: string;
@@ -32,11 +34,13 @@ function num(value: unknown): number {
 
 function toItem(raw: unknown): CoolItem | null {
   if (typeof raw !== "object" || raw === null) return null;
-  const { id, title, url, note, added, shot, shotW, shotH } = raw as Record<string, unknown>;
+  const { id, title, label, url, note, added, shot, shotW, shotH } =
+    raw as Record<string, unknown>;
   if (!str(title) && !str(url)) return null;
   return {
     id: str(id) || str(url) || str(title),
     title: str(title) || str(url),
+    label: str(label),
     url: str(url),
     note: str(note),
     added: str(added),

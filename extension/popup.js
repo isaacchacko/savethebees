@@ -20,6 +20,7 @@ const listSelect = document.getElementById("list");
 const newListRow = document.getElementById("new-list-row");
 const newListInput = document.getElementById("new-list");
 const titleInput = document.getElementById("title");
+const labelInput = document.getElementById("entry-label");
 const urlInput = document.getElementById("url");
 const noteInput = document.getElementById("note");
 const listsRoot = document.getElementById("lists");
@@ -121,7 +122,12 @@ async function save() {
     return;
   }
 
-  const entry = { title: title || url, url, note: noteInput.value.trim() };
+  const entry = {
+    title: title || url,
+    label: labelInput.value.trim(),
+    url,
+    note: noteInput.value.trim(),
+  };
   const target = makingList ? newListTitle : listById(listSelect.value).title;
 
   const attach = useShot.checked ? shot : null;
@@ -162,12 +168,19 @@ function deleteButton(key, label, onConfirm) {
 
 function itemEditor(list, item) {
   const title = el("input", { type: "text", value: item.title });
+  const label = el("input", {
+    type: "text",
+    value: item.label || "",
+    placeholder: "optional — the link reads as this",
+  });
   const url = el("input", { type: "text", value: item.url });
   const note = el("input", { type: "text", value: item.note, placeholder: "note" });
 
   return el("div", { className: "editor" }, [
     el("label", { textContent: "title" }),
     title,
+    el("label", { textContent: "label" }),
+    label,
     el("label", { textContent: "url" }),
     url,
     el("label", { textContent: "note" }),
@@ -181,6 +194,7 @@ function itemEditor(list, item) {
             (draft) =>
               updateItem(draft, list.id, item.id, {
                 title: title.value.trim(),
+                label: label.value.trim(),
                 url: url.value.trim(),
                 note: note.value.trim(),
               }),
@@ -208,7 +222,7 @@ function listEditor(list) {
   const description = el("input", {
     type: "text",
     value: list?.description || "",
-    placeholder: "optional",
+    placeholder: "optional — [links](url) work",
   });
 
   const submit = () => {
@@ -257,8 +271,9 @@ function renderItem(list, item) {
     return el("li", {}, itemEditor(list, item));
   }
 
+  // shows the label when there is one, so the row reads like the site does
   return el("li", { title: item.url }, [
-    el("span", { className: "name", textContent: item.title }),
+    el("span", { className: "name", textContent: item.label || item.title }),
     el("button", {
       textContent: "ed",
       onclick: () => {

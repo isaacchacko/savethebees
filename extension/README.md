@@ -40,6 +40,28 @@ built from the cached lists; _refresh lists_ re-reads them from GitHub.
 **Manage tab** — create, rename, and delete lists; edit and delete entries.
 Delete asks twice: the button turns into `sure?` before it does anything.
 
+## Label
+
+A page's own title is often not what you'd call it — `Lucas Jin — Software
+Engineer, Designer, Etc.` when you just mean `lucas`. **Label** is optional and
+is what the link reads as; the title stays on the entry as the record of what
+the page actually calls itself.
+
+Leave it blank and the link reads as the title, which is the usual case. Both
+the popup and the manage view have the field, so you can add one later. The
+manage list shows the label when there is one, so a row reads the way the site
+does.
+
+## Notes take markdown
+
+A note — and a list's description — is rendered as inline markdown, so
+`found via [lucas](https://lucasjin.ca)` gets you a real link with your own
+text. `**bold**`, `*italic*` and `` `code` `` work too. Raw HTML does not, and
+`javascript:` urls are stripped, so a note cannot do anything but read.
+
+Block-level markdown (headings, lists) has nowhere to go on a single line —
+keep notes inline.
+
 ## Screenshots
 
 Saving a page also grabs its visible viewport, shrinks it to 640px webp

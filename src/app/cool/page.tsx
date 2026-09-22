@@ -1,4 +1,5 @@
 import HoverPreview from "@/components/HoverPreview";
+import Markdown from "@/components/Markdown";
 import Shell from "@/components/Shell";
 import { getCoolLists, type CoolItem } from "@/lib/cool";
 
@@ -17,12 +18,13 @@ function hostname(url: string): string {
 
 function Entry({ item }: { item: CoolItem }) {
   const host = hostname(item.url);
+  const text = item.label || item.title;
   const link = item.url ? (
     <a href={item.url} target="_blank" rel="noopener noreferrer">
-      {item.title}
+      {text}
     </a>
   ) : (
-    item.title
+    text
   );
 
   return (
@@ -49,7 +51,12 @@ function Entry({ item }: { item: CoolItem }) {
       {host ? (
         <span style={{ color: "var(--muted)" }}> ({host})</span>
       ) : null}
-      {item.note ? <span> — {item.note}</span> : null}
+      {item.note ? (
+        <span>
+          {" — "}
+          <Markdown content={item.note} inline />
+        </span>
+      ) : null}
     </li>
   );
 }
@@ -70,7 +77,11 @@ export default function CoolPage() {
         lists.map((list) => (
           <section key={list.id}>
             <h3>{list.title}</h3>
-            {list.description ? <p>{list.description}</p> : null}
+            {list.description ? (
+              <p>
+                <Markdown content={list.description} inline />
+              </p>
+            ) : null}
             {list.items.length === 0 ? (
               <p style={{ color: "var(--muted)" }}>empty for now.</p>
             ) : (

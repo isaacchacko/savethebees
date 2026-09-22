@@ -122,9 +122,16 @@ button:focus-visible {
   accent-color: var(--accent);
 }
 
+/* The thumbnail is only there to confirm what got captured, and a tall browser
+   window makes a tall one — left uncapped it pushes save past the 600px chrome
+   allows a popup, where it cannot be reached. Cropped from the top, since
+   that's the recognisable part of a page. */
 #shot-preview {
   display: block;
   width: 100%;
+  max-height: 7rem;
+  object-fit: cover;
+  object-position: top;
   margin-top: 0.4rem;
   border: 1px solid var(--border);
 }

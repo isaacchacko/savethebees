@@ -282,9 +282,13 @@ export function removeList(data, listId) {
 /** `shot` is {base64, width, height} from shot.js, or null for no screenshot. */
 export function addItem(data, listId, item, shot = null) {
   const id = crypto.randomUUID();
+  const label = (item.label || "").trim();
   findList(data, listId).items.unshift({
     id,
     title: item.title.trim(),
+    // only when it differs from the title — an entry that reads fine as-is
+    // should not carry a redundant field
+    ...(label ? { label } : {}),
     url: (item.url || "").trim(),
     note: (item.note || "").trim(),
     added: new Date().toISOString().slice(0, 10),
@@ -298,6 +302,7 @@ export function updateItem(data, listId, itemId, patch) {
   const item = list.items.find((candidate) => candidate.id === itemId);
   if (!item) throw new Error("that entry is gone");
   Object.assign(item, patch);
+  if (!item.label) delete item.label;
 }
 
 /** Returns the removed entry so the caller can drop its screenshot too. */
