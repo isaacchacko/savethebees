@@ -52,6 +52,17 @@
       "description": "",
       "items": [
         {
+          "id": "087c5e33-040e-4e73-97d9-36c5e9f34e93",
+          "title": "Bindwell — Building new pesticides with AI",
+          "label": "bindwell",
+          "url": "https://bindwell.ai/en-us",
+          "note": "virtual scrolling",
+          "added": "2026-09-22",
+          "shot": "/cool-shots/087c5e33-040e-4e73-97d9-36c5e9f34e93.webp",
+          "shotW": 640,
+          "shotH": 396
+        },
+        {
           "id": "8f023001-4963-4032-a8c2-e57a253ecbce",
           "title": "Home - TypeSafe AI",
           "label": "typesafe",
