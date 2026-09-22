@@ -52,6 +52,17 @@
       "description": "",
       "items": [
         {
+          "id": "8f023001-4963-4032-a8c2-e57a253ecbce",
+          "title": "Home - TypeSafe AI",
+          "label": "typesafe",
+          "url": "https://typesafe.ai/",
+          "note": "",
+          "added": "2026-09-22",
+          "shot": "/cool-shots/8f023001-4963-4032-a8c2-e57a253ecbce.webp",
+          "shotW": 640,
+          "shotH": 396
+        },
+        {
           "id": "f9c2cca3-3193-44e6-84ac-1c28ed3d00a6",
           "title": "vit",
           "url": "https://vit-editor.vercel.app/",
