@@ -29,6 +29,17 @@
       "description": "frontend + product",
       "items": [
         {
+          "id": "ddf2f2c8-390f-4a40-85cd-a733a69ade04",
+          "title": "aggier.ing",
+          "label": "aggier.ing",
+          "url": "https://www.aggier.ing/",
+          "note": "i wonder who made this",
+          "added": "2026-09-22",
+          "shot": "/cool-shots/ddf2f2c8-390f-4a40-85cd-a733a69ade04.webp",
+          "shotW": 640,
+          "shotH": 396
+        },
+        {
           "id": "f9c2cca3-3193-44e6-84ac-1c28ed3d00a6",
           "title": "vit",
           "url": "https://vit-editor.vercel.app/",
