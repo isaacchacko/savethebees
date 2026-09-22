@@ -1,5 +1,32 @@
-/* the "dryft" palette from the site's globals.css — the popup does not rotate */
-:root {
+/* The palettes mirror src/app/globals.css and the rotation mirrors
+   src/lib/themes.ts, so the popup wears whatever the site is wearing. themes.js
+   stamps data-theme on <html>; :root repeats the first palette as the fallback
+   for the instant before it runs.
+
+   --danger is the one colour the site has no equivalent for, so each palette
+   picks its own: dark on the light themes, light on the dark ones. */
+:root,
+[data-theme="pink"] {
+  --background: #ff5fa8;
+  --surface: #ff86c2;
+  --foreground: #1a0610;
+  --muted: #5c1636;
+  --accent: #3d0c24;
+  --border: #b3306e;
+  --danger: #570a1c;
+}
+
+[data-theme="banana"] {
+  --background: #ffd93b;
+  --surface: #ffe680;
+  --foreground: #241d00;
+  --muted: #5c4a00;
+  --accent: #3d3000;
+  --border: #c9a400;
+  --danger: #7a1500;
+}
+
+[data-theme="dryft"] {
   --background: #0b2545;
   --surface: #12355e;
   --foreground: #d6e8ff;
@@ -7,6 +34,52 @@
   --accent: #6fb3ff;
   --border: #1f4d85;
   --danger: #ff9e9e;
+}
+
+[data-theme="maroon"] {
+  --background: #500000;
+  --surface: #6b1212;
+  --foreground: #f2e4e4;
+  --muted: #d09a9a;
+  --accent: #ff9e9e;
+  --border: #7d2626;
+  --danger: #ffc9c9;
+}
+
+[data-theme="matcha"] {
+  --background: #a3c585;
+  --surface: #bfd9a8;
+  --foreground: #12200a;
+  --muted: #2e441a;
+  --accent: #1f3311;
+  --border: #6d9149;
+  --danger: #5c1000;
+}
+
+/* the same 600ms handover the site uses, for a rollover with the popup open */
+body,
+input,
+select,
+button,
+.list,
+.list-head,
+#shot-preview {
+  transition:
+    background-color 600ms ease,
+    border-color 600ms ease,
+    color 600ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body,
+  input,
+  select,
+  button,
+  .list,
+  .list-head,
+  #shot-preview {
+    transition: none;
+  }
 }
 
 * {
@@ -43,6 +116,12 @@ button {
   border: 1px solid var(--border);
   padding: 0.15rem 0.5rem;
   cursor: pointer;
+  /* overrides the 600ms handover above — hover has to feel immediate, the way
+     links do on the site */
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    color 120ms ease;
 }
 
 button:hover {

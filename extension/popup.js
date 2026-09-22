@@ -12,6 +12,9 @@ import {
   updateList,
 } from "./store.js";
 import { capture } from "./shot.js";
+import { followTheme } from "./themes.js";
+
+followTheme();
 
 const NEW_LIST = "__new__";
 

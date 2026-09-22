@@ -40,6 +40,19 @@ built from the cached lists; _refresh lists_ re-reads them from GitHub.
 **Manage tab** — create, rename, and delete lists; edit and delete entries.
 Delete asks twice: the button turns into `sure?` before it does anything.
 
+## It wears whatever the site is wearing
+
+The site picks its palette from the wall clock — `floor(now / 5min) % 5` over
+pink, banana, dryft, maroon, matcha — rather than storing it, so every visitor
+sees the same theme at the same moment. `themes.js` does that same arithmetic,
+which is the whole synchronisation: no messaging, no network, nothing to fall
+out of step. Open the popup and it is already on the site's current theme, and
+it rolls over on the boundary if you leave it open.
+
+The palettes in `popup.css` mirror `src/app/globals.css`. Change one and change
+the other — nothing enforces it. `--danger` is the exception: the site has no
+equivalent, so each palette picks its own.
+
 ## Label
 
 A page's own title is often not what you'd call it — `Lucas Jin — Software

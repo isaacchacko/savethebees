@@ -1,4 +1,7 @@
 import { fetchCool, getConfig, setConfig } from "./store.js";
+import { followTheme } from "./themes.js";
+
+followTheme();
 
 const FIELDS = ["owner", "repo", "branch", "filePath", "token"];
 const status = document.getElementById("status");
