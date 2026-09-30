@@ -47,6 +47,45 @@ see it. Moving keeps the entry's id, so its screenshot stays where it is rather
 than being rewritten under a new name. There is no reordering within a list —
 only moving between them.
 
+## Admin view
+
+The popup's **admin view** button opens a stand-in for the site you can type
+into: the same shell, the same palette, the same markdown rendering, with
+about, now, running and the learnings write-ups editable in place. Type over
+the text, hit save (or cmd-S), and it commits to `content/` — same conditional
+ref update as everything else here, so a change that landed elsewhere is a
+conflict rather than an overwrite.
+
+Home is listed but not editable. It is a boid simulation, a spotify widget and
+live readme embeds — components, not prose, with nothing to type over.
+
+### Why editing the rendered page is safe
+
+Saving rewrites the whole file from the DOM, so anything the serialiser cannot
+read would be dropped silently. Three things stop that:
+
+- **Both halves know the same constructs.** `markdown.js` renders and
+  serialises headings, paragraphs, unordered lists, fenced code, and inline
+  links, bold, italic and code — nothing else.
+- **A file that cannot round-trip is never opened for editing.** On load the
+  editor renders the markdown, serialises it straight back, and compares. If it
+  does not match byte for byte the page goes read-only and says so, rather than
+  letting you type into something it would mangle.
+- **Paste is forced to plain text**, so rich markup never enters the document.
+
+`markdown.test.html` asserts both properties — that render-then-serialise is
+the identity for every file in `content/`, and that serialising twice after a
+real contenteditable edit does not drift. Run it from the repo root:
+
+```sh
+python3 -m http.server 8000
+open http://localhost:8000/extension/markdown.test.html
+```
+
+Headings keep their real level in the editor (`#` stays `<h1>`) even though the
+site maps markdown `h1` onto an `<h2>`. Rendering both as `<h2>` would make the
+trip back ambiguous; `admin.css` makes them look the same instead.
+
 ## It wears whatever the site is wearing
 
 The site picks its palette from the wall clock — `floor(now / 5min) % 5` over
@@ -119,9 +158,15 @@ really did commit underneath you. Try again.
 
 ## Files
 
-| file            | what it does                                             |
-| --------------- | -------------------------------------------------------- |
-| `store.js`      | GitHub client, the read-modify-write commit, list helpers |
-| `background.js` | context menus and their handler                           |
-| `popup.js`      | the add form and the manage view                          |
-| `options.js`    | repo + token settings                                     |
+| file                  | what it does                                              |
+| --------------------- | --------------------------------------------------------- |
+| `store.js`            | GitHub client, the read-modify-write commit, list helpers |
+| `background.js`       | context menus and their handler                            |
+| `popup.js`            | the add form and the manage view                           |
+| `admin.js`            | the editable stand-in for the site                         |
+| `markdown.js`         | markdown in, DOM out, and back again                       |
+| `themes.js`           | the site's wall-clock palette rotation                     |
+| `shot.js`             | screenshot capture and shrinking                           |
+| `options.js`          | repo + token settings                                      |
+| `store.test.mjs`      | `npm test` — the commit logic, against a fake github       |
+| `markdown.test.html`  | the round trip, in a browser because it needs a DOM        |

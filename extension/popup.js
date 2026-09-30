@@ -407,6 +407,10 @@ for (const tab of document.querySelectorAll(".tabs [data-view]")) {
 }
 
 document.getElementById("settings").onclick = () => chrome.runtime.openOptionsPage();
+document.getElementById("admin").onclick = () => {
+  chrome.tabs.create({ url: chrome.runtime.getURL("admin.html") });
+  window.close();
+};
 document.getElementById("save").onclick = save;
 listSelect.onchange = syncNewListRow;
 

@@ -228,6 +228,60 @@ export async function mutate(message, apply) {
   throw new Error("cool.json changed while saving — try again");
 }
 
+// ─────────────────────── arbitrary files, for the admin view ───────────────
+// cool.json is not the only thing worth editing from here: the admin view
+// rewrites the markdown behind about, now, running and the learnings.
+
+export async function readFile(path) {
+  const config = await getConfig();
+  const head = await getHead(config);
+  const response = await github(
+    config,
+    `${repoPath(config, `/contents/${path}`)}?ref=${head}`
+  );
+
+  if (response.status === 404) return { text: "", head, missing: true };
+  if (!response.ok) throw new Error(await explain(response));
+
+  const body = await response.json();
+  if (!body.content) throw new Error(`${path} is too large for the contents API`);
+  return { text: decodeBase64(body.content), head };
+}
+
+/** Lists the markdown files in a directory, newest name first. */
+export async function listDir(path) {
+  const config = await getConfig();
+  const head = await getHead(config);
+  const response = await github(
+    config,
+    `${repoPath(config, `/contents/${path}`)}?ref=${head}`
+  );
+  if (response.status === 404) return [];
+  if (!response.ok) throw new Error(await explain(response));
+  const body = await response.json();
+  return (Array.isArray(body) ? body : [])
+    .filter((entry) => entry.type === "file" && entry.name.endsWith(".md"))
+    .map((entry) => entry.name);
+}
+
+/**
+ * Commit text files straight, without going through cool.json. Same
+ * conditional ref update, so a commit that landed since we read is a conflict
+ * rather than an overwrite.
+ */
+export async function saveFiles(message, files) {
+  const config = await getConfig();
+
+  for (let attempt = 0; attempt < 4; attempt++) {
+    if (attempt) await new Promise((done) => setTimeout(done, 250 * attempt));
+    const head = await getHead(config);
+    const sha = await commitFiles(config, head, files, message);
+    if (sha) return sha;
+  }
+
+  throw new Error("the repo changed while saving — try again");
+}
+
 // ──────────────────────────────  pure helpers  ──────────────────────────────
 
 export function shotPath(id) {

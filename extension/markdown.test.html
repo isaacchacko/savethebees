@@ -1,0 +1,164 @@
+<!doctype html>
+<!--
+  The markdown round trip needs a DOM, so it runs here rather than in node.
+
+      python3 -m http.server 8000     # from the repo root
+      open http://localhost:8000/extension/markdown.test.html
+
+  Two properties, and the editor is only safe if both hold:
+
+  1. render then serialise is the identity, for every file in content/
+  2. after a real contenteditable edit, serialising twice does not drift —
+     which is what catches markup the browser inserted that the serialiser
+     cannot read
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>markdown round trip</title>
+    <style>
+      body { font: 13px ui-monospace, monospace; background: #0b2545; color: #d6e8ff; padding: 1.5rem; }
+      .fail { color: #ff9e9e; }
+      .ok { color: #6fb3ff; }
+      h2 { font-size: 1rem; margin: 1.5rem 0 0.5rem; }
+    </style>
+  </head>
+  <body>
+    <pre id="out">running…</pre>
+    <script type="module">
+      import { toHtml, toMarkdown, splitFrontMatter } from "./markdown.js";
+
+      const FILES = [
+        "../content/pages/about.md",
+        "../content/pages/now.md",
+        "../content/pages/running.md",
+        "../content/learnings/how-does-tailscale-work.md",
+      ];
+
+      const SYNTHETIC = {
+        "heading levels": "# one\n\n## two\n\n### three\n",
+        "inline mix": "a **bold** and *italic* and `code` and [link](https://x.example/y).\n",
+        "list with links": "- plain\n- with [a link](https://x.example) inside\n- **bold item**\n",
+        "internal link": "see my [dotfiles](/arch) page.\n",
+        "literal asterisk": "a \\* literal star and a \\[bracket\\].\n",
+        "apostrophes": "suki's concert, w/ friends, 70mm & more.\n",
+        "unicode": "ドーナツ — café ☕ and an em–dash.\n",
+        "paragraph then list": "intro line.\n\n- one\n- two\n",
+        "nested emphasis in link": "[**bold link**](https://x.example)\n",
+        "angle brackets": "a < b and c > d and 5 & 6.\n",
+        "code fence": "before.\n\n```\na -> b\nc -> d\n```\n\nafter.\n",
+        "fence with language": "```js\nconst x = 1;\n```\n",
+      };
+
+      const out = [];
+      let pass = 0;
+      let fail = 0;
+
+      const norm = (text) => text.replace(/\r\n/g, "\n").trim();
+
+      function host(markdown) {
+        const node = document.createElement("div");
+        node.contentEditable = "true";
+        node.innerHTML = toHtml(markdown);
+        document.body.append(node);
+        return node;
+      }
+
+      function record(name, okay, detail) {
+        if (okay) {
+          pass += 1;
+          out.push(`ok    ${name}`);
+        } else {
+          fail += 1;
+          out.push(`FAIL  ${name}`);
+          if (detail) out.push(detail);
+        }
+      }
+
+      function roundTrip(name, source) {
+        const { body } = splitFrontMatter(source);
+        const node = host(body);
+        const back = toMarkdown(node);
+        node.remove();
+
+        if (norm(back) === norm(body)) return record(name, true);
+
+        const want = norm(body).split("\n");
+        const got = norm(back).split("\n");
+        const lines = [];
+        for (let i = 0; i < Math.max(want.length, got.length); i++) {
+          if (want[i] !== got[i]) {
+            lines.push(`        line ${i + 1}\n          want: ${JSON.stringify(want[i])}\n          got : ${JSON.stringify(got[i])}`);
+          }
+        }
+        record(name, false, lines.join("\n"));
+      }
+
+      function caretAtEnd(node) {
+        const range = document.createRange();
+        range.selectNodeContents(node);
+        range.collapse(false);
+        const selection = getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
+
+      /** Serialise, re-render, serialise again. Drift means lost content. */
+      function stable(name, node) {
+        const once = toMarkdown(node);
+        const again = document.createElement("div");
+        again.innerHTML = toHtml(once);
+        const twice = toMarkdown(again);
+        node.remove();
+        record(name, once.trim() === twice.trim(),
+          once.trim() === twice.trim() ? "" :
+          `        1st: ${JSON.stringify(once.slice(0, 200))}\n        2nd: ${JSON.stringify(twice.slice(0, 200))}`);
+      }
+
+      const sources = {};
+      for (const path of FILES) {
+        try {
+          sources[path] = await (await fetch(path)).text();
+        } catch {
+          out.push(`SKIP  ${path} (serve the repo root over http to include it)`);
+        }
+      }
+
+      out.push("── round trip ──");
+      for (const [name, source] of Object.entries({ ...sources, ...SYNTHETIC })) roundTrip(name, source);
+
+      out.push("", "── stable after editing ──");
+      const about = sources["../content/pages/about.md"];
+      if (about) {
+        const body = splitFrontMatter(about).body;
+
+        let node = host(body);
+        caretAtEnd(node.querySelector("p"));
+        node.focus();
+        document.execCommand("insertText", false, " and more");
+        stable("type into a paragraph", node);
+
+        node = host(body);
+        caretAtEnd(node.querySelector("li"));
+        node.focus();
+        document.execCommand("insertText", false, " extra");
+        stable("type into a list item", node);
+
+        node = host(body);
+        getSelection().selectAllChildren(node.querySelector("li"));
+        document.execCommand("bold");
+        stable("ctrl+b inserts <b>", node);
+
+        node = host(body);
+        node.querySelectorAll("p")[1]?.remove();
+        stable("delete a block", node);
+      }
+
+      out.unshift(`${pass} passed, ${fail} failed`, "");
+      const el = document.getElementById("out");
+      el.textContent = out.join("\n");
+      el.className = fail ? "fail" : "ok";
+      document.title = `${fail ? "FAIL" : "ok"} — markdown round trip`;
+    </script>
+  </body>
+</html>

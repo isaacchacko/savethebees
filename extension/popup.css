@@ -327,3 +327,25 @@ button:focus-visible {
 #status[data-tone="ok"] {
   color: var(--accent);
 }
+
+/* a rule with the word sitting in the gap, rather than a label under a line */
+.or {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0.9rem 0 0;
+  color: var(--muted);
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+}
+
+.or::before,
+.or::after {
+  content: "";
+  flex: 1;
+  border-top: 1px dashed var(--border);
+}
+
+#admin {
+  margin-top: 0.6rem;
+}

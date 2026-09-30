@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>admin — isaacchacko.com</title>
+    <link rel="stylesheet" href="admin.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <nav class="titlebar">
+        <span class="titlebar-dots" aria-hidden>
+          <span class="titlebar-dot" data-live="true"></span>
+          <span class="titlebar-dot"></span>
+          <span class="titlebar-dot"></span>
+        </span>
+        <ul class="nav-links" id="nav"></ul>
+        <span class="titlebar-right">
+          <span id="dirty" class="dirty" hidden>unsaved</span>
+          <button type="button" id="save" disabled>save</button>
+        </span>
+      </nav>
+
+      <p class="prompt">
+        <span class="prompt-user">isaac@sf</span><span class="prompt-sigil">:</span
+        ><span class="prompt-path" id="cwd">~</span><span class="prompt-sigil">$ </span
+        ><span class="prompt-cmd" id="cmd">vim</span>
+        <span class="cursor"></span>
+      </p>
+
+      <p id="hint" class="hint"></p>
+      <div id="picker" class="picker" hidden></div>
+      <main id="doc"></main>
+      <p id="status"></p>
+    </div>
+
+    <script type="module" src="admin.js"></script>
+  </body>
+</html>
