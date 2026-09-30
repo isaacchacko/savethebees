@@ -8,7 +8,12 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true
   },
   async redirects() {
-    return [{ source: '/tracking', destination: '/running', permanent: true }];
+    return [
+      { source: '/tracking', destination: '/running', permanent: true },
+      // learnings became dumps; the old links were public, so they keep working
+      { source: '/learnings', destination: '/dumps', permanent: true },
+      { source: '/learnings/:slug', destination: '/dumps/:slug', permanent: true },
+    ];
   },
 };
 

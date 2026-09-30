@@ -231,7 +231,7 @@ export async function mutate(message, apply) {
 
 // ─────────────────────── arbitrary files, for the admin view ───────────────
 // cool.json is not the only thing worth editing from here: the admin view
-// rewrites the markdown behind about, now, running and the learnings.
+// rewrites the markdown behind about, now, running and the dumps.
 
 export async function readFile(path) {
   const config = await getConfig();

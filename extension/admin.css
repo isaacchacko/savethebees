@@ -250,7 +250,7 @@ body {
   padding: 0.05em 0.3em;
 }
 
-/* front matter for a learnings write-up: the fields the index page reads */
+/* front matter for a dump: the fields the index page reads */
 .meta {
   border: 1px solid var(--border);
   padding: 0.75rem 1rem 1rem;
@@ -506,4 +506,34 @@ body {
   border: 1px solid var(--border);
   padding: 0.05em 0.3em;
   color: var(--accent);
+}
+
+.meta-check {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 0.8rem;
+  cursor: pointer;
+}
+
+/* .meta label::before is more specific than a bare .meta-check, so match its
+   weight or the "> " marker leaks onto the checkbox row */
+.meta label.meta-check::before { content: none; }
+
+.meta-check input {
+  width: auto;
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+.live[aria-disabled="true"] {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.meta-warn {
+  margin: 0.4rem 0 0;
+  color: var(--danger);
+  font-size: 0.75rem;
+  line-height: 1.5;
 }

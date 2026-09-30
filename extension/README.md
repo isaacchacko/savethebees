@@ -51,7 +51,7 @@ only moving between them.
 
 The popup's **admin view** button opens a stand-in for the site you can type
 into: the same shell, the same palette, the same markdown rendering, with
-about, now, running and the learnings write-ups editable in place. Type over
+about, now, running and the dumps editable in place. Type over
 the text, hit save (or cmd-S), and it commits to `content/` — same conditional
 ref update as everything else here, so a change that landed elsewhere is a
 conflict rather than an overwrite.
@@ -59,10 +59,26 @@ conflict rather than an overwrite.
 Home is listed but not editable. It is a boid simulation, a spotify widget and
 live readme embeds — components, not prose, with nothing to type over.
 
+### Private dumps
+
+Ticking **private** puts `private: true` in the front matter. The site then
+leaves that dump off the index *and builds no page for it at all*, so its url
+404s rather than being an unlisted page someone could stumble onto. Unticking
+it removes the key rather than writing `private: false`.
+
+**It is off the site, not secret.** This repo is public, so the markdown is
+still there for anyone who looks at github. The editor says so under the
+checkbox. If a dump needs to be genuinely unreadable it cannot live here at
+all — it would need a private repo, which is a different `owner`/`repo` in
+options and a second token.
+
+The live link is disabled while a dump is private, because there is no page to
+open.
+
 ### Seeing it live
 
 **live ↗** in the titlebar opens whatever you are editing on the real site, in
-a new tab — `/about`, `/cool`, `/learnings/<slug>`, and so on. It is an anchor
+a new tab — `/about`, `/cool`, `/dumps/<slug>`, and so on. It is an anchor
 rather than a button so the url is there to copy or middle-click.
 
 For a write-up it points at the *saved* slug, not the one sitting in the field.
@@ -90,9 +106,9 @@ needs a tab showing the page, so an entry added from here has no image until
 you re-save it from the popup on the page itself. Thumbnails are loaded from
 the live site, so a brand new one stays blank until that commit has deployed.
 
-### Learnings are files, so the admin view CRUDs them
+### Dumps are files, so the admin view CRUDs them
 
-The learnings tab lists every write-up with a **del** next to it and a **+ new
+The dumps tab lists every dump with a **del** next to it and a **+ new
 write-up** button underneath. Delete asks twice, the same as everywhere else
 here.
 
@@ -110,7 +126,7 @@ field, and the filename it will actually become is shown underneath the whole
 time, so the field never quietly disagrees with what gets committed. Accents
 decompose to their base letter, so "café" is `cafe` rather than `caf`.
 
-A new write-up starts as a real file with front matter and a heading, so the
+A new dump starts as a real file with front matter and a heading, so the
 index page, the editor and a later save all see the same shape as any other.
 Its slug follows the title while you are naming it, and stops the moment you
 edit the slug yourself.

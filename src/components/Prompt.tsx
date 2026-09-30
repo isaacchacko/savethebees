@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 
-// "/" -> "~", "/learnings/foo" -> "~/learnings/foo"
+// "/" -> "~", "/dumps/foo" -> "~/dumps/foo"
 function cwd(pathname: string) {
   return pathname === '/' ? '~' : `~${pathname}`;
 }

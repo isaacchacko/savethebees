@@ -24,7 +24,7 @@ const PAGES = [
   { id: "about", label: "about", path: "content/pages/about.md", cmd: "vim about.md" },
   { id: "now", label: "now", path: "content/pages/now.md", cmd: "vim now.md" },
   { id: "running", label: "running", path: "content/pages/running.md", cmd: "vim races.md" },
-  { id: "learnings", label: "learnings", cmd: "ls -l learnings/" },
+  { id: "dumps", label: "dumps", cmd: "ls -l dumps/" },
   { id: "cool", label: "cool", cmd: "vim cool.json" },
 ];
 
@@ -41,6 +41,8 @@ const metaFields = {
 };
 const slugField = document.getElementById("meta-slug");
 const slugPreview = document.getElementById("slug-preview");
+const privateBox = document.getElementById("meta-private");
+const privateWarn = document.getElementById("private-warn");
 const revertButton = document.getElementById("revert");
 const coolRoot = document.getElementById("cool");
 const liveLink = document.getElementById("live");
@@ -51,9 +53,9 @@ const dirtyFlag = document.getElementById("dirty");
 const cwd = document.getElementById("cwd");
 const cmd = document.getElementById("cmd");
 
-const LEARNINGS_DIR = "content/learnings";
+const DUMPS_DIR = "content/dumps";
 
-let current = null; // { path, fields, markdown, isLearning }
+let current = null; // { path, fields, markdown, isDump }
 let dirty = false;
 let arming = null; // the delete button waiting for a second click
 
@@ -64,9 +66,23 @@ let siteUrl = "";
  * the path that is actually deployed — the saved one — because a slug you have
  * typed but not committed is a url that does not exist yet.
  */
-function setLive(path) {
+function setLive(path, unavailable = false) {
   liveLink.href = siteUrl + path;
-  liveLink.title = siteUrl + path;
+  liveLink.title = unavailable
+    ? "a private dump has no page on the site"
+    : siteUrl + path;
+  // toggleAttribute writes an empty value, which is not the aria contract and
+  // does not match [aria-disabled="true"]
+  if (unavailable) liveLink.setAttribute("aria-disabled", "true");
+  else liveLink.removeAttribute("aria-disabled");
+}
+
+/** The live link is meaningless while a dump is private — no page is built. */
+function refreshLive() {
+  privateWarn.hidden = !privateBox.checked;
+  if (!current?.isDump) return;
+  const slug = current.path.split("/").pop().replace(/\.md$/, "");
+  setLive(`/dumps/${slug}`, privateBox.checked);
 }
 
 function say(message, tone = "") {
@@ -97,7 +113,7 @@ async function openPath(path, { label } = {}) {
   try {
     const { text } = await readFile(path);
     const { front, body } = splitFrontMatter(text);
-    const isLearning = path.startsWith(`${LEARNINGS_DIR}/`);
+    const isDump = path.startsWith(`${DUMPS_DIR}/`);
 
     // Refuse to edit anything this editor cannot reproduce byte for byte.
     // Saving is a full rewrite of the file, so a construct the renderer does
@@ -121,15 +137,16 @@ async function openPath(path, { label } = {}) {
     }
 
     const fields = parseFrontMatter(front);
-    current = { path, fields, markdown: body, isLearning };
+    current = { path, fields, markdown: body, isDump };
 
-    meta.hidden = !isLearning;
-    if (isLearning) {
+    meta.hidden = !isDump;
+    if (isDump) {
       for (const [key, input] of Object.entries(metaFields)) input.value = fields[key] || "";
+      privateBox.checked = fields.private === "true" || fields.private === true;
       slugField.value = path.split("/").pop().replace(/\.md$/, "");
       slugFollowsTitle = false;
       showSlug();
-      setLive(`/learnings/${slugField.value}`);
+      refreshLive();
     }
 
     doc.innerHTML = toHtml(body);
@@ -145,7 +162,7 @@ async function openPath(path, { label } = {}) {
   }
 }
 
-async function showLearnings() {
+async function showDumps() {
   picker.hidden = false;
   doc.innerHTML = "";
   doc.contentEditable = "false";
@@ -154,19 +171,19 @@ async function showLearnings() {
   current = null;
   arming = null;
   setDirty(false);
-  hint.textContent = "each write-up is a markdown file.";
+  hint.textContent = "each dump is a markdown file.";
   say("loading…");
 
   try {
-    const files = await listDir(LEARNINGS_DIR);
-    renderLearnings(files);
+    const files = await listDir(DUMPS_DIR);
+    renderDumps(files);
     say("");
   } catch (error) {
     say(error.message, "error");
   }
 }
 
-function renderLearnings(files) {
+function renderDumps(files) {
   const rows = files.map((name) => {
     const open = el("button", {
       type: "button",
@@ -174,7 +191,7 @@ function renderLearnings(files) {
       onclick: () => {
         picker.hidden = true;
         hint.textContent = "";
-        openPath(`${LEARNINGS_DIR}/${name}`, { label: name });
+        openPath(`${DUMPS_DIR}/${name}`, { label: name });
       },
     });
 
@@ -185,9 +202,9 @@ function renderLearnings(files) {
       onclick: () => {
         if (!armed) {
           arming = name;
-          return renderLearnings(files);
+          return renderDumps(files);
         }
-        deleteLearning(name, files);
+        deleteDump(name, files);
       },
     });
 
@@ -198,25 +215,25 @@ function renderLearnings(files) {
     el("button", {
       className: "new",
       type: "button",
-      textContent: "+ new write-up",
-      onclick: () => newLearning(files),
+      textContent: "+ new dump",
+      onclick: () => newDump(files),
     })
   );
 
   picker.replaceChildren(...rows);
 }
 
-async function deleteLearning(name, files) {
+async function deleteDump(name, files) {
   arming = null;
   say(`deleting ${name}…`);
   try {
     await saveFiles(`admin: delete ${name}`, [
-      { path: `${LEARNINGS_DIR}/${name}`, remove: true },
+      { path: `${DUMPS_DIR}/${name}`, remove: true },
     ]);
-    renderLearnings(files.filter((file) => file !== name));
+    renderDumps(files.filter((file) => file !== name));
     say(`deleted ${name}`, "ok");
   } catch (error) {
-    renderLearnings(files);
+    renderDumps(files);
     say(error.message, "error");
   }
 }
@@ -225,7 +242,7 @@ async function deleteLearning(name, files) {
  * A new write-up starts as a real file so everything downstream — the index
  * page, the editor, a save — sees the same shape as any other.
  */
-async function newLearning(files) {
+async function newDump(files) {
   const title = el("input", { type: "text", placeholder: "what did you learn?" });
   const create = el("button", {
     type: "button",
@@ -246,10 +263,10 @@ async function newLearning(files) {
         `# ${text}\n\nstart here.\n`;
 
       try {
-        await saveFiles(`admin: add ${name}`, [{ path: `${LEARNINGS_DIR}/${name}`, text: body }]);
+        await saveFiles(`admin: add ${name}`, [{ path: `${DUMPS_DIR}/${name}`, text: body }]);
         picker.hidden = true;
         hint.textContent = "";
-        await openPath(`${LEARNINGS_DIR}/${name}`, { label: name });
+        await openPath(`${DUMPS_DIR}/${name}`, { label: name });
         slugFollowsTitle = true; // until you edit the slug yourself
         say("created — give it a description, then write", "ok");
       } catch (error) {
@@ -263,7 +280,7 @@ async function newLearning(files) {
     el("div", { className: "row" }, [
       title,
       create,
-      el("button", { type: "button", textContent: "cancel", onclick: () => renderLearnings(files) }),
+      el("button", { type: "button", textContent: "cancel", onclick: () => renderDumps(files) }),
     ])
   );
   title.focus();
@@ -295,7 +312,7 @@ function selectPage(page) {
     say("");
     return;
   }
-  if (page.id === "learnings") return showLearnings();
+  if (page.id === "dumps") return showDumps();
   if (page.id === "cool") {
     coolRoot.hidden = false;
     doc.contentEditable = "false";
@@ -320,6 +337,11 @@ doc.addEventListener("input", () => {
   if (current) setDirty(true);
 });
 
+privateBox.addEventListener("change", () => {
+  if (current) setDirty(true);
+  refreshLive();
+});
+
 for (const input of [...Object.values(metaFields), slugField]) {
   input.addEventListener("input", () => {
     if (current) setDirty(true);
@@ -336,7 +358,7 @@ for (const input of [...Object.values(metaFields), slugField]) {
  */
 function showSlug() {
   const slug = slugify(slugField.value || metaFields.title.value || "untitled");
-  slugPreview.textContent = `${LEARNINGS_DIR}/${slug}.md`;
+  slugPreview.textContent = `${DUMPS_DIR}/${slug}.md`;
 }
 
 // typing a title for a new write-up names the file too, until you name it
@@ -561,15 +583,16 @@ doc.addEventListener("keydown", (event) => {
 /** What the file would look like if saved right now. */
 function composed() {
   const body = toMarkdown(doc);
-  if (!current.isLearning) return { text: body, path: current.path };
+  if (!current.isDump) return { text: body, path: current.path };
 
   const fields = Object.fromEntries(
     Object.entries(metaFields).map(([key, input]) => [key, input.value.trim()])
   );
+  if (privateBox.checked) fields.private = "true";
   const slug = slugify(slugField.value || fields.title || "untitled");
   return {
     text: buildFrontMatter(fields) + body,
-    path: `${LEARNINGS_DIR}/${slug}.md`,
+    path: `${DUMPS_DIR}/${slug}.md`,
     fields,
   };
 }
@@ -603,7 +626,7 @@ async function save() {
     composed.lastSaved = next.text;
     setDirty(false);
     cmd.textContent = `vim ${name}`;
-    if (current.isLearning) setLive(`/learnings/${name.replace(/\.md$/, "")}`);
+    if (current.isDump) refreshLive();
     say(renamed ? `saved as ${name} — the old url is gone` : "saved — vercel will rebuild in a minute or so", "ok");
   } catch (error) {
     saveButton.disabled = false;
@@ -617,10 +640,12 @@ function revert() {
   if (!current || !dirty) return;
 
   doc.innerHTML = toHtml(current.markdown);
-  if (current.isLearning) {
+  if (current.isDump) {
     for (const [key, input] of Object.entries(metaFields)) input.value = current.fields[key] || "";
     slugField.value = current.path.split("/").pop().replace(/\.md$/, "");
+    privateBox.checked = current.fields.private === "true" || current.fields.private === true;
     showSlug();
+    refreshLive();
   }
   setDirty(false);
   say("reverted");

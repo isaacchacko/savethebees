@@ -46,6 +46,15 @@
         <input id="meta-description" type="text" />
         <label for="meta-slug">url slug</label>
         <input id="meta-slug" type="text" />
+
+        <label class="meta-check">
+          <input id="meta-private" type="checkbox" />
+          <span>private — keep it off the site</span>
+        </label>
+        <p class="meta-warn" id="private-warn" hidden>
+          off the site, not secret: the file still sits in the repo, which is
+          public. anyone who looks can read it on github.
+        </p>
         <p class="slug-preview">saves as <code id="slug-preview"></code></p>
         <p class="meta-note">
           the slug is the filename and the url. changing it renames the file,

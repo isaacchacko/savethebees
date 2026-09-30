@@ -108,9 +108,9 @@ globalThis.fetch = async (url, init = {}) => {
   if (contents) {
     const wanted = decodeURIComponent(contents[1]);
     const tree = trees[commits[contents[2]].tree];
-    if (wanted === "content/learnings") {
+    if (wanted === "content/dumps") {
       return json(200, Object.keys(tree)
-        .filter((p) => p.startsWith("content/learnings/"))
+        .filter((p) => p.startsWith("content/dumps/"))
         .map((p) => ({ type: "file", name: p.split("/").pop() })));
     }
     if (!tree[wanted]) return json(404, { message: "Not Found" });
@@ -200,8 +200,8 @@ assert.equal(readJson().lists[0].items[0].title, "kept", "and so must ours");
 // the admin view's plain-file path
 await saveFiles("admin: edit about.md", [{ path: "content/pages/about.md", text: "# about\n" }]);
 assert.equal((await readFile("content/pages/about.md")).text, "# about\n");
-await saveFiles("add a write-up", [{ path: "content/learnings/x.md", text: "# x\n" }]);
-assert.deepEqual(await listDir("content/learnings"), ["x.md"]);
+await saveFiles("add a write-up", [{ path: "content/dumps/x.md", text: "# x\n" }]);
+assert.deepEqual(await listDir("content/dumps"), ["x.md"]);
 assert.equal((await readFile("content/pages/missing.md")).missing, true);
 
 // a conflict that never clears gives up instead of looping forever

@@ -2,10 +2,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Shell from "@/components/Shell";
 import Markdown from "@/components/Markdown";
-import { getLearning, getLearningSlugs } from "@/lib/learnings";
+import { getDump, getDumpSlugs } from "@/lib/dumps";
 
 export function generateStaticParams() {
-  return getLearningSlugs().map((slug) => ({ slug }));
+  return getDumpSlugs().map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({
@@ -14,30 +14,30 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const learning = getLearning(slug);
-  if (!learning) return { title: "learnings — isaacchacko.com" };
+  const dump = getDump(slug);
+  if (!dump) return { title: "dumps — isaacchacko.com" };
 
   return {
-    title: `${learning.title} — isaacchacko.com`,
-    description: learning.description || learning.title,
+    title: `${dump.title} — isaacchacko.com`,
+    description: dump.description || dump.title,
   };
 }
 
-export default async function LearningPage({
+export default async function DumpPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const learning = getLearning(slug);
-  if (!learning) notFound();
+  const dump = getDump(slug);
+  if (!dump) notFound();
 
   return (
     <Shell cmd={`cat ${slug}.md`}>
       <p style={{ marginTop: 0 }}>
-        <Link href="/learnings">← learnings</Link>
+        <Link href="/dumps">← dumps</Link>
       </p>
-      <Markdown content={learning.content} />
+      <Markdown content={dump.content} />
     </Shell>
   );
 }
