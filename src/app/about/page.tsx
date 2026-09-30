@@ -1,14 +1,14 @@
 import Shell from "@/components/Shell";
-import Likes from "@/components/Likes";
-import Dislikes from "@/components/Dislikes";
+import Markdown from "@/components/Markdown";
+import { getPage } from "@/lib/pages";
 
 export default function About() {
   return (
     <Shell cmd="cat about.txt">
-      <h2 style={{ marginTop: 0 }}>about</h2>
-      <Likes />
-      <div style={{ marginTop: "1.5rem" }}>
-        <Dislikes />
+      {/* tight-lists keeps the spacing the hand-written markup had, where each
+          heading sat right on top of its list */}
+      <div className="tight-lists">
+        <Markdown content={getPage("about")} />
       </div>
     </Shell>
   );

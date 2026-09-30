@@ -506,3 +506,19 @@ summary::marker {
   overflow: auto;
   box-shadow: 0 0 0 1px var(--background), 0 12px 40px rgba(0, 0, 0, 0.6);
 }
+
+/* The about page's lists used to be hand-written with their own tight margins:
+   a bold line sitting right on its list, and 1.5rem between the two sections.
+   Markdown gives every block the same rhythm, so this restores that spacing
+   exactly rather than letting the page reflow. */
+.tight-lists p {
+  margin: 0 0 0.5rem;
+}
+
+.tight-lists ul {
+  margin: 0 0 1.5rem;
+}
+
+.tight-lists ul:last-child {
+  margin-bottom: 0;
+}
