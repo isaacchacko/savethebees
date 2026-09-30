@@ -280,6 +280,10 @@ export function buildFrontMatter(fields) {
 export function slugify(title) {
   return (
     title
+      // decompose accents so they strip to their base letter rather than
+      // vanishing — "tïtle" should be "title", not "t-tle"
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "") || "untitled"

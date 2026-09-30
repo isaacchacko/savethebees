@@ -89,6 +89,13 @@ path and the old one's removal in a *single* commit, so the write-up is never
 briefly missing or briefly duplicated. It also breaks any existing link, and
 the editor says so rather than letting you find out later.
 
+The slug field takes whatever you type, spaces and all, because normalising
+every keystroke makes it impossible to type — a trailing space would be
+stripped before you reached the next word. It is tidied when you leave the
+field, and the filename it will actually become is shown underneath the whole
+time, so the field never quietly disagrees with what gets committed. Accents
+decompose to their base letter, so "café" is `cafe` rather than `caf`.
+
 A new write-up starts as a real file with front matter and a heading, so the
 index page, the editor and a later save all see the same shape as any other.
 Its slug follows the title while you are naming it, and stops the moment you

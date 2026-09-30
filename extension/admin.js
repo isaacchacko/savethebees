@@ -40,6 +40,7 @@ const metaFields = {
   description: document.getElementById("meta-description"),
 };
 const slugField = document.getElementById("meta-slug");
+const slugPreview = document.getElementById("slug-preview");
 const revertButton = document.getElementById("revert");
 const coolRoot = document.getElementById("cool");
 const coolView = createCoolView({ root: coolRoot, say });
@@ -113,6 +114,8 @@ async function openPath(path, { label } = {}) {
     if (isLearning) {
       for (const [key, input] of Object.entries(metaFields)) input.value = fields[key] || "";
       slugField.value = path.split("/").pop().replace(/\.md$/, "");
+      slugFollowsTitle = false;
+      showSlug();
     }
 
     doc.innerHTML = toHtml(body);
@@ -233,6 +236,7 @@ async function newLearning(files) {
         picker.hidden = true;
         hint.textContent = "";
         await openPath(`${LEARNINGS_DIR}/${name}`, { label: name });
+        slugFollowsTitle = true; // until you edit the slug yourself
         say("created — give it a description, then write", "ok");
       } catch (error) {
         create.disabled = false;
@@ -307,14 +311,37 @@ for (const input of [...Object.values(metaFields), slugField]) {
   });
 }
 
+/**
+ * The slug field takes whatever you type — spaces and all — because
+ * normalising each keystroke makes it impossible to type: a trailing space
+ * would be stripped before you reached the next word. It is normalised when
+ * you leave the field, and the filename it will actually become is shown
+ * underneath the whole time, so the field never quietly disagrees with what
+ * gets committed.
+ */
+function showSlug() {
+  const slug = slugify(slugField.value || metaFields.title.value || "untitled");
+  slugPreview.textContent = `${LEARNINGS_DIR}/${slug}.md`;
+}
+
 // typing a title for a new write-up names the file too, until you name it
 // yourself — after that the slug is yours and stops following along
 let slugFollowsTitle = false;
+
 metaFields.title.addEventListener("input", () => {
   if (slugFollowsTitle) slugField.value = slugify(metaFields.title.value);
+  showSlug();
 });
+
 slugField.addEventListener("input", () => {
   slugFollowsTitle = false;
+  showSlug();
+});
+
+slugField.addEventListener("blur", () => {
+  const slug = slugify(slugField.value || metaFields.title.value || "untitled");
+  if (slugField.value !== slug) slugField.value = slug;
+  showSlug();
 });
 
 // Rich paste would smuggle in markup the serializer does not handle, and
@@ -577,6 +604,7 @@ function revert() {
   if (current.isLearning) {
     for (const [key, input] of Object.entries(metaFields)) input.value = current.fields[key] || "";
     slugField.value = current.path.split("/").pop().replace(/\.md$/, "");
+    showSlug();
   }
   setDirty(false);
   say("reverted");
