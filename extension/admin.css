@@ -150,11 +150,15 @@ body {
 
 #doc > h1:first-child { margin-top: 0; }
 
+/* These markers are drawn, not typed, so there is no character to select or
+   delete. Taking them out of selection stops them behaving like text that
+   will not budge; backspace at the start of the line is what removes them. */
 #doc h1::before,
 #doc h2::before,
 #doc h3::before {
   content: "## ";
   color: var(--muted);
+  user-select: none;
 }
 
 #doc p { margin: 0 0 1em; }
@@ -173,6 +177,7 @@ body {
 #doc li::before {
   content: "─ ";
   color: var(--accent);
+  user-select: none;
 }
 
 #doc a {
@@ -212,3 +217,16 @@ body {
 
 #status[data-tone="error"] { color: var(--danger); }
 #status[data-tone="ok"] { color: var(--accent); }
+
+.legend {
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin: 0 0 1.25rem;
+  line-height: 1.5;
+}
+
+.legend code {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 0.05em 0.3em;
+}

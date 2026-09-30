@@ -59,6 +59,24 @@ conflict rather than an overwrite.
 Home is listed but not editable. It is a boid simulation, a spotify widget and
 live readme embeds — components, not prose, with nothing to type over.
 
+### The ─ and ## are drawn, not typed
+
+The bullet markers and heading hashes are CSS `::before`, the same as on the
+site, so there is no character there to select or backspace over. That makes a
+bullet a one-way door unless the editor does something about it:
+
+- **backspace at the very start of a line** turns a bullet or heading back into
+  plain text. A bullet in the middle of a list leaves the items either side in
+  lists of their own.
+- **type `- ` or `## ` at the start of a line** to make one. A line turned into
+  a bullet next to an existing list joins that list rather than starting a
+  second one touching it.
+- **enter on an empty bullet** leaves the list, and **enter at the end of a
+  heading** starts a paragraph rather than another heading.
+
+The two directions are exact inverses: adding a bullet and removing it again
+returns the document to the structure it started with.
+
 ### Why editing the rendered page is safe
 
 Saving rewrites the whole file from the DOM, so anything the serialiser cannot
