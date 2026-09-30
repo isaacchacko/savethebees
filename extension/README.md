@@ -59,6 +59,23 @@ conflict rather than an overwrite.
 Home is listed but not editable. It is a boid simulation, a spotify widget and
 live readme embeds — components, not prose, with nothing to type over.
 
+### The cool page, from the admin view
+
+The **cool** tab is the popup's manage view with room to breathe: every list is
+open at once, entries show their screenshot, url and note, and moving one
+between lists is a drag rather than a trip through a submenu. Lists and entries
+can both be added, edited and deleted, delete asks twice, and deleting an entry
+takes its screenshot with it — the same helpers the popup uses, so the conflict
+handling and the cleanup come along unchanged.
+
+Every action is its own commit, as in the popup. There is no save button here
+because there is nothing held back.
+
+One thing the popup can do that this cannot: **capture a screenshot**. That
+needs a tab showing the page, so an entry added from here has no image until
+you re-save it from the popup on the page itself. Thumbnails are loaded from
+the live site, so a brand new one stays blank until that commit has deployed.
+
 ### Learnings are files, so the admin view CRUDs them
 
 The learnings tab lists every write-up with a **del** next to it and a **+ new
@@ -204,6 +221,7 @@ really did commit underneath you. Try again.
 | `background.js`       | context menus and their handler                            |
 | `popup.js`            | the add form and the manage view                           |
 | `admin.js`            | the editable stand-in for the site                         |
+| `admin-cool.js`       | the cool page's lists and entries, editable                |
 | `markdown.js`         | markdown in, DOM out, and back again                       |
 | `themes.js`           | the site's wall-clock palette rotation                     |
 | `shot.js`             | screenshot capture and shrinking                           |

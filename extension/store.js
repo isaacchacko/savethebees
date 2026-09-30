@@ -10,6 +10,7 @@ const CONFIG_DEFAULTS = {
   repo: "savethebees",
   branch: "main",
   filePath: "content/cool.json",
+  site: "https://isaacchacko.com",
   token: "",
 };
 

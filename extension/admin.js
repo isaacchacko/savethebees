@@ -15,6 +15,7 @@ import {
   toMarkdown,
 } from "./markdown.js";
 import { followTheme } from "./themes.js";
+import { createCoolView } from "./admin-cool.js";
 
 followTheme();
 
@@ -24,6 +25,7 @@ const PAGES = [
   { id: "now", label: "now", path: "content/pages/now.md", cmd: "vim now.md" },
   { id: "running", label: "running", path: "content/pages/running.md", cmd: "vim races.md" },
   { id: "learnings", label: "learnings", cmd: "ls -l learnings/" },
+  { id: "cool", label: "cool", cmd: "vim cool.json" },
 ];
 
 const nav = document.getElementById("nav");
@@ -39,6 +41,8 @@ const metaFields = {
 };
 const slugField = document.getElementById("meta-slug");
 const revertButton = document.getElementById("revert");
+const coolRoot = document.getElementById("cool");
+const coolView = createCoolView({ root: coolRoot, say });
 const status = document.getElementById("status");
 const saveButton = document.getElementById("save");
 const dirtyFlag = document.getElementById("dirty");
@@ -257,6 +261,7 @@ function selectPage(page) {
   cwd.textContent = page.id === "home" ? "~" : `~/${page.id}`;
   cmd.textContent = page.cmd;
   picker.hidden = true;
+  coolRoot.hidden = true;
   hint.textContent = "";
   setDirty(false);
   current = null;
@@ -272,6 +277,16 @@ function selectPage(page) {
     return;
   }
   if (page.id === "learnings") return showLearnings();
+  if (page.id === "cool") {
+    coolRoot.hidden = false;
+    doc.contentEditable = "false";
+    doc.innerHTML = "";
+    legend.hidden = true;
+    meta.hidden = true;
+    hint.textContent =
+      "lists and entries, the same as the popup's manage tab. drag an entry onto another list to move it. every change is its own commit.";
+    return coolView.load();
+  }
   return openPath(page.path);
 }
 
