@@ -24,7 +24,7 @@ const PAGES = [
   { id: "about", label: "about", path: "content/pages/about.md", cmd: "vim about.md" },
   { id: "now", label: "now", path: "content/pages/now.md", cmd: "vim now.md" },
   { id: "running", label: "running", path: "content/pages/running.md", cmd: "vim races.md" },
-  { id: "dumps", label: "dumps", cmd: "ls -l dumps/" },
+  { id: "dumps", label: "yap", cmd: "ls -l dumps/" },
   { id: "cool", label: "cool", cmd: "vim cool.json" },
 ];
 

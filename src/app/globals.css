@@ -522,3 +522,25 @@ summary::marker {
 .tight-lists ul:last-child {
   margin-bottom: 0;
 }
+
+/* The yap index reads like an ls listing: title on the left, the month it was
+   written pushed to the right. The global marker hangs via text-indent, which
+   a flex row cannot carry, so ::before becomes the row's first item instead. */
+.yap-list li {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5em;
+  padding-left: 0;
+  text-indent: 0;
+}
+
+.yap-list li::before {
+  flex-shrink: 0;
+}
+
+.yap-date {
+  margin-left: auto;
+  flex-shrink: 0;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}

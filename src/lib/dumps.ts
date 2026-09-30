@@ -18,6 +18,16 @@ export type Dump = {
   content: string;
 };
 
+/**
+ * yaml reads an unquoted `date: 2026-09-30` as a Date, not a string, so taking
+ * only strings dropped every date on the floor — which is why the index never
+ * showed one and the newest-first sort did nothing.
+ */
+function isoDate(value: unknown): string {
+  if (value instanceof Date) return value.toISOString().slice(0, 10);
+  return typeof value === "string" ? value.trim() : "";
+}
+
 function isMarkdown(filename: string) {
   return filename.endsWith(".md");
 }
@@ -40,7 +50,7 @@ function read(slug: string): Dump | null {
   return {
     slug,
     title: typeof data.title === "string" ? data.title : slug,
-    date: typeof data.date === "string" ? data.date : "",
+    date: isoDate(data.date),
     description: typeof data.description === "string" ? data.description : "",
     private: data.private === true || data.private === "true",
     content,

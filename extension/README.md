@@ -108,7 +108,10 @@ the live site, so a brand new one stays blank until that commit has deployed.
 
 ### Dumps are files, so the admin view CRUDs them
 
-The dumps tab lists every dump with a **del** next to it and a **+ new
+The page is called **yap**; a single write-up is a dump. The route and the
+content directory stay `dumps`.
+
+The **yap** tab lists every dump with a **del** next to it and a **+ new
 write-up** button underneath. Delete asks twice, the same as everywhere else
 here.
 
