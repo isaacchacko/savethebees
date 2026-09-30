@@ -4,7 +4,7 @@
 // extension uses, so a change that landed elsewhere is a conflict, not an
 // overwrite.
 
-import { listDir, readFile, saveFiles } from "./store.js";
+import { getConfig, listDir, readFile, saveFiles } from "./store.js";
 import {
   buildFrontMatter,
   parseFrontMatter,
@@ -43,6 +43,7 @@ const slugField = document.getElementById("meta-slug");
 const slugPreview = document.getElementById("slug-preview");
 const revertButton = document.getElementById("revert");
 const coolRoot = document.getElementById("cool");
+const liveLink = document.getElementById("live");
 const coolView = createCoolView({ root: coolRoot, say });
 const status = document.getElementById("status");
 const saveButton = document.getElementById("save");
@@ -55,6 +56,18 @@ const LEARNINGS_DIR = "content/learnings";
 let current = null; // { path, fields, markdown, isLearning }
 let dirty = false;
 let arming = null; // the delete button waiting for a second click
+
+let siteUrl = "";
+
+/**
+ * Where the thing being edited lives on the real site. A write-up points at
+ * the path that is actually deployed — the saved one — because a slug you have
+ * typed but not committed is a url that does not exist yet.
+ */
+function setLive(path) {
+  liveLink.href = siteUrl + path;
+  liveLink.title = siteUrl + path;
+}
 
 function say(message, tone = "") {
   status.textContent = message;
@@ -116,6 +129,7 @@ async function openPath(path, { label } = {}) {
       slugField.value = path.split("/").pop().replace(/\.md$/, "");
       slugFollowsTitle = false;
       showSlug();
+      setLive(`/learnings/${slugField.value}`);
     }
 
     doc.innerHTML = toHtml(body);
@@ -263,6 +277,7 @@ function selectPage(page) {
     if (button.dataset.id === page.id) button.setAttribute("aria-current", "page");
   }
   cwd.textContent = page.id === "home" ? "~" : `~/${page.id}`;
+  setLive(page.id === "home" ? "/" : `/${page.id}`);
   cmd.textContent = page.cmd;
   picker.hidden = true;
   coolRoot.hidden = true;
@@ -588,6 +603,7 @@ async function save() {
     composed.lastSaved = next.text;
     setDirty(false);
     cmd.textContent = `vim ${name}`;
+    if (current.isLearning) setLive(`/learnings/${name.replace(/\.md$/, "")}`);
     say(renamed ? `saved as ${name} — the old url is gone` : "saved — vercel will rebuild in a minute or so", "ok");
   } catch (error) {
     saveButton.disabled = false;
@@ -631,4 +647,7 @@ nav.replaceChildren(
   })
 );
 
-selectPage(PAGES[1]); // land on about, the first editable page
+(async () => {
+  siteUrl = (await getConfig()).site.replace(/\/$/, "");
+  selectPage(PAGES[1]); // land on about, the first editable page
+})();

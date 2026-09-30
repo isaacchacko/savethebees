@@ -59,6 +59,20 @@ conflict rather than an overwrite.
 Home is listed but not editable. It is a boid simulation, a spotify widget and
 live readme embeds — components, not prose, with nothing to type over.
 
+### Seeing it live
+
+**live ↗** in the titlebar opens whatever you are editing on the real site, in
+a new tab — `/about`, `/cool`, `/learnings/<slug>`, and so on. It is an anchor
+rather than a button so the url is there to copy or middle-click.
+
+For a write-up it points at the *saved* slug, not the one sitting in the field.
+A slug you have typed but not committed is a url that does not exist yet, and
+the link would 404; the filename preview under the field is where you see the
+pending one. After a rename it follows to the new url.
+
+The site it points at is the **site url** in options, which defaults to
+isaacchacko.com.
+
 ### The cool page, from the admin view
 
 The **cool** tab is the popup's manage view with room to breathe: every list is

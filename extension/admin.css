@@ -93,6 +93,25 @@ body {
   color: var(--danger);
 }
 
+/* an anchor rather than a button, so it opens in a tab the ordinary way and
+   the url is there to copy or middle-click */
+.live {
+  color: var(--muted);
+  text-decoration: none;
+  border: 1px solid var(--border);
+  padding: 0.15rem 0.5rem;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    color 120ms ease;
+}
+
+.live:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--background);
+}
+
 /* ───────────────────────────── the page ───────────────────────────── */
 
 .prompt {

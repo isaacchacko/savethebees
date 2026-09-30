@@ -3,7 +3,7 @@ import { followTheme } from "./themes.js";
 
 followTheme();
 
-const FIELDS = ["owner", "repo", "branch", "filePath", "token"];
+const FIELDS = ["owner", "repo", "branch", "filePath", "site", "token"];
 const status = document.getElementById("status");
 
 function say(message, tone = "") {
