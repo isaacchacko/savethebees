@@ -59,6 +59,28 @@ conflict rather than an overwrite.
 Home is listed but not editable. It is a boid simulation, a spotify widget and
 live readme embeds — components, not prose, with nothing to type over.
 
+### Learnings are files, so the admin view CRUDs them
+
+The learnings tab lists every write-up with a **del** next to it and a **+ new
+write-up** button underneath. Delete asks twice, the same as everywhere else
+here.
+
+Opening one shows its front matter — title, date, description — above the
+prose, because those are what the index page reads, not the body. The **url
+slug** is the filename. Changing it renames the file, which lands as the new
+path and the old one's removal in a *single* commit, so the write-up is never
+briefly missing or briefly duplicated. It also breaks any existing link, and
+the editor says so rather than letting you find out later.
+
+A new write-up starts as a real file with front matter and a heading, so the
+index page, the editor and a later save all see the same shape as any other.
+Its slug follows the title while you are naming it, and stops the moment you
+edit the slug yourself.
+
+**revert** sits next to save and throws away everything unsaved — prose and
+front matter both — back to what was last loaded or saved. It touches nothing
+in the repo.
+
 ### The ─ and ## are drawn, not typed
 
 The bullet markers and heading hashes are CSS `::before`, the same as on the

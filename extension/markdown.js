@@ -241,4 +241,49 @@ export function roundTrips(markdown, makeHost) {
   return { ok: norm(back) === norm(markdown), got: back };
 }
 
+// ────────────────────────────── front matter ──────────────────────────────
+// gray-matter reads these on the site, so keep to plain `key: value` and quote
+// anything that would otherwise change the meaning.
+
+export function parseFrontMatter(front) {
+  const fields = {};
+  for (const line of front.split("\n")) {
+    const match = /^(\w+):\s*(.*)$/.exec(line);
+    if (!match) continue;
+    let value = match[2].trim();
+    if (/^".*"$/.test(value) || /^'.*'$/.test(value)) {
+      try {
+        value = JSON.parse(value.replace(/^'|'$/g, '"'));
+      } catch {
+        value = value.slice(1, -1);
+      }
+    }
+    fields[match[1]] = value;
+  }
+  return fields;
+}
+
+function yamlValue(value) {
+  const text = String(value ?? "");
+  // a colon-space, a leading #, or edge whitespace would all change the parse
+  return /:\s|^#|^\s|\s$|^$|^["'[{]/.test(text) ? JSON.stringify(text) : text;
+}
+
+export function buildFrontMatter(fields) {
+  const lines = Object.entries(fields)
+    .filter(([, value]) => String(value ?? "").length)
+    .map(([key, value]) => `${key}: ${yamlValue(value)}`);
+  return lines.length ? `---\n${lines.join("\n")}\n---\n\n` : "";
+}
+
+/** A filename for a write-up, from its title. */
+export function slugify(title) {
+  return (
+    title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "") || "untitled"
+  );
+}
+
 export { escapeMarkdown, unescapeMarkdown };

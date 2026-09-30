@@ -230,3 +230,89 @@ body {
   border: 1px solid var(--border);
   padding: 0.05em 0.3em;
 }
+
+/* front matter for a learnings write-up: the fields the index page reads */
+.meta {
+  border: 1px solid var(--border);
+  padding: 0.75rem 1rem 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.meta label {
+  display: block;
+  margin-top: 0.6rem;
+  color: var(--muted);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+}
+
+.meta label:first-child { margin-top: 0; }
+
+.meta label::before { content: "> "; }
+
+.meta input {
+  width: 100%;
+  font: inherit;
+  font-size: 0.9rem;
+  color: var(--foreground);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 0.25rem 0.45rem;
+}
+
+.meta input:focus {
+  outline: 1px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.meta-note {
+  margin: 0.75rem 0 0;
+  color: var(--muted);
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+/* the write-up list */
+.picker .row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.35rem;
+}
+
+/* the full-width rule above is for the standalone buttons; inside a row the
+   name should take the slack and del should stay the size of its label */
+.picker .row button {
+  width: auto;
+  margin-bottom: 0;
+}
+
+.picker .row button:first-child {
+  flex: 1;
+  text-align: left;
+}
+
+.picker .danger:hover {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: var(--background);
+}
+
+.picker .new {
+  margin-top: 0.75rem;
+}
+
+.picker input {
+  flex: 1;
+  font: inherit;
+  font-size: 0.9rem;
+  color: var(--foreground);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 0.25rem 0.45rem;
+}
+
+.picker input:focus {
+  outline: 1px solid var(--accent);
+  outline-offset: 1px;
+}

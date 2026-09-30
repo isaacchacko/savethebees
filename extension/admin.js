@@ -5,7 +5,15 @@
 // overwrite.
 
 import { listDir, readFile, saveFiles } from "./store.js";
-import { roundTrips, splitFrontMatter, toHtml, toMarkdown } from "./markdown.js";
+import {
+  buildFrontMatter,
+  parseFrontMatter,
+  roundTrips,
+  slugify,
+  splitFrontMatter,
+  toHtml,
+  toMarkdown,
+} from "./markdown.js";
 import { followTheme } from "./themes.js";
 
 followTheme();
@@ -23,14 +31,25 @@ const doc = document.getElementById("doc");
 const picker = document.getElementById("picker");
 const hint = document.getElementById("hint");
 const legend = document.getElementById("legend");
+const meta = document.getElementById("meta");
+const metaFields = {
+  title: document.getElementById("meta-title"),
+  date: document.getElementById("meta-date"),
+  description: document.getElementById("meta-description"),
+};
+const slugField = document.getElementById("meta-slug");
+const revertButton = document.getElementById("revert");
 const status = document.getElementById("status");
 const saveButton = document.getElementById("save");
 const dirtyFlag = document.getElementById("dirty");
 const cwd = document.getElementById("cwd");
 const cmd = document.getElementById("cmd");
 
-let current = null; // { path, front, markdown }
+const LEARNINGS_DIR = "content/learnings";
+
+let current = null; // { path, fields, markdown, isLearning }
 let dirty = false;
+let arming = null; // the delete button waiting for a second click
 
 function say(message, tone = "") {
   status.textContent = message;
@@ -41,6 +60,7 @@ function setDirty(value) {
   dirty = value;
   dirtyFlag.hidden = !value;
   saveButton.disabled = !value;
+  revertButton.disabled = !value;
 }
 
 function el(tag, props = {}, children = []) {
@@ -55,9 +75,11 @@ async function openPath(path, { label } = {}) {
   say("loading…");
   doc.contentEditable = "false";
   legend.hidden = true;
+  meta.hidden = true;
   try {
     const { text } = await readFile(path);
     const { front, body } = splitFrontMatter(text);
+    const isLearning = path.startsWith(`${LEARNINGS_DIR}/`);
 
     // Refuse to edit anything this editor cannot reproduce byte for byte.
     // Saving is a full rewrite of the file, so a construct the renderer does
@@ -73,19 +95,29 @@ async function openPath(path, { label } = {}) {
       doc.innerHTML = toHtml(body);
       doc.contentEditable = "false";
       legend.hidden = true;
+      meta.hidden = true;
       hint.textContent =
         "read-only: this file uses markdown the editor cannot write back exactly, so editing it here would lose something. edit it in the repo instead.";
       say("not editable", "error");
       return;
     }
 
-    current = { path, front, markdown: body };
+    const fields = parseFrontMatter(front);
+    current = { path, fields, markdown: body, isLearning };
+
+    meta.hidden = !isLearning;
+    if (isLearning) {
+      for (const [key, input] of Object.entries(metaFields)) input.value = fields[key] || "";
+      slugField.value = path.split("/").pop().replace(/\.md$/, "");
+    }
+
     doc.innerHTML = toHtml(body);
     doc.contentEditable = "true";
     legend.hidden = false;
     setDirty(false);
+    composed.lastSaved = null;
     cmd.textContent = `vim ${label || path.split("/").pop()}`;
-    say(front ? "front matter is kept as-is; edit the prose" : "");
+    say("");
   } catch (error) {
     doc.innerHTML = "";
     say(error.message, "error");
@@ -97,29 +129,122 @@ async function showLearnings() {
   doc.innerHTML = "";
   doc.contentEditable = "false";
   legend.hidden = true;
+  meta.hidden = true;
   current = null;
+  arming = null;
   setDirty(false);
-  hint.textContent = "each write-up is a markdown file. pick one to edit.";
+  hint.textContent = "each write-up is a markdown file.";
   say("loading…");
+
   try {
-    const files = await listDir("content/learnings");
-    picker.replaceChildren(
-      ...files.map((name) =>
-        el("button", {
-          type: "button",
-          textContent: name.replace(/\.md$/, ""),
-          onclick: () => {
-            picker.hidden = true;
-            hint.textContent = "";
-            openPath(`content/learnings/${name}`, { label: name });
-          },
-        })
-      )
-    );
-    say(files.length ? "" : "no write-ups yet");
+    const files = await listDir(LEARNINGS_DIR);
+    renderLearnings(files);
+    say("");
   } catch (error) {
     say(error.message, "error");
   }
+}
+
+function renderLearnings(files) {
+  const rows = files.map((name) => {
+    const open = el("button", {
+      type: "button",
+      textContent: name.replace(/\.md$/, ""),
+      onclick: () => {
+        picker.hidden = true;
+        hint.textContent = "";
+        openPath(`${LEARNINGS_DIR}/${name}`, { label: name });
+      },
+    });
+
+    const armed = arming === name;
+    const remove = el("button", {
+      className: "danger",
+      textContent: armed ? "sure?" : "del",
+      onclick: () => {
+        if (!armed) {
+          arming = name;
+          return renderLearnings(files);
+        }
+        deleteLearning(name, files);
+      },
+    });
+
+    return el("div", { className: "row" }, [open, remove]);
+  });
+
+  rows.push(
+    el("button", {
+      className: "new",
+      type: "button",
+      textContent: "+ new write-up",
+      onclick: () => newLearning(files),
+    })
+  );
+
+  picker.replaceChildren(...rows);
+}
+
+async function deleteLearning(name, files) {
+  arming = null;
+  say(`deleting ${name}…`);
+  try {
+    await saveFiles(`admin: delete ${name}`, [
+      { path: `${LEARNINGS_DIR}/${name}`, remove: true },
+    ]);
+    renderLearnings(files.filter((file) => file !== name));
+    say(`deleted ${name}`, "ok");
+  } catch (error) {
+    renderLearnings(files);
+    say(error.message, "error");
+  }
+}
+
+/**
+ * A new write-up starts as a real file so everything downstream — the index
+ * page, the editor, a save — sees the same shape as any other.
+ */
+async function newLearning(files) {
+  const title = el("input", { type: "text", placeholder: "what did you learn?" });
+  const create = el("button", {
+    type: "button",
+    textContent: "create",
+    onclick: async () => {
+      const text = title.value.trim();
+      if (!text) return say("give it a title first", "error");
+
+      const slug = slugify(text);
+      const name = `${slug}.md`;
+      if (files.includes(name)) return say(`${name} already exists`, "error");
+
+      create.disabled = true;
+      say("creating…");
+      const today = new Date().toISOString().slice(0, 10);
+      const body =
+        buildFrontMatter({ title: text, date: today, description: "" }) +
+        `# ${text}\n\nstart here.\n`;
+
+      try {
+        await saveFiles(`admin: add ${name}`, [{ path: `${LEARNINGS_DIR}/${name}`, text: body }]);
+        picker.hidden = true;
+        hint.textContent = "";
+        await openPath(`${LEARNINGS_DIR}/${name}`, { label: name });
+        say("created — give it a description, then write", "ok");
+      } catch (error) {
+        create.disabled = false;
+        say(error.message, "error");
+      }
+    },
+  });
+
+  picker.replaceChildren(
+    el("div", { className: "row" }, [
+      title,
+      create,
+      el("button", { type: "button", textContent: "cancel", onclick: () => renderLearnings(files) }),
+    ])
+  );
+  title.focus();
 }
 
 function selectPage(page) {
@@ -140,6 +265,7 @@ function selectPage(page) {
     doc.contentEditable = "false";
     doc.innerHTML = "";
     legend.hidden = true;
+    meta.hidden = true;
     hint.textContent =
       "home is a boid simulation, a spotify widget and live readme embeds — components, not prose, so there is nothing here to type over. the other four pages are markdown.";
     say("");
@@ -158,6 +284,22 @@ function confirmDiscard() {
 
 doc.addEventListener("input", () => {
   if (current) setDirty(true);
+});
+
+for (const input of [...Object.values(metaFields), slugField]) {
+  input.addEventListener("input", () => {
+    if (current) setDirty(true);
+  });
+}
+
+// typing a title for a new write-up names the file too, until you name it
+// yourself — after that the slug is yours and stops following along
+let slugFollowsTitle = false;
+metaFields.title.addEventListener("input", () => {
+  if (slugFollowsTitle) slugField.value = slugify(metaFields.title.value);
+});
+slugField.addEventListener("input", () => {
+  slugFollowsTitle = false;
 });
 
 // Rich paste would smuggle in markup the serializer does not handle, and
@@ -359,33 +501,74 @@ doc.addEventListener("keydown", (event) => {
   }
 });
 
+/** What the file would look like if saved right now. */
+function composed() {
+  const body = toMarkdown(doc);
+  if (!current.isLearning) return { text: body, path: current.path };
+
+  const fields = Object.fromEntries(
+    Object.entries(metaFields).map(([key, input]) => [key, input.value.trim()])
+  );
+  const slug = slugify(slugField.value || fields.title || "untitled");
+  return {
+    text: buildFrontMatter(fields) + body,
+    path: `${LEARNINGS_DIR}/${slug}.md`,
+    fields,
+  };
+}
+
 async function save() {
   if (!current || !dirty) return;
 
-  const body = toMarkdown(doc);
-  const next = current.front + body;
-  if (next === current.front + current.markdown) {
+  const next = composed();
+  const renamed = next.path !== current.path;
+
+  if (!renamed && next.text === composed.lastSaved) {
     setDirty(false);
-    say("nothing changed");
-    return;
+    return say("nothing changed");
   }
 
   saveButton.disabled = true;
+  revertButton.disabled = true;
   say("saving…");
+
+  // a rename is the new file and the old one's removal in a single commit, so
+  // the write-up is never briefly absent or briefly duplicated
+  const files = [{ path: next.path, text: next.text }];
+  if (renamed) files.push({ path: current.path, remove: true });
+
+  const name = next.path.split("/").pop();
   try {
-    await saveFiles(`admin: edit ${current.path.split("/").pop()}`, [
-      { path: current.path, text: next },
-    ]);
-    current.markdown = body;
+    await saveFiles(renamed ? `admin: rename ${current.path.split("/").pop()} to ${name}` : `admin: edit ${name}`, files);
+    current.path = next.path;
+    current.markdown = toMarkdown(doc);
+    if (next.fields) current.fields = next.fields;
+    composed.lastSaved = next.text;
     setDirty(false);
-    say("saved — vercel will rebuild in a minute or so", "ok");
+    cmd.textContent = `vim ${name}`;
+    say(renamed ? `saved as ${name} — the old url is gone` : "saved — vercel will rebuild in a minute or so", "ok");
   } catch (error) {
     saveButton.disabled = false;
+    revertButton.disabled = false;
     say(error.message, "error");
   }
 }
 
+/** Back to what was last loaded or saved, without touching the repo. */
+function revert() {
+  if (!current || !dirty) return;
+
+  doc.innerHTML = toHtml(current.markdown);
+  if (current.isLearning) {
+    for (const [key, input] of Object.entries(metaFields)) input.value = current.fields[key] || "";
+    slugField.value = current.path.split("/").pop().replace(/\.md$/, "");
+  }
+  setDirty(false);
+  say("reverted");
+}
+
 saveButton.onclick = save;
+revertButton.onclick = revert;
 
 window.addEventListener("beforeunload", (event) => {
   if (dirty) event.preventDefault();

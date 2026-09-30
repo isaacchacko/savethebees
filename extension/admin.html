@@ -16,6 +16,7 @@
         <ul class="nav-links" id="nav"></ul>
         <span class="titlebar-right">
           <span id="dirty" class="dirty" hidden>unsaved</span>
+          <button type="button" id="revert" disabled>revert</button>
           <button type="button" id="save" disabled>save</button>
         </span>
       </nav>
@@ -34,6 +35,21 @@
         <code>## </code> at the start of a line to make one.
       </p>
       <p id="hint" class="hint"></p>
+
+      <div id="meta" class="meta" hidden>
+        <label for="meta-title">title</label>
+        <input id="meta-title" type="text" />
+        <label for="meta-date">date</label>
+        <input id="meta-date" type="text" placeholder="2026-09-30" />
+        <label for="meta-description">description</label>
+        <input id="meta-description" type="text" />
+        <label for="meta-slug">url slug</label>
+        <input id="meta-slug" type="text" />
+        <p class="meta-note">
+          the slug is the filename and the url. changing it renames the file,
+          so any existing link to this write-up stops working.
+        </p>
+      </div>
       <div id="picker" class="picker" hidden></div>
       <main id="doc"></main>
       <p id="status"></p>
