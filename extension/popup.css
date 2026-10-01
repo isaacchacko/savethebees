@@ -201,19 +201,167 @@ button:focus-visible {
   accent-color: var(--accent);
 }
 
-/* The thumbnail is only there to confirm what got captured, and a tall browser
-   window makes a tall one — left uncapped it pushes save past the 600px chrome
-   allows a popup, where it cannot be reached. Cropped from the top, since
-   that's the recognisable part of a page. */
+/* Chrome measures the popup once, at first paint, and does not reliably grow
+   it afterwards. Capture is async, so an <img> with no reserved size is 0px
+   when that measurement happens and ~9rem a moment later — the popup keeps the
+   smaller size and the buttons end up below the fold. A definite height means
+   the document is its final size from the start.
+
+   Cropped from the top, since that is the recognisable part of a page, and
+   capped because a tall browser window makes a tall capture. The ceiling is
+   chrome's 800px popup, which leaves room for this at 9rem. */
 #shot-preview {
   display: block;
   width: 100%;
-  max-height: 7rem;
+  height: 9rem;
   object-fit: cover;
   object-position: top;
   margin-top: 0.4rem;
   border: 1px solid var(--border);
+  background: var(--surface);
 }
+
+/* an id selector outweighs [hidden], so a page that cannot be captured would
+   otherwise still reserve the whole slot */
+#shot-preview[hidden] {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body,
+  input,
+  select,
+  button,
+  .list,
+  .list-head,
+  #shot-preview {
+    transition: none;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  width: 22rem;
+  margin: 0;
+  padding: 0.75rem;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.35rem;
+  border-bottom: 1px dashed var(--border);
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.tabs .right {
+  margin-left: auto;
+}
+
+button {
+  font: inherit;
+  color: var(--muted);
+  background: none;
+  border: 1px solid var(--border);
+  padding: 0.15rem 0.5rem;
+  cursor: pointer;
+  /* overrides the 600ms handover above — hover has to feel immediate, the way
+     links do on the site */
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    color 120ms ease;
+}
+
+button:hover {
+  color: var(--background);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+button.on {
+  color: var(--background);
+  background: var(--foreground);
+  border-color: var(--foreground);
+}
+
+button.primary {
+  width: 100%;
+  margin-top: 0.75rem;
+  padding: 0.35rem;
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+button.danger:hover {
+  background: var(--danger);
+  border-color: var(--danger);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+label {
+  display: block;
+  margin-top: 0.5rem;
+  color: var(--muted);
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+}
+
+label::before {
+  content: "> ";
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  font: inherit;
+  color: var(--foreground);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 0.25rem 0.4rem;
+}
+
+input:focus,
+select:focus,
+button:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+}
+
+.check::before {
+  content: none;
+}
+
+.check input {
+  width: auto;
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+/* The thumbnail is only there to confirm what got captured, and a tall browser
+   window makes a tall one — left uncapped it pushes save past the 600px chrome
+   allows a popup, where it cannot be reached. Cropped from the top, since
+   that's the recognisable part of a page. */
 
 /* ─────────────────────────────  manage view  ───────────────────────────── */
 

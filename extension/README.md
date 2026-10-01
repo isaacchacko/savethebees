@@ -240,6 +240,11 @@ Two cases get no screenshot, and both save fine without one:
 
 Uncheck **screenshot** in the popup to skip it for a single save.
 
+The thumbnail's slot is reserved in css rather than left to the image. Chrome
+measures a popup once, at first paint, and capture is async — an image with no
+reserved size is 0px when that measurement happens and 9rem a moment later, so
+the popup keeps the smaller size and the buttons end up below the fold.
+
 ## How a save works
 
 Read the branch head, read `cool.json` at that commit, apply the change, then
