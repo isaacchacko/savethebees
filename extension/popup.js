@@ -405,6 +405,8 @@ for (const tab of document.querySelectorAll(".tabs [data-view]")) {
       other.classList.toggle("on", other === tab);
       document.getElementById(`view-${other.dataset.view}`).hidden = other !== tab;
     }
+    // save is pinned in the footer now, but it only applies to the add form
+    document.getElementById("save").hidden = tab.dataset.view !== "add";
   };
 }
 

@@ -47,6 +47,15 @@ see it. Moving keeps the entry's id, so its screenshot stays where it is rather
 than being rewritten under a new name. There is no reordering within a list —
 only moving between them.
 
+## The popup is a fixed size
+
+A popup is bounded by the browser window, not only by chrome's 800px, which on
+a laptop works out around 600. Sizing it from its content therefore meant
+guessing, and guessing wrong cut the buttons off the bottom. It is 34rem tall
+instead: the form scrolls and the buttons are pinned under it, so nothing is
+ever unreachable whatever the screen. Save is pinned too, and hides on the
+manage tab where it has nothing to do.
+
 ## Admin view
 
 When the tab you are on *is* the site, the popup also offers **edit this page**
@@ -240,10 +249,8 @@ Two cases get no screenshot, and both save fine without one:
 
 Uncheck **screenshot** in the popup to skip it for a single save.
 
-The thumbnail's slot is reserved in css rather than left to the image. Chrome
-measures a popup once, at first paint, and capture is async — an image with no
-reserved size is 0px when that measurement happens and 9rem a moment later, so
-the popup keeps the smaller size and the buttons end up below the fold.
+The thumbnail's slot is reserved in css rather than left to the image, since
+capture is async and chrome measures a popup once, at first paint.
 
 ## How a save works
 

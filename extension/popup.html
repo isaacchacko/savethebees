@@ -11,6 +11,7 @@
       <button type="button" id="settings" class="right" title="options">opts</button>
     </nav>
 
+    <div class="scroll">
     <section id="view-add">
       <label for="list">list</label>
       <select id="list"></select>
@@ -38,20 +39,24 @@
       </label>
       <img id="shot-preview" alt="" hidden />
 
-      <button type="button" id="save" class="primary">save</button>
-
-      <p class="or"><span>OR</span></p>
-
-      <button type="button" id="edit-this" class="primary" hidden>edit this page</button>
-      <button type="button" id="admin" class="primary">edit website</button>
     </section>
 
     <section id="view-manage" hidden>
       <div id="lists"></div>
       <button type="button" id="add-list">+ new list</button>
     </section>
+    </div>
 
-    <p id="status"></p>
+    <footer class="actions">
+      <button type="button" id="save" class="primary">save</button>
+
+      <p class="or"><span>OR</span></p>
+
+      <button type="button" id="edit-this" class="primary" hidden>edit this page</button>
+      <button type="button" id="admin" class="primary">edit website</button>
+
+      <p id="status"></p>
+    </footer>
 
     <script type="module" src="popup.js"></script>
   </body>
