@@ -524,8 +524,7 @@ summary::marker {
 }
 
 /* The yap index reads like an ls listing: title on the left, the month it was
-   written pushed to the right. The global marker hangs via text-indent, which
-   a flex row cannot carry, so ::before becomes the row's first item instead. */
+   written pushed to the right, and no bullet in front of either. */
 .yap-list li {
   display: flex;
   align-items: baseline;
@@ -535,7 +534,7 @@ summary::marker {
 }
 
 .yap-list li::before {
-  flex-shrink: 0;
+  content: none;
 }
 
 .yap-date {
