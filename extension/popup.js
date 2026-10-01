@@ -3,6 +3,7 @@ import {
   addList,
   fetchCool,
   getCached,
+  getConfig,
   moveItem,
   mutate,
   removeItem,
@@ -13,6 +14,7 @@ import {
   updateList,
 } from "./store.js";
 import { capture } from "./shot.js";
+import { editorFor, isOwnSite } from "./site-paths.js";
 import { followTheme } from "./themes.js";
 
 followTheme();
@@ -407,10 +409,32 @@ for (const tab of document.querySelectorAll(".tabs [data-view]")) {
 }
 
 document.getElementById("settings").onclick = () => chrome.runtime.openOptionsPage();
-document.getElementById("admin").onclick = () => {
-  chrome.tabs.create({ url: chrome.runtime.getURL("admin.html") });
+function openAdmin(path) {
+  const base = chrome.runtime.getURL("admin.html");
+  chrome.tabs.create({ url: path ? `${base}?path=${encodeURIComponent(path)}` : base });
   window.close();
-};
+}
+
+document.getElementById("admin").onclick = () => openAdmin();
+
+/**
+ * "edit this page" only appears when the tab is on the site and the path is
+ * something the admin view can actually edit — not home, not /arch, not a 404.
+ */
+async function offerEditThisPage() {
+  const button = document.getElementById("edit-this");
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  if (!tab?.url) return;
+
+  const { site } = await getConfig();
+  if (!isOwnSite(tab.url, site)) return;
+
+  const { pathname } = new URL(tab.url);
+  if (!editorFor(pathname)) return;
+
+  button.hidden = false;
+  button.onclick = () => openAdmin(pathname);
+}
 document.getElementById("save").onclick = save;
 listSelect.onchange = syncNewListRow;
 
@@ -426,6 +450,7 @@ document.getElementById("add-list").onclick = () => {
     render();
   }
   await prefillFromTab();
+  await offerEditThisPage();
   await grabShot();
 
   say("loading lists…");

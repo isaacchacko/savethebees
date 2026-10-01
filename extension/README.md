@@ -49,7 +49,14 @@ only moving between them.
 
 ## Admin view
 
-The popup's **admin view** button opens a stand-in for the site you can type
+When the tab you are on *is* the site, the popup also offers **edit this page**
+above that, which opens the admin view already on whatever you were reading —
+straight into a dump's editor rather than its list. It only appears when the
+path is something the admin view can actually edit, so not on home, not on
+/arch, and not on another site. `site-paths.js` holds that mapping, shared so
+the popup and the admin view cannot disagree about it.
+
+The popup's **edit website** button opens a stand-in for the site you can type
 into: the same shell, the same palette, the same markdown rendering, with
 about, now, running and the dumps editable in place. Type over
 the text, hit save (or cmd-S), and it commits to `content/` — same conditional
@@ -262,6 +269,7 @@ really did commit underneath you. Try again.
 | `popup.js`            | the add form and the manage view                           |
 | `admin.js`            | the editable stand-in for the site                         |
 | `admin-cool.js`       | the cool page's lists and entries, editable                |
+| `site-paths.js`       | which admin page edits which url on the site               |
 | `markdown.js`         | markdown in, DOM out, and back again                       |
 | `themes.js`           | the site's wall-clock palette rotation                     |
 | `shot.js`             | screenshot capture and shrinking                           |

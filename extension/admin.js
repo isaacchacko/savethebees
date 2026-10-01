@@ -16,6 +16,7 @@ import {
 } from "./markdown.js";
 import { followTheme } from "./themes.js";
 import { createCoolView } from "./admin-cool.js";
+import { editorFor } from "./site-paths.js";
 
 followTheme();
 
@@ -672,7 +673,28 @@ nav.replaceChildren(
   })
 );
 
+/**
+ * Opened from "edit this page" with the path you were looking at, so land on
+ * that rather than making you find it again. A dump opens straight into its
+ * own editor instead of the list.
+ */
+async function openRequested() {
+  const asked = new URLSearchParams(location.search).get("path");
+  const target = asked ? editorFor(asked) : null;
+  if (!target) return selectPage(PAGES[1]); // about, the first editable page
+
+  const page = PAGES.find((candidate) => candidate.id === target.page);
+  if (!page) return selectPage(PAGES[1]);
+
+  await selectPage(page);
+  if (!target.slug) return;
+
+  picker.hidden = true;
+  hint.textContent = "";
+  await openPath(`${DUMPS_DIR}/${target.slug}.md`, { label: `${target.slug}.md` });
+}
+
 (async () => {
   siteUrl = (await getConfig()).site.replace(/\/$/, "");
-  selectPage(PAGES[1]); // land on about, the first editable page
+  await openRequested();
 })();
