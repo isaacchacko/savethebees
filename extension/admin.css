@@ -6,8 +6,19 @@
   --editing: color-mix(in srgb, var(--accent) 12%, transparent);
 }
 
+/* popup.css pins the popup to a fixed height with overflow hidden, because a
+   popup cannot be scrolled by the window. This is a full tab, so undo all of
+   that — inheriting it clipped the page at 34rem and left the longer tabs,
+   cool especially, with no way to scroll. */
+html {
+  height: auto;
+}
+
 body {
   width: auto;
+  height: auto;
+  display: block;
+  overflow: visible;
   margin: 0;
   padding: 0;
   font-size: 1rem;
