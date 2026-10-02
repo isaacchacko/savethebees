@@ -1,89 +1,31 @@
-/* The palettes mirror src/app/globals.css and the rotation mirrors
-   src/lib/themes.ts, so the popup wears whatever the site is wearing. themes.js
-   stamps data-theme on <html>; :root repeats the first palette as the fallback
-   for the instant before it runs.
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap");
 
-   --danger is the one colour the site has no equivalent for, so each palette
-   picks its own: dark on the light themes, light on the dark ones. */
-:root,
-[data-theme="pink"] {
-  --background: #ff5fa8;
-  --surface: #ff86c2;
-  --foreground: #1a0610;
-  --muted: #5c1636;
-  --accent: #3d0c24;
-  --border: #b3306e;
-  --danger: #570a1c;
-}
+/* The palette is the site's, copied from src/app/globals.css: one pale card
+   over a green field. Change one and change the other. The popup is the card,
+   so it is paper with ink on it.
 
-[data-theme="banana"] {
-  --background: #ffd93b;
-  --surface: #ffe680;
-  --foreground: #241d00;
-  --muted: #5c4a00;
-  --accent: #3d3000;
-  --border: #c9a400;
-  --danger: #7a1500;
-}
-
-[data-theme="dryft"] {
-  --background: #0b2545;
-  --surface: #12355e;
-  --foreground: #d6e8ff;
-  --muted: #7ea6d6;
-  --accent: #6fb3ff;
-  --border: #1f4d85;
-  --danger: #ff9e9e;
-}
-
-[data-theme="maroon"] {
-  --background: #500000;
-  --surface: #6b1212;
-  --foreground: #f2e4e4;
-  --muted: #d09a9a;
-  --accent: #ff9e9e;
-  --border: #7d2626;
-  --danger: #ffc9c9;
-}
-
-[data-theme="matcha"] {
-  --background: #a3c585;
-  --surface: #bfd9a8;
-  --foreground: #12200a;
-  --muted: #2e441a;
-  --accent: #1f3311;
-  --border: #6d9149;
-  --danger: #5c1000;
-}
-
-/* the same 600ms handover the site uses, for a rollover with the popup open */
-body,
-input,
-select,
-button,
-.list,
-.list-head,
-#shot-preview {
-  transition:
-    background-color 600ms ease,
-    border-color 600ms ease,
-    color 600ms ease;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  body,
-  input,
-  select,
-  button,
-  .list,
-  .list-head,
-  #shot-preview {
-    transition: none;
-  }
+   --danger is the one colour the site has no name for; it borrows the site's
+   one warm colour, the terracotta it uses for alerts. */
+:root {
+  --field: #a3c585;
+  --ink: #12200a;
+  --paper: #eef3e6;
+  --rule: #c9d8b7;
+  --muted: #4a5e3a;
+  --code: #dfe9d2;
+  --tile: #b9d69e;
+  --accent: #b9654c;
+  --danger: var(--accent);
+  --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
 * {
   box-sizing: border-box;
+}
+
+::selection {
+  background: var(--ink);
+  color: var(--paper);
 }
 
 /* A popup is capped by the browser window, not just chrome's 800px, and the
@@ -102,11 +44,23 @@ body {
   overflow: hidden;
   margin: 0;
   padding: 0.75rem;
-  background: var(--background);
-  color: var(--foreground);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--mono);
   font-size: 0.8rem;
   line-height: 1.5;
+}
+
+a {
+  color: var(--ink);
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+}
+
+a:hover {
+  background: var(--ink);
+  color: var(--paper);
+  text-decoration: none;
 }
 
 .scroll {
@@ -116,57 +70,74 @@ body {
   overscroll-behavior: contain;
 }
 
+.scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scroll::-webkit-scrollbar-track {
+  background: var(--rule);
+}
+
+.scroll::-webkit-scrollbar-thumb {
+  background: var(--ink);
+}
+
 .actions {
   flex-shrink: 0;
   padding-top: 0.25rem;
 }
 
+/* the site's nav: ink on the active tab, nothing on the rest */
 .tabs {
   flex-shrink: 0;
   display: flex;
-  gap: 0.35rem;
-  border-bottom: 1px dashed var(--border);
-  padding-bottom: 0.5rem;
+  gap: 2px;
+  padding-bottom: 0.6rem;
   margin-bottom: 0.75rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.tabs button {
+  border: 0;
+  color: var(--ink);
+}
+
+.tabs button:hover {
+  background: var(--code);
+  color: var(--ink);
 }
 
 .tabs .right {
   margin-left: auto;
+  color: var(--muted);
 }
 
 button {
   font: inherit;
-  color: var(--muted);
-  background: none;
-  border: 1px solid var(--border);
-  padding: 0.15rem 0.5rem;
+  font-weight: 500;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--ink);
+  padding: 0.1rem 0.5rem;
   cursor: pointer;
-  /* overrides the 600ms handover above — hover has to feel immediate, the way
-     links do on the site */
-  transition:
-    background-color 120ms ease,
-    border-color 120ms ease,
-    color 120ms ease;
 }
 
 button:hover {
-  color: var(--background);
-  background: var(--accent);
-  border-color: var(--accent);
+  color: var(--paper);
+  background: var(--ink);
 }
 
-button.on {
-  color: var(--background);
-  background: var(--foreground);
-  border-color: var(--foreground);
+button.on,
+.tabs button.on {
+  color: var(--paper);
+  background: var(--ink);
 }
 
 button.primary {
   width: 100%;
   margin-top: 0.75rem;
   padding: 0.35rem;
-  color: var(--accent);
-  border-color: var(--accent);
+  font-weight: 700;
 }
 
 button.danger:hover {
@@ -175,20 +146,24 @@ button.danger:hover {
 }
 
 button:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: default;
 }
 
-label {
-  display: block;
-  margin-top: 0.5rem;
-  color: var(--muted);
-  font-size: 0.7rem;
-  letter-spacing: 0.04em;
+button:disabled:hover {
+  color: var(--ink);
+  background: transparent;
 }
 
-label::before {
-  content: "> ";
+/* the site's .label: small caps sitting right on top of what it names */
+label {
+  display: block;
+  margin-top: 0.7rem;
+  margin-bottom: 0.15rem;
+  color: var(--muted);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 input,
@@ -196,16 +171,23 @@ select,
 textarea {
   width: 100%;
   font: inherit;
-  color: var(--foreground);
-  background: var(--surface);
-  border: 1px solid var(--border);
+  color: var(--ink);
+  background: var(--code);
+  border: 1px solid var(--rule);
+  border-radius: 0;
   padding: 0.25rem 0.4rem;
+}
+
+input::placeholder {
+  color: var(--muted);
+  opacity: 0.7;
 }
 
 input:focus,
 select:focus,
+textarea:focus,
 button:focus-visible {
-  outline: 1px solid var(--accent);
+  outline: 1px solid var(--ink);
   outline-offset: 1px;
 }
 
@@ -214,36 +196,32 @@ button:focus-visible {
   align-items: center;
   gap: 0.4rem;
   cursor: pointer;
-}
-
-.check::before {
-  content: none;
+  text-transform: none;
+  letter-spacing: normal;
+  font-size: inherit;
 }
 
 .check input {
   width: auto;
   margin: 0;
-  accent-color: var(--accent);
+  accent-color: var(--ink);
 }
 
 /* Chrome measures the popup once, at first paint, and does not reliably grow
    it afterwards. Capture is async, so an <img> with no reserved size is 0px
-   when that measurement happens and ~9rem a moment later — the popup keeps the
-   smaller size and the buttons end up below the fold. A definite height means
-   the document is its final size from the start.
-
-   Cropped from the top, since that is the recognisable part of a page, and
-   capped because a tall browser window makes a tall capture. The ceiling is
-   chrome's 800px popup, which leaves room for this at 9rem. */
+   when that measurement happens and ~9rem a moment later. A definite height
+   means the document is its final size from the start. Cropped from the top,
+   since that is the recognisable part of a page. */
 #shot-preview {
   display: block;
   width: 100%;
   height: 6rem;
   object-fit: cover;
   object-position: top;
-  margin-top: 0.4rem;
-  border: 1px solid var(--border);
-  background: var(--surface);
+  margin-top: 0.5rem;
+  border: 1px solid var(--ink);
+  box-shadow: 4px 4px 0 var(--ink);
+  background: var(--tile);
 }
 
 /* an id selector outweighs [hidden], so a page that cannot be captured would
@@ -252,21 +230,11 @@ button:focus-visible {
   display: none;
 }
 
-/* The thumbnail is only there to confirm what got captured, and a tall browser
-   window makes a tall one — left uncapped it pushes save past the 600px chrome
-   allows a popup, where it cannot be reached. Cropped from the top, since
-   that's the recognisable part of a page. */
-
 /* ─────────────────────────────  manage view  ───────────────────────────── */
 
 .list {
-  border: 1px solid var(--border);
+  border: 1px solid var(--rule);
   margin-bottom: 0.5rem;
-  /* the border doubles as drag feedback, so it cannot use the 600ms handover */
-  transition:
-    background-color 600ms ease,
-    color 600ms ease,
-    border-color 120ms ease;
 }
 
 .list-head {
@@ -274,7 +242,7 @@ button:focus-visible {
   align-items: center;
   gap: 0.35rem;
   padding: 0.3rem 0.4rem;
-  background: var(--surface);
+  background: var(--code);
 }
 
 .list-head .name {
@@ -282,12 +250,16 @@ button:focus-visible {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: var(--accent);
+  color: var(--muted);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   cursor: pointer;
 }
 
 .count {
-  color: var(--muted);
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
 }
 
 .items {
@@ -314,12 +286,12 @@ button:focus-visible {
 
 /* the list an entry would land in */
 .list.drop-target {
-  border-color: var(--accent);
-  box-shadow: inset 0 0 0 1px var(--accent);
+  border-color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--ink);
 }
 
-.list.drop-target .list-head {
-  color: var(--accent);
+.list.drop-target .list-head .name {
+  color: var(--ink);
 }
 
 .items .name {
@@ -329,10 +301,15 @@ button:focus-visible {
   white-space: nowrap;
 }
 
-.items .name::before,
-.empty::before {
-  content: "─ ";
-  color: var(--accent);
+/* the site's bullet: a small ink square */
+.items .name::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: 0.6rem;
+  vertical-align: middle;
+  background: var(--ink);
 }
 
 .empty {
@@ -342,7 +319,7 @@ button:focus-visible {
 
 .editor {
   padding: 0.4rem;
-  border-top: 1px dashed var(--border);
+  border-top: 1px solid var(--rule);
 }
 
 .editor .row {
@@ -367,7 +344,7 @@ button:focus-visible {
 }
 
 #status[data-tone="ok"] {
-  color: var(--accent);
+  color: var(--ink);
 }
 
 /* a rule with the word sitting in the gap, rather than a label under a line */
@@ -377,7 +354,7 @@ button:focus-visible {
   gap: 0.6rem;
   margin: 0.9rem 0 0;
   color: var(--muted);
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   letter-spacing: 0.18em;
 }
 
@@ -385,7 +362,7 @@ button:focus-visible {
 .or::after {
   content: "";
   flex: 1;
-  border-top: 1px dashed var(--border);
+  border-top: 1px solid var(--rule);
 }
 
 #admin {

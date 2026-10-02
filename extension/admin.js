@@ -1,5 +1,5 @@
 // A stand-in for the site you can type into. It renders the same markdown the
-// site renders, in the same shell, and what you type goes back to
+// site renders, in the same card, and what you type goes back to
 // content/*.md as a commit — the same read-modify-write the rest of the
 // extension uses, so a change that landed elsewhere is a conflict, not an
 // overwrite.
@@ -14,22 +14,24 @@ import {
   toHtml,
   toMarkdown,
 } from "./markdown.js";
-import { followTheme } from "./themes.js";
 import { createCoolView } from "./admin-cool.js";
 import { editorFor } from "./site-paths.js";
 
-followTheme();
-
+// labels and card sizes as the site's Card.tsx has them: home is the small
+// corner card, the list-heavy tabs take the width
 const PAGES = [
-  { id: "home", label: "home", cmd: "cat index.tsx" },
-  { id: "about", label: "about", path: "content/pages/about.md", cmd: "vim about.md" },
-  { id: "now", label: "now", path: "content/pages/now.md", cmd: "vim now.md" },
-  { id: "running", label: "running", path: "content/pages/running.md", cmd: "vim races.md" },
-  { id: "dumps", label: "yap", cmd: "ls -l dumps/" },
-  { id: "cool", label: "cool", cmd: "vim cool.json" },
+  { id: "home", label: "home", size: "sm" },
+  { id: "about", label: "about", size: "md", path: "content/pages/about.md" },
+  { id: "now", label: "now", size: "md", path: "content/pages/now.md" },
+  { id: "running", label: "runs", size: "md", path: "content/pages/running.md" },
+  { id: "dumps", label: "traces", size: "lg" },
+  { id: "cool", label: "cache", size: "lg" },
 ];
 
+const WORDS_PER_MINUTE = 200; // the site's, from dumps/[slug]/page.tsx
+
 const nav = document.getElementById("nav");
+const card = document.getElementById("card");
 const doc = document.getElementById("doc");
 const picker = document.getElementById("picker");
 const hint = document.getElementById("hint");
@@ -44,6 +46,8 @@ const slugField = document.getElementById("meta-slug");
 const slugPreview = document.getElementById("slug-preview");
 const privateBox = document.getElementById("meta-private");
 const privateWarn = document.getElementById("private-warn");
+const descWarn = document.getElementById("desc-warn");
+const postStats = document.getElementById("post-stats");
 const revertButton = document.getElementById("revert");
 const coolRoot = document.getElementById("cool");
 const liveLink = document.getElementById("live");
@@ -51,8 +55,6 @@ const coolView = createCoolView({ root: coolRoot, say });
 const status = document.getElementById("status");
 const saveButton = document.getElementById("save");
 const dirtyFlag = document.getElementById("dirty");
-const cwd = document.getElementById("cwd");
-const cmd = document.getElementById("cmd");
 
 const DUMPS_DIR = "content/dumps";
 
@@ -86,6 +88,22 @@ function refreshLive() {
   setLive(`/dumps/${slug}`, privateBox.checked);
 }
 
+/** "2026-08-21" -> "08/21/26", as the post's header shows it. */
+function shortDate(date) {
+  const match = /^\d{2}(\d{2})-(\d{2})-(\d{2})/.exec(date);
+  return match ? `${match[2]}/${match[3]}/${match[1]}` : "";
+}
+
+/** The date and read time above a post, kept current as you type. */
+function refreshPostHeader() {
+  if (!current?.isDump) return;
+  const words = doc.textContent.split(/\s+/).filter(Boolean).length;
+  const minutes = Math.max(1, Math.round(words / WORDS_PER_MINUTE));
+  const date = shortDate(metaFields.date.value.trim());
+  postStats.textContent = `${date ? `${date} · ` : ""}${minutes} min`;
+  descWarn.hidden = Boolean(metaFields.description.value.trim());
+}
+
 function say(message, tone = "") {
   status.textContent = message;
   status.dataset.tone = tone;
@@ -106,7 +124,7 @@ function el(tag, props = {}, children = []) {
 
 // ──────────────────────────────── loading ────────────────────────────────
 
-async function openPath(path, { label } = {}) {
+async function openPath(path) {
   say("loading…");
   doc.contentEditable = "false";
   legend.hidden = true;
@@ -152,10 +170,11 @@ async function openPath(path, { label } = {}) {
 
     doc.innerHTML = toHtml(body);
     doc.contentEditable = "true";
+    doc.classList.toggle("post", isDump);
     legend.hidden = false;
+    refreshPostHeader();
     setDirty(false);
     composed.lastSaved = null;
-    cmd.textContent = `vim ${label || path.split("/").pop()}`;
     say("");
   } catch (error) {
     doc.innerHTML = "";
@@ -172,11 +191,26 @@ async function showDumps() {
   current = null;
   arming = null;
   setDirty(false);
-  hint.textContent = "each dump is a markdown file.";
+  doc.classList.remove("post");
+  hint.textContent = "just let a man yap — each trace is a markdown file in content/dumps.";
   say("loading…");
 
   try {
-    const files = await listDir(DUMPS_DIR);
+    const names = await listDir(DUMPS_DIR);
+    // the index reads front matter, not filenames, so this does too — one
+    // read per file, which is fine at this size
+    const files = await Promise.all(
+      names.map(async (name) => {
+        try {
+          const { front } = splitFrontMatter((await readFile(`${DUMPS_DIR}/${name}`)).text);
+          return { name, ...parseFrontMatter(front) };
+        } catch {
+          return { name };
+        }
+      })
+    );
+    // newest first, as the site sorts them
+    files.sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")));
     renderDumps(files);
     say("");
   } catch (error) {
@@ -184,17 +218,28 @@ async function showDumps() {
   }
 }
 
+/** "2026-08-21" -> "08/26", as the traces index shows it. */
+function monthYear(date) {
+  const match = /^(\d{4})-(\d{2})/.exec(date || "");
+  return match ? `${match[2]}/${match[1].slice(2)}` : "";
+}
+
+const isPrivate = (fields) => fields.private === "true" || fields.private === true;
+
+/** `files` is [{name, title?, date?, description?, private?}], one per dump. */
 function renderDumps(files) {
-  const rows = files.map((name) => {
-    const open = el("button", {
-      type: "button",
-      textContent: name.replace(/\.md$/, ""),
-      onclick: () => {
-        picker.hidden = true;
-        hint.textContent = "";
-        openPath(`${DUMPS_DIR}/${name}`, { label: name });
-      },
-    });
+  const rows = files.map((file) => {
+    const { name } = file;
+    const open = el("button", { type: "button", className: "open" }, [
+      el("span", { className: "trace-title", textContent: file.title || name.replace(/\.md$/, "") }),
+      el("span", { className: "muted tabular", textContent: monthYear(file.date) }),
+      el("span", { className: "trace-desc", textContent: file.description || "" }),
+    ]);
+    open.onclick = () => {
+      picker.hidden = true;
+      hint.textContent = "";
+      openPath(`${DUMPS_DIR}/${name}`);
+    };
 
     const armed = arming === name;
     const remove = el("button", {
@@ -209,14 +254,15 @@ function renderDumps(files) {
       },
     });
 
-    return el("div", { className: "row" }, [open, remove]);
+    const tag = isPrivate(file) ? el("span", { className: "trace-private", textContent: "private" }) : el("span");
+    return el("div", { className: "row" }, [open, tag, remove]);
   });
 
   rows.push(
     el("button", {
       className: "new",
       type: "button",
-      textContent: "+ new dump",
+      textContent: "+ new trace",
       onclick: () => newDump(files),
     })
   );
@@ -231,7 +277,7 @@ async function deleteDump(name, files) {
     await saveFiles(`admin: delete ${name}`, [
       { path: `${DUMPS_DIR}/${name}`, remove: true },
     ]);
-    renderDumps(files.filter((file) => file !== name));
+    renderDumps(files.filter((file) => file.name !== name));
     say(`deleted ${name}`, "ok");
   } catch (error) {
     renderDumps(files);
@@ -254,20 +300,20 @@ async function newDump(files) {
 
       const slug = slugify(text);
       const name = `${slug}.md`;
-      if (files.includes(name)) return say(`${name} already exists`, "error");
+      if (files.some((file) => file.name === name)) return say(`${name} already exists`, "error");
 
       create.disabled = true;
       say("creating…");
       const today = new Date().toISOString().slice(0, 10);
-      const body =
-        buildFrontMatter({ title: text, date: today, description: "" }) +
-        `# ${text}\n\nstart here.\n`;
+      // no `# title` in the body: the site takes a post's title from the front
+      // matter and drops the body's h1, so one here would only go unread
+      const body = buildFrontMatter({ title: text, date: today, description: "" }) + "start here.\n";
 
       try {
         await saveFiles(`admin: add ${name}`, [{ path: `${DUMPS_DIR}/${name}`, text: body }]);
         picker.hidden = true;
         hint.textContent = "";
-        await openPath(`${DUMPS_DIR}/${name}`, { label: name });
+        await openPath(`${DUMPS_DIR}/${name}`);
         slugFollowsTitle = true; // until you edit the slug yourself
         say("created — give it a description, then write", "ok");
       } catch (error) {
@@ -278,7 +324,7 @@ async function newDump(files) {
   });
 
   picker.replaceChildren(
-    el("div", { className: "row" }, [
+    el("div", { className: "create" }, [
       title,
       create,
       el("button", { type: "button", textContent: "cancel", onclick: () => renderDumps(files) }),
@@ -294,9 +340,12 @@ function selectPage(page) {
     button.toggleAttribute("aria-current", button.dataset.id === page.id);
     if (button.dataset.id === page.id) button.setAttribute("aria-current", "page");
   }
-  cwd.textContent = page.id === "home" ? "~" : `~/${page.id}`;
+  card.dataset.size = page.size;
+  // home and cache have nothing held back to save: cache commits every action
+  saveButton.hidden = revertButton.hidden = page.id === "home" || page.id === "cool";
+  doc.classList.toggle("labelled", page.id === "about");
+  doc.classList.remove("post");
   setLive(page.id === "home" ? "/" : `/${page.id}`);
-  cmd.textContent = page.cmd;
   picker.hidden = true;
   coolRoot.hidden = true;
   hint.textContent = "";
@@ -309,7 +358,7 @@ function selectPage(page) {
     legend.hidden = true;
     meta.hidden = true;
     hint.textContent =
-      "home is a boid simulation, a spotify widget and live readme embeds — components, not prose, so there is nothing here to type over. the other four pages are markdown.";
+      "home is a few lines of jsx and a spotify widget over the map — components, not prose, so there is nothing here to type over. about, now, runs and traces are markdown; cache is cool.json.";
     say("");
     return;
   }
@@ -321,7 +370,7 @@ function selectPage(page) {
     legend.hidden = true;
     meta.hidden = true;
     hint.textContent =
-      "lists and entries, the same as the popup's manage tab. drag an entry onto another list to move it. every change is its own commit.";
+      "lists and entries, the same as the popup's manage tab. hover an entry for its screenshot and note, drag it onto another list to move it. every change is its own commit.";
     return coolView.load();
   }
   return openPath(page.path);
@@ -336,6 +385,7 @@ function confirmDiscard() {
 
 doc.addEventListener("input", () => {
   if (current) setDirty(true);
+  refreshPostHeader();
 });
 
 privateBox.addEventListener("change", () => {
@@ -346,8 +396,14 @@ privateBox.addEventListener("change", () => {
 for (const input of [...Object.values(metaFields), slugField]) {
   input.addEventListener("input", () => {
     if (current) setDirty(true);
+    refreshPostHeader();
   });
 }
+
+document.getElementById("back").onclick = () => {
+  if (dirty && !confirmDiscard()) return;
+  showDumps();
+};
 
 /**
  * The slug field takes whatever you type — spaces and all — because
@@ -626,7 +682,6 @@ async function save() {
     if (next.fields) current.fields = next.fields;
     composed.lastSaved = next.text;
     setDirty(false);
-    cmd.textContent = `vim ${name}`;
     if (current.isDump) refreshLive();
     say(renamed ? `saved as ${name} — the old url is gone` : "saved — vercel will rebuild in a minute or so", "ok");
   } catch (error) {
@@ -648,6 +703,7 @@ function revert() {
     showSlug();
     refreshLive();
   }
+  refreshPostHeader();
   setDirty(false);
   say("reverted");
 }
@@ -669,7 +725,7 @@ nav.replaceChildren(
       onclick: () => selectPage(page),
     });
     button.dataset.id = page.id; // dataset is read-only, so not via el()
-    return el("li", {}, button);
+    return button;
   })
 );
 
@@ -691,7 +747,7 @@ async function openRequested() {
 
   picker.hidden = true;
   hint.textContent = "";
-  await openPath(`${DUMPS_DIR}/${target.slug}.md`, { label: `${target.slug}.md` });
+  await openPath(`${DUMPS_DIR}/${target.slug}.md`);
 }
 
 (async () => {

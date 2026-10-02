@@ -6,65 +6,81 @@
     <link rel="stylesheet" href="admin.css" />
   </head>
   <body>
-    <div class="shell">
-      <nav class="titlebar">
-        <span class="titlebar-dots" aria-hidden>
-          <span class="titlebar-dot" data-live="true"></span>
-          <span class="titlebar-dot"></span>
-          <span class="titlebar-dot"></span>
-        </span>
-        <ul class="nav-links" id="nav"></ul>
-        <span class="titlebar-right">
-          <a id="live" class="live" target="_blank" rel="noopener noreferrer">live ↗</a>
-          <span id="dirty" class="dirty" hidden>unsaved</span>
-          <button type="button" id="revert" disabled>revert</button>
-          <button type="button" id="save" disabled>save</button>
-        </span>
+    <header class="topbar">
+      <span class="brand">isaacchacko.com</span>
+      <nav class="tabs">
+        <div class="tab-links" id="nav"></div>
       </nav>
+    </header>
 
-      <p class="prompt">
-        <span class="prompt-user">isaac@sf</span><span class="prompt-sigil">:</span
-        ><span class="prompt-path" id="cwd">~</span><span class="prompt-sigil">$ </span
-        ><span class="prompt-cmd" id="cmd">vim</span>
-        <span class="cursor"></span>
-      </p>
+    <div class="card" id="card" data-size="md">
+      <h1 class="card-title">howdy!</h1>
 
-      <p id="legend" class="legend" hidden>
-        the <code>─</code> and <code>##</code> are drawn by the page, not typed,
-        so there is no character to delete. backspace at the start of a line
-        turns a bullet or heading back into plain text; type <code>- </code> or
-        <code>## </code> at the start of a line to make one.
-      </p>
-      <p id="hint" class="hint"></p>
-
-      <div id="meta" class="meta" hidden>
-        <label for="meta-title">title</label>
-        <input id="meta-title" type="text" />
-        <label for="meta-date">date</label>
-        <input id="meta-date" type="text" placeholder="2026-09-30" />
-        <label for="meta-description">description</label>
-        <input id="meta-description" type="text" />
-        <label for="meta-slug">url slug</label>
-        <input id="meta-slug" type="text" />
-
-        <label class="meta-check">
-          <input id="meta-private" type="checkbox" />
-          <span>private — keep it off the site</span>
-        </label>
-        <p class="meta-warn" id="private-warn" hidden>
-          off the site, not secret: the file still sits in the repo, which is
-          public. anyone who looks can read it on github.
+      <div class="card-body">
+        <p id="legend" class="legend" hidden>
+          bullets and section labels are drawn by the page, not typed, so there
+          is no character to delete. backspace at the start of a line turns one
+          back into plain text; type <code>- </code> or <code>## </code> at the
+          start of a line to make one.
         </p>
-        <p class="slug-preview">saves as <code id="slug-preview"></code></p>
-        <p class="meta-note">
-          the slug is the filename and the url. changing it renames the file,
-          so any existing link to this write-up stops working.
-        </p>
+        <p id="hint" class="hint"></p>
+
+        <div id="meta" class="meta" hidden>
+          <div class="post-meta">
+            <button type="button" id="back" class="chip-link">← traces</button>
+            <span class="muted tabular" id="post-stats"></span>
+          </div>
+          <div class="post-head">
+            <input id="meta-title" class="post-title" type="text" placeholder="title" aria-label="title" />
+            <input
+              id="meta-description"
+              class="post-desc"
+              type="text"
+              placeholder="description — the traces index shows this under the title"
+              aria-label="description"
+            />
+            <p class="meta-warn" id="desc-warn" hidden>
+              no description: the traces index shows an empty line under this one.
+            </p>
+          </div>
+
+          <details class="front-matter">
+            <summary>front matter</summary>
+            <div class="front-matter-fields">
+              <label for="meta-date">date</label>
+              <input id="meta-date" type="text" placeholder="2026-09-30" />
+              <label for="meta-slug">url slug</label>
+              <input id="meta-slug" type="text" />
+              <p class="slug-preview">saves as <code id="slug-preview"></code></p>
+              <p class="meta-note">
+                the slug is the filename and the url. changing it renames the
+                file, so any existing link to this write-up stops working.
+              </p>
+
+              <label class="meta-check">
+                <input id="meta-private" type="checkbox" />
+                <span>private — keep it off the site</span>
+              </label>
+              <p class="meta-warn" id="private-warn" hidden>
+                off the site, not secret: the file still sits in the repo, which
+                is public. anyone who looks can read it on github.
+              </p>
+            </div>
+          </details>
+        </div>
+
+        <div id="picker" class="picker" hidden></div>
+        <div id="cool" class="cool" hidden></div>
+        <main id="doc" class="stack"></main>
       </div>
-      <div id="picker" class="picker" hidden></div>
-      <div id="cool" class="cool" hidden></div>
-      <main id="doc"></main>
-      <p id="status"></p>
+
+      <footer class="card-footer">
+        <a id="live" class="live" target="_blank" rel="noopener noreferrer">live ↗</a>
+        <p id="status"></p>
+        <span id="dirty" class="dirty" hidden>unsaved</span>
+        <button type="button" id="revert" disabled>revert</button>
+        <button type="button" id="save" class="save" disabled>save</button>
+      </footer>
     </div>
 
     <script type="module" src="admin.js"></script>

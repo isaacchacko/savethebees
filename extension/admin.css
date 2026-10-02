@@ -1,236 +1,375 @@
-/* A replica of the site's shell, so editing a page looks like the page. The
-   palettes and the rotation are the site's own — see themes.js. */
+/* A replica of the site's frame, so editing a page looks like the page: the
+   card over the field, the nav pinned above it, and the card taking the size
+   the site gives that tab. The geometry and the content rules are copied from
+   src/app/globals.css; the palette comes in with popup.css. */
 @import url("popup.css");
 
 :root {
-  --editing: color-mix(in srgb, var(--accent) 12%, transparent);
+  --editing: color-mix(in srgb, var(--tile) 45%, transparent);
+  --card-ease: cubic-bezier(0.7, 0, 0.2, 1);
 }
 
-/* popup.css pins the popup to a fixed height with overflow hidden, because a
-   popup cannot be scrolled by the window. This is a full tab, so undo all of
-   that — inheriting it clipped the page at 34rem and left the longer tabs,
-   cool especially, with no way to scroll. */
-html {
-  height: auto;
+/* popup.css pins the popup to a fixed size. This is a full tab: the field is
+   the viewport and, as on the site, long pages scroll inside the card */
+html,
+body {
+  width: auto;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: var(--field);
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.7;
 }
 
 body {
-  width: auto;
-  height: auto;
   display: block;
-  overflow: visible;
-  margin: 0;
-  padding: 0;
-  font-size: 1rem;
-  line-height: 1.6;
+  position: relative;
 }
 
-.shell {
-  max-width: 48rem;
-  margin: 0 auto;
-  padding: 1.5rem 1.25rem 4rem;
-}
+/* ───────────────────────────── the nav ───────────────────────────── */
 
-/* ───────────────────────────── titlebar ───────────────────────────── */
-
-.titlebar {
+.topbar {
+  position: absolute;
+  z-index: 2;
+  left: 56px;
+  top: 40px;
+  right: 68px;
   display: flex;
-  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 13px;
+  pointer-events: none;
+}
+
+.brand {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 4px 10px;
+  font-weight: 700;
+}
+
+/* popup.css's .tabs is the popup's underlined row; this is the site's pill */
+.topbar .tabs {
+  display: flex;
   align-items: center;
-  gap: 0.75rem 1rem;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  padding: 0.5rem 0.75rem;
-  margin-bottom: 1.5rem;
-}
-
-.titlebar-dots {
-  display: flex;
-  gap: 0.4rem;
-}
-
-.titlebar-dot {
-  width: 0.6rem;
-  height: 0.6rem;
-  border-radius: 50%;
-  background: var(--border);
-}
-
-.titlebar-dot[data-live="true"] {
-  background: var(--accent);
-}
-
-.nav-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0 1rem;
+  background: var(--paper);
+  padding: 4px;
   margin: 0;
-  padding: 0;
-  list-style: none;
-  font-size: 0.9rem;
-}
-
-.nav-links button {
   border: 0;
-  padding: 0;
-  background: none;
-  color: var(--muted);
+  pointer-events: auto;
 }
 
-.nav-links button::before {
-  content: "/";
-  color: var(--border);
-}
-
-.nav-links button:hover {
-  background: var(--accent);
-  color: var(--background);
-}
-
-.nav-links button[aria-current="page"] {
-  background: var(--foreground);
-  color: var(--surface);
-}
-
-.titlebar-right {
+.tab-links {
   display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  margin-left: auto;
-  font-size: 0.9rem;
+  gap: 2px;
 }
 
-.dirty {
-  color: var(--danger);
+.tab-links button {
+  border: 0;
+  padding: 0 8px;
+  font-weight: 400;
+  line-height: 1.7;
+  color: var(--ink);
+  background: transparent;
+}
+
+.tab-links button:hover {
+  background: var(--code);
+  color: var(--ink);
+}
+
+.tab-links button[aria-current="page"] {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+/* ───────────────────────────── the card ───────────────────────────── */
+
+.card {
+  position: absolute;
+  z-index: 1;
+  right: 44px;
+  bottom: 68px;
+  top: 16px;
+  left: calc(100% - 68px - 484px);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 84px 40px 28px;
+  overflow: hidden;
+  background: var(--paper);
+  box-shadow: 12px 12px 0 var(--ink);
+  transition:
+    top 650ms var(--card-ease),
+    left 650ms var(--card-ease),
+    padding 650ms var(--card-ease);
+}
+
+.card[data-size="sm"] {
+  top: max(96px, calc(100% - 68px - 452px));
+  padding-top: 36px;
+}
+
+.card[data-size="lg"] {
+  left: 32px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
+}
+
+.card-title {
+  flex: none;
+  margin: 0;
+  font-size: 44px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.card-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-right: 14px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.card-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.card-body::-webkit-scrollbar-track {
+  background: var(--rule);
+}
+
+.card-body::-webkit-scrollbar-thumb {
+  background: var(--ink);
+}
+
+.card-body::-webkit-scrollbar-button {
+  display: none;
+}
+
+.card-body > [hidden] {
+  display: none;
+}
+
+/* the site's footer holds socials and the clock; here it holds the save */
+.card-footer {
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  align-items: baseline;
+  padding-top: 16px;
+  border-top: 1px solid var(--rule);
+  font-size: 13px;
+}
+
+.card-footer button {
+  font-size: 13px;
+}
+
+.save {
+  font-weight: 700;
 }
 
 /* an anchor rather than a button, so it opens in a tab the ordinary way and
    the url is there to copy or middle-click */
 .live {
-  color: var(--muted);
+  border: 1px solid var(--ink);
+  padding: 0 8px;
   text-decoration: none;
-  border: 1px solid var(--border);
-  padding: 0.15rem 0.5rem;
-  transition:
-    background-color 120ms ease,
-    border-color 120ms ease,
-    color 120ms ease;
 }
 
-.live:hover {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--background);
+.live[aria-disabled="true"] {
+  opacity: 0.4;
+  pointer-events: none;
 }
 
-/* ───────────────────────────── the page ───────────────────────────── */
-
-.prompt {
-  margin: 0 0 1.5rem;
-  font-size: 0.95rem;
-}
-
-.prompt-user { color: var(--accent); }
-.prompt-path { color: var(--accent); opacity: 0.85; }
-.prompt-sigil { color: var(--muted); }
-.prompt-cmd { color: var(--foreground); }
-
-.cursor {
-  display: inline-block;
-  width: 0.6em;
-  height: 1.05em;
-  background: var(--accent);
-  vertical-align: text-bottom;
-  animation: blink 1.1s steps(1, end) infinite;
-}
-
-@keyframes blink {
-  0%, 50% { opacity: 1; }
-  50.01%, 100% { opacity: 0; }
-}
-
-.hint {
-  color: var(--muted);
-  font-size: 0.85rem;
-  margin: 0 0 1rem;
-}
-
-.picker button {
-  display: block;
-  width: 100%;
-  text-align: left;
-  margin-bottom: 0.35rem;
-}
-
-/* the site maps markdown h1 onto its h2, so both read the same size here */
-#doc h1,
-#doc h2 {
-  font-size: 1.25rem;
-}
-
-#doc h3 { font-size: 1.05rem; }
-
-#doc h1, #doc h2, #doc h3 {
-  font-weight: 700;
-  line-height: 1.3;
-  letter-spacing: 0.02em;
-  margin: 2em 0 0.75em;
+.dirty {
   color: var(--accent);
 }
 
-#doc > h1:first-child { margin-top: 0; }
-
-/* These markers are drawn, not typed, so there is no character to select or
-   delete. Taking them out of selection stops them behaving like text that
-   will not budge; backspace at the start of the line is what removes them. */
-#doc h1::before,
-#doc h2::before,
-#doc h3::before {
-  content: "## ";
+#status {
+  flex: 1;
+  min-width: 8rem;
+  margin: 0;
   color: var(--muted);
-  user-select: none;
+  overflow-wrap: anywhere;
 }
 
-#doc p { margin: 0 0 1em; }
+#status[data-tone="error"] { color: var(--danger); }
+#status[data-tone="ok"] { color: var(--ink); }
+
+.hint,
+.legend {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.hint:empty {
+  display: none;
+}
+
+.legend code {
+  font-size: 12px;
+  background: var(--code);
+  padding: 1px 5px;
+}
+
+.muted { color: var(--muted); }
+.tabular { font-variant-numeric: tabular-nums; }
+
+/* ─────────────────────── the page, as the site draws it ─────────────────── */
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+#doc > * {
+  margin: 0;
+  text-wrap: pretty;
+}
 
 #doc ul {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0;
   list-style: none;
-  padding-left: 0;
-  margin: 0 0 1em;
 }
 
+/* the bullet is drawn, not typed: there is no character to select or delete,
+   so backspace at the start of the line is what removes it */
 #doc li {
-  padding-left: 1.5em;
-  text-indent: -1.5em;
+  position: relative;
+  padding-left: 18px;
 }
 
 #doc li::before {
-  content: "─ ";
-  color: var(--accent);
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 10px;
+  width: 6px;
+  height: 6px;
+  background: var(--ink);
+}
+
+/* section headings: a dated entry on /now, a section of a post */
+#doc h2,
+#doc h3 {
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.7;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+}
+
+#doc h2 {
+  margin-top: 10px;
+  text-transform: uppercase;
+}
+
+#doc h3 + ul {
+  margin-top: -10px;
+}
+
+/* The site drops the page's `# title` — the card, or a post's front matter,
+   already names it. It is still in the file, so it stays editable here, but
+   faded and labelled so nobody polishes a line no visitor will read. */
+#doc h1 {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.7;
+  color: var(--muted);
+  opacity: 0.6;
+  text-decoration: line-through dotted;
+}
+
+#doc h1::after {
+  content: "  not shown on the site";
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  display: inline-block;
+  margin-left: 0.75rem;
   user-select: none;
 }
 
 #doc a {
-  color: var(--accent);
-  text-decoration: underline dotted;
+  color: var(--ink);
+  text-decoration-style: dotted;
   text-underline-offset: 3px;
 }
 
 #doc code {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  padding: 0.1em 0.35em;
+  font: inherit;
+  font-size: 13px;
+  background: var(--code);
+  padding: 1px 5px;
+}
+
+#doc pre {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 16px 18px;
+  font: 13px/1.7 var(--mono);
+  overflow-x: auto;
+}
+
+#doc pre code {
+  background: none;
+  padding: 0;
+  color: inherit;
+}
+
+/* about: "**i like**" reads as a label sitting right on top of its list */
+#doc.labelled p:has(> strong:only-child) {
+  margin-bottom: -10px;
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+#doc.labelled p:has(> strong:only-child) strong {
+  font-weight: 400;
+}
+
+/* a post is capped like the site's .post */
+#doc.post,
+.meta {
+  max-width: 720px;
 }
 
 /* editing affordance: the page you are typing into gets a quiet frame */
 #doc[contenteditable="true"] {
-  outline: 1px dashed var(--border);
-  outline-offset: 0.75rem;
-  border-radius: 2px;
+  outline: 1px dashed var(--rule);
+  outline-offset: 10px;
+  margin: 10px;
 }
 
 #doc[contenteditable="true"]:focus-within {
-  outline-color: var(--accent);
+  outline-color: var(--ink);
 }
 
 #doc :is(p, li, h1, h2, h3):focus {
@@ -238,131 +377,227 @@ body {
   outline: none;
 }
 
-#status {
-  margin-top: 2rem;
-  min-height: 1.5em;
-  color: var(--muted);
-  overflow-wrap: anywhere;
-}
+/* ─────────────────── a dump: its header, as the post shows it ───────────── */
 
-#status[data-tone="error"] { color: var(--danger); }
-#status[data-tone="ok"] { color: var(--accent); }
-
-.legend {
-  color: var(--muted);
-  font-size: 0.8rem;
-  margin: 0 0 1.25rem;
-  line-height: 1.5;
-}
-
-.legend code {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  padding: 0.05em 0.3em;
-}
-
-/* front matter for a dump: the fields the index page reads */
 .meta {
-  border: 1px solid var(--border);
-  padding: 0.75rem 1rem 1rem;
-  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.meta label {
-  display: block;
-  margin-top: 0.6rem;
+.post-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  font-size: 13px;
+}
+
+.chip-link {
+  font-size: 13px;
+  font-weight: 400;
+  padding: 0 8px;
+}
+
+.post-head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* inputs dressed as the post's own title and description, so the header reads
+   the way the page will */
+.post-head input {
+  border: 0;
+  border-bottom: 1px dashed var(--rule);
+  background: transparent;
+  padding: 0;
+}
+
+.post-head input:hover {
+  border-bottom-color: var(--muted);
+}
+
+.post-head input:focus {
+  outline: none;
+  border-bottom: 1px solid var(--ink);
+  background: var(--editing);
+}
+
+.post-title {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.post-desc {
   color: var(--muted);
-  font-size: 0.75rem;
-  letter-spacing: 0.04em;
 }
 
-.meta label:first-child { margin-top: 0; }
-
-.meta label::before { content: "> "; }
-
-.meta input {
-  width: 100%;
-  font: inherit;
-  font-size: 0.9rem;
-  color: var(--foreground);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  padding: 0.25rem 0.45rem;
+.front-matter {
+  border: 1px solid var(--rule);
+  padding: 0.4rem 0.75rem;
+  font-size: 13px;
 }
 
-.meta input:focus {
-  outline: 1px solid var(--accent);
-  outline-offset: 1px;
-}
-
-.meta-note {
-  margin: 0.75rem 0 0;
+.front-matter summary {
+  cursor: pointer;
   color: var(--muted);
-  font-size: 0.75rem;
-  line-height: 1.5;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
-/* the write-up list */
-.picker .row {
+.front-matter-fields {
+  padding: 0.25rem 0 0.5rem;
+}
+
+.meta-check {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  margin-bottom: 0.35rem;
+  gap: 0.45rem;
+  margin-top: 0.9rem;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--ink);
+  text-transform: none;
+  letter-spacing: normal;
 }
 
-/* the full-width rule above is for the standalone buttons; inside a row the
-   name should take the slack and del should stay the size of its label */
-.picker .row button {
+.meta-check input {
   width: auto;
-  margin-bottom: 0;
+  margin: 0;
+  accent-color: var(--ink);
 }
 
-.picker .row button:first-child {
-  flex: 1;
+.meta-note,
+.slug-preview {
+  margin: 0.4rem 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.slug-preview code {
+  background: var(--code);
+  padding: 1px 5px;
+  color: var(--ink);
+}
+
+.meta-warn {
+  margin: 0.4rem 0 0;
+  color: var(--danger);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* ─────────────────────── traces: the write-up list ──────────────────────── */
+
+.picker {
+  display: flex;
+  flex-direction: column;
+}
+
+/* a row of the traces index, with del pinned on the end */
+.picker .row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 0 16px;
+  padding: 5px 12px;
+  border-top: 1px solid var(--rule);
+}
+
+.picker .open {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0 32px;
+  border: 0;
+  padding: 0;
   text-align: left;
+  font-weight: 400;
 }
 
-.picker .danger:hover {
-  background: var(--danger);
-  border-color: var(--danger);
-  color: var(--background);
+.picker .open:hover,
+.picker .open:hover .muted,
+.picker .open:hover .trace-desc {
+  color: var(--paper);
+}
+
+.trace-title {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.trace-desc {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.trace-desc:empty::before {
+  content: "no description";
+  font-style: italic;
+  color: var(--accent);
+}
+
+.trace-private {
+  font-size: 12px;
+  color: var(--accent);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.picker .danger {
+  font-size: 13px;
 }
 
 .picker .new {
+  align-self: flex-start;
   margin-top: 0.75rem;
 }
 
-.picker input {
+.picker .create {
+  display: flex;
+  gap: 0.5rem;
+  padding: 5px 0;
+}
+
+.picker .create input {
   flex: 1;
-  font: inherit;
-  font-size: 0.9rem;
-  color: var(--foreground);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  padding: 0.25rem 0.45rem;
 }
 
-.picker input:focus {
-  outline: 1px solid var(--accent);
-  outline-offset: 1px;
+/* ─────────────────────────── cache, editable ─────────────────────────────── */
+
+/* the site's layout: lists on the left, a drawer on the right that shows the
+   hovered entry's screenshot and note */
+.cool {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 400px;
+  gap: 40px;
+  align-items: start;
 }
 
-/* ─────────────────────────── the cool page, editable ─────────────────────── */
+.cool[hidden] {
+  display: none;
+}
+
+.cool-lists {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
 
 .cool-list {
-  border: 1px solid var(--border);
-  padding: 0.75rem 1rem 1rem;
-  margin-bottom: 1rem;
-  /* the border doubles as the drop indicator, so it cannot fade */
-  transition:
-    background-color 600ms ease,
-    color 600ms ease,
-    border-color 120ms ease;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px 8px;
+  margin: -6px -8px;
+  border: 1px solid transparent;
 }
 
 .cool-list.drop-target {
-  border-color: var(--accent);
-  box-shadow: inset 0 0 0 1px var(--accent);
+  border-color: var(--ink);
+  background: var(--code);
 }
 
 .list-bar {
@@ -371,114 +606,164 @@ body {
   gap: 0.5rem;
 }
 
-.list-bar h2 {
+.list-bar .label {
   flex: 1;
-  margin: 0;
-  font-size: 1.1rem;
-  /* the #doc heading rules do not reach this pane; match the site's accent */
-  color: var(--accent);
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
-.list-bar h2::before {
-  content: "## ";
-  color: var(--muted);
+.list-bar .count {
+  font-size: 12px;
+}
+
+.list-bar button,
+.cool-row button,
+.add-entry,
+.add-list {
+  font-size: 12px;
+  font-weight: 400;
+  padding: 0 6px;
+  line-height: 1.6;
+}
+
+/* the row buttons stay out of the way until the row is pointed at */
+.cool-row button,
+.list-bar button {
+  opacity: 0;
+}
+
+.cool-row:hover button,
+.cool-row:focus-within button,
+.list-bar:hover button,
+.list-bar:focus-within button {
+  opacity: 1;
 }
 
 .list-desc {
-  margin: 0.4rem 0 0;
+  margin: 0;
+  font-size: 13px;
   color: var(--muted);
-  font-size: 0.9rem;
 }
 
-.count {
-  color: var(--muted);
-  font-size: 0.85rem;
-}
-
-.entries {
-  list-style: none;
-  padding: 0;
-  margin: 0.75rem 0 0;
-}
-
-.entries li {
+.cool-row {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.25rem 0;
+  gap: 12px;
+  padding-left: 20px;
   cursor: grab;
 }
 
-.entries li:active { cursor: grabbing; }
-.entries li.dragging { opacity: 0.4; }
+.cool-row:active { cursor: grabbing; }
+.cool-row.dragging { opacity: 0.4; }
 
-.entry-main {
+.cool-row a,
+.cool-row .entry-text {
   flex: 1;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.entry-main::before {
-  content: "─ ";
-  color: var(--accent);
-}
-
-/* the #doc rules do not reach this pane, and the ua default blue is unreadable
-   on the dark palettes */
-.cool a {
-  color: var(--accent);
-  text-decoration: underline dotted;
+  text-decoration-style: dotted;
   text-underline-offset: 3px;
 }
 
-.cool a:hover {
-  background: var(--accent);
-  color: var(--background);
-  text-decoration: none;
+.bullet {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  background: var(--ink);
 }
 
-.entry-host { color: var(--muted); }
-.entry-note { color: var(--muted); }
+.favicon {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  background: center / 16px no-repeat;
+}
 
-.entry-shot {
-  width: 3.5rem;
-  height: 2.2rem;
-  object-fit: cover;
-  object-position: top;
-  border: 1px solid var(--border);
-  flex-shrink: 0;
+.cool .empty {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--muted);
+}
+
+.add-entry {
+  align-self: flex-start;
+  margin: 4px 0 0 20px;
+}
+
+.add-list {
+  align-self: flex-start;
+}
+
+.cool-drawer {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  opacity: 0;
+  transform: translateX(16px);
+  transition:
+    opacity 220ms ease,
+    transform 260ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.cool-drawer[data-open="true"] {
+  opacity: 1;
+  transform: none;
+}
+
+.cool-shot {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 640 / 396;
+  border: 1px solid var(--ink);
+  box-shadow: 8px 8px 0 var(--ink);
+  background: var(--tile) center / cover no-repeat;
+}
+
+.cool-shot-missing {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+  padding: 1rem;
+}
+
+.cool-host {
+  position: absolute;
+  right: -1px;
+  bottom: -1px;
+  padding: 2px 8px;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.cool-note {
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.cool-note p {
+  margin: 0;
 }
 
 .entry-form {
-  border-top: 1px dashed var(--border);
-  margin-top: 0.5rem;
-  padding-top: 0.5rem;
-}
-
-.entry-form label {
-  display: block;
-  margin-top: 0.5rem;
-  color: var(--muted);
-  font-size: 0.75rem;
-  letter-spacing: 0.04em;
-}
-
-.entry-form label::before { content: "> "; }
-
-.entry-form input {
-  width: 100%;
-  font: inherit;
-  font-size: 0.9rem;
-  color: var(--foreground);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  padding: 0.25rem 0.45rem;
-}
-
-.entry-form input:focus {
-  outline: 1px solid var(--accent);
-  outline-offset: 1px;
+  margin: 4px 0 8px 20px;
+  padding: 0.5rem 0.75rem 0.75rem;
+  border: 1px solid var(--rule);
+  background: var(--paper);
+  cursor: default;
 }
 
 .form-actions {
@@ -487,64 +772,45 @@ body {
   margin-top: 0.75rem;
 }
 
-.add-entry {
-  margin-top: 0.6rem;
-}
-
-.add-list {
-  margin-top: 0.5rem;
-}
-
-.cool .empty {
-  margin: 0.75rem 0 0;
-  color: var(--muted);
+.form-actions button {
+  font-size: 13px;
 }
 
 .cool .danger:hover {
   background: var(--danger);
   border-color: var(--danger);
-  color: var(--background);
+  color: var(--paper);
 }
 
-.slug-preview {
-  margin: 0.4rem 0 0;
-  color: var(--muted);
-  font-size: 0.75rem;
-}
+/* below the site's desktop breakpoint the drawer has no room; drop it */
+@media (max-width: 899px) {
+  .topbar {
+    left: 16px;
+    right: 16px;
+    top: 16px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
 
-.slug-preview code {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  padding: 0.05em 0.3em;
-  color: var(--accent);
-}
+  .card,
+  .card[data-size] {
+    top: 96px;
+    left: 16px;
+    right: 24px;
+    bottom: 24px;
+    padding: 24px 20px 18px;
+    box-shadow: 8px 8px 0 var(--ink);
+  }
 
-.meta-check {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-  margin-top: 0.8rem;
-  cursor: pointer;
-}
+  .card-title {
+    font-size: 32px;
+  }
 
-/* .meta label::before is more specific than a bare .meta-check, so match its
-   weight or the "> " marker leaks onto the checkbox row */
-.meta label.meta-check::before { content: none; }
+  .cool {
+    grid-template-columns: minmax(0, 1fr);
+  }
 
-.meta-check input {
-  width: auto;
-  margin: 0;
-  accent-color: var(--accent);
-}
-
-.live[aria-disabled="true"] {
-  opacity: 0.45;
-  pointer-events: none;
-}
-
-.meta-warn {
-  margin: 0.4rem 0 0;
-  color: var(--danger);
-  font-size: 0.75rem;
-  line-height: 1.5;
+  .cool-drawer {
+    display: none;
+  }
 }

@@ -1,6 +1,7 @@
-# cool — the Chrome extension
+# cache — the Chrome extension
 
-CRUD for the lists on [/cool](https://isaacchacko.com/cool), from the browser.
+CRUD for the lists on [/cool](https://isaacchacko.com/cool) (the site's
+**cache** tab), and an editor for the rest of the site, from the browser.
 
 There is no server in the loop. The extension edits `content/cool.json` in this
 repo directly through the GitHub contents API; Vercel sees the commit and
@@ -33,7 +34,7 @@ is someone editing this site's files.
 **Toolbar icon** — opens the popup with the current tab's title and URL already
 filled in. Pick a list, add a note if you want, save. The popup closes itself.
 
-**Right-click** — _add to cool → \<list\>_ on any page or link, no popup. A
+**Right-click** — _add to cache → \<list\>_ on any page or link, no popup. A
 selection becomes the note on a page, or the title on a link. The submenu is
 built from the cached lists; _refresh lists_ re-reads them from GitHub.
 
@@ -66,14 +67,23 @@ path is something the admin view can actually edit, so not on home, not on
 the popup and the admin view cannot disagree about it.
 
 The popup's **edit website** button opens a stand-in for the site you can type
-into: the same shell, the same palette, the same markdown rendering, with
-about, now, running and the dumps editable in place. Type over
+into: the same card over the same green field, the same nav, the same
+markdown rendering, with about, now, runs and traces editable in place. The
+card takes the size the site gives each tab — home the small corner card,
+about/now/runs the tall one, traces and cache the full width. Type over
 the text, hit save (or cmd-S), and it commits to `content/` — same conditional
 ref update as everything else here, so a change that landed elsewhere is a
 conflict rather than an overwrite.
 
-Home is listed but not editable. It is a boid simulation, a spotify widget and
-live readme embeds — components, not prose, with nothing to type over.
+Home is listed but not editable. It is a few lines of jsx and a spotify widget
+over the map — components, not prose, with nothing to type over.
+
+### The page's `# title` is not on the site
+
+The site drops a page's h1: the card already says "howdy!", and a post takes
+its title from the front matter. The line is still in the file, so the editor
+keeps it editable, but faded, struck through and labelled *not shown on the
+site* so nobody polishes a line no visitor will read.
 
 ### Private dumps
 
@@ -105,34 +115,42 @@ pending one. After a rename it follows to the new url.
 The site it points at is the **site url** in options, which defaults to
 isaacchacko.com.
 
-### The cool page, from the admin view
+### The cache page, from the admin view
 
-The **cool** tab is the popup's manage view with room to breathe: every list is
-open at once, entries show their screenshot, url and note, and moving one
-between lists is a drag rather than a trip through a submenu. Lists and entries
+The **cache** tab is the popup's manage view with room to breathe, laid out as
+the site lays it out: every list open at once, each entry a bullet, a favicon
+and its label, and hovering one slides its screenshot and note into the drawer
+on the right. Moving an entry between lists is a drag rather than a trip
+through a submenu. The **ed** and **del** buttons show when you point at a row. Lists and entries
 can both be added, edited and deleted, delete asks twice, and deleting an entry
 takes its screenshot with it — the same helpers the popup uses, so the conflict
 handling and the cleanup come along unchanged.
 
-Every action is its own commit, as in the popup. There is no save button here
-because there is nothing held back.
+Every action is its own commit, as in the popup. Save and revert are hidden on
+this tab because there is nothing held back.
 
 One thing the popup can do that this cannot: **capture a screenshot**. That
 needs a tab showing the page, so an entry added from here has no image until
-you re-save it from the popup on the page itself. Thumbnails are loaded from
-the live site, so a brand new one stays blank until that commit has deployed.
+you re-save it from the popup on the page itself; the drawer says so. Thumbnails
+are loaded from the live site, so a brand new one stays blank until that commit
+has deployed.
 
 ### Dumps are files, so the admin view CRUDs them
 
-The page is called **yap**; a single write-up is a dump. The route and the
+The page is called **traces**; a single write-up is a dump. The route and the
 content directory stay `dumps`.
 
-The **yap** tab lists every dump with a **del** next to it and a **+ new
-write-up** button underneath. Delete asks twice, the same as everywhere else
-here.
+The **traces** tab lists every dump the way the site's index does — title,
+month and description, newest first — with a **del** next to it and a
+**+ new trace** button underneath. A private one is tagged. A missing
+description shows as *no description*, because the site's index shows an empty
+line there. Delete asks twice, the same as everywhere else here.
 
-Opening one shows its front matter — title, date, description — above the
-prose, because those are what the index page reads, not the body. The **url
+Opening one shows the post's header as the site draws it: **← traces**, the
+date and read time (kept current as you type), then the title and description
+as inputs dressed as the real thing, because those are what the site reads,
+not the body. The date, slug and private flag sit under **front matter**,
+folded away. The **url
 slug** is the filename. Changing it renames the file, which lands as the new
 path and the old one's removal in a *single* commit, so the write-up is never
 briefly missing or briefly duplicated. It also breaks any existing link, and
@@ -145,8 +163,9 @@ field, and the filename it will actually become is shown underneath the whole
 time, so the field never quietly disagrees with what gets committed. Accents
 decompose to their base letter, so "café" is `cafe` rather than `caf`.
 
-A new dump starts as a real file with front matter and a heading, so the
+A new dump starts as a real file with front matter and a first line, so the
 index page, the editor and a later save all see the same shape as any other.
+It gets no `# title` in the body — the site would only drop it.
 Its slug follows the title while you are naming it, and stops the moment you
 edit the slug yourself.
 
@@ -154,10 +173,11 @@ edit the slug yourself.
 front matter both — back to what was last loaded or saved. It touches nothing
 in the repo.
 
-### The ─ and ## are drawn, not typed
+### Bullets and section labels are drawn, not typed
 
-The bullet markers and heading hashes are CSS `::before`, the same as on the
-site, so there is no character there to select or backspace over. That makes a
+The bullet is a small ink square drawn by CSS `::before` and a `## heading` is
+a small-caps label with a rule above it, the same as on the site, so there is
+no marker character to select or backspace over. That makes a
 bullet a one-way door unless the editor does something about it:
 
 - **backspace at the very start of a line** turns a bullet or heading back into
@@ -196,21 +216,17 @@ open http://localhost:8000/extension/markdown.test.html
 ```
 
 Headings keep their real level in the editor (`#` stays `<h1>`) even though the
-site maps markdown `h1` onto an `<h2>`. Rendering both as `<h2>` would make the
-trip back ambiguous; `admin.css` makes them look the same instead.
+site drops the `h1` altogether, so the trip back never loses it.
 
-## It wears whatever the site is wearing
+## It wears what the site wears
 
-The site picks its palette from the wall clock — `floor(now / 5min) % 5` over
-pink, banana, dryft, maroon, matcha — rather than storing it, so every visitor
-sees the same theme at the same moment. `themes.js` does that same arithmetic,
-which is the whole synchronisation: no messaging, no network, nothing to fall
-out of step. Open the popup and it is already on the site's current theme, and
-it rolls over on the boundary if you leave it open.
-
-The palettes in `popup.css` mirror `src/app/globals.css`. Change one and change
-the other — nothing enforces it. `--danger` is the exception: the site has no
-equivalent, so each palette picks its own.
+The site has one palette now — a pale card over a green field — and
+`popup.css` copies its tokens (`--field`, `--paper`, `--ink`, `--rule`,
+`--muted`, `--code`, `--tile`, `--accent`) from `src/app/globals.css`. Change
+one and change the other; nothing enforces it. `--danger` is the extension's
+own name and borrows the site's one warm colour, the terracotta `--accent`.
+The font is the site's JetBrains Mono, from Google Fonts, falling back to the
+system mono offline.
 
 ## Label
 
@@ -238,7 +254,7 @@ keep notes inline.
 
 Saving a page also grabs its visible viewport, shrinks it to 640px webp
 (~30–50kb) and commits it to `public/cool-shots/<id>.webp`. The site shows it as
-a hover preview over the entry's title. Deleting an entry deletes its shot.
+the drawer that slides in when you hover the entry. Deleting an entry deletes its shot.
 
 Two cases get no screenshot, and both save fine without one:
 
@@ -280,10 +296,9 @@ really did commit underneath you. Try again.
 | `background.js`       | context menus and their handler                            |
 | `popup.js`            | the add form and the manage view                           |
 | `admin.js`            | the editable stand-in for the site                         |
-| `admin-cool.js`       | the cool page's lists and entries, editable                |
+| `admin-cool.js`       | the cache page's lists, entries and drawer, editable       |
 | `site-paths.js`       | which admin page edits which url on the site               |
 | `markdown.js`         | markdown in, DOM out, and back again                       |
-| `themes.js`           | the site's wall-clock palette rotation                     |
 | `shot.js`             | screenshot capture and shrinking                           |
 | `options.js`          | repo + token settings                                      |
 | `store.test.mjs`      | `npm test` — the commit logic, against a fake github       |

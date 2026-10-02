@@ -5,9 +5,9 @@
 // italic and code — and markdown.test asserts that render then serialize is the
 // identity for every page in content/.
 //
-// Headings keep their real level here (h1 stays h1) even though the site maps
-// markdown h1 onto an <h2>. Rendering both as <h2> would make the trip back
-// ambiguous; admin.css makes them look the same instead.
+// Headings keep their real level here (h1 stays h1) even though the site
+// drops a page's h1 altogether. Leaving it out would lose it on the trip back;
+// admin.css shows it faded and labelled as not on the site instead.
 
 const ESCAPE_HTML = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" };
 

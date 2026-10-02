@@ -1,6 +1,8 @@
-// The /cool page, editable. The popup can do all of this too, but in a
-// 22rem-wide popup; here every list is open at once, entries show their url and
-// note, and moving one is a drag rather than a trip through a submenu.
+// The /cool page (the site's "cache" tab), editable. The popup can do all of
+// this too, but in a 22rem-wide popup; here every list is open at once, laid
+// out as the site lays them out — hovering an entry slides its screenshot and
+// note into the drawer on the right — and moving one is a drag rather than a
+// trip through a submenu.
 //
 // Every action is its own commit through the same mutate() the popup uses, so
 // the conflict handling and the screenshot cleanup come along for free.
@@ -18,6 +20,7 @@ import {
   updateItem,
   updateList,
 } from "./store.js";
+import { toHtml } from "./markdown.js";
 
 function el(tag, props = {}, children = []) {
   const node = Object.assign(document.createElement(tag), props);
@@ -33,8 +36,12 @@ function hostname(url) {
   }
 }
 
+// long enough to move the mouse across the gap from a link into the drawer
+const CLOSE_DELAY_MS = 1000;
+
 export function createCoolView({ root, say }) {
   let data = { lists: [] };
+  let closeTimer;
   let site = "";
   let editing = null; // { listId, itemId? } — the row swapped for a form
   let adding = null; // listId whose "+ entry" form is open, or "__list__"
@@ -81,13 +88,13 @@ export function createCoolView({ root, say }) {
 
       if (item) {
         commit(
-          `cool: update "${values.title}" in ${list.title}`,
+          `cache: update "${values.title}" in ${list.title}`,
           (draft) => updateItem(draft, list.id, item.id, values),
           "updated"
         );
       } else {
         commit(
-          `cool: add "${values.title || values.url}" to ${list.title}`,
+          `cache: add "${values.title || values.url}" to ${list.title}`,
           (draft) => addItem(draft, list.id, { ...values, title: values.title || values.url }),
           `added to ${list.title}`
         );
@@ -129,36 +136,60 @@ export function createCoolView({ root, say }) {
     });
   }
 
+  // ─────────────────────────────── drawer ────────────────────────────────
+
+  const drawerShot = el("div", { className: "cool-shot" });
+  const drawerNote = el("div", { className: "cool-note" });
+  const drawer = el("div", { className: "cool-drawer" }, [drawerShot, drawerNote]);
+  drawer.setAttribute("aria-hidden", "true");
+  drawer.dataset.open = "false";
+  drawer.onmouseenter = () => clearTimeout(closeTimer);
+  drawer.onmouseleave = () => closeDrawerSoon();
+
+  /** The site's drawer, showing `item`. Thumbnails come from the live site. */
+  function showInDrawer(item) {
+    clearTimeout(closeTimer);
+    const host = hostname(item.url);
+    drawerShot.style.backgroundImage = item.shot ? `url("${site + item.shot}")` : "";
+    drawerShot.replaceChildren(
+      // a brand new shot is only on the site once its commit has deployed
+      item.shot
+        ? el("span")
+        : el("span", {
+            className: "cool-shot-missing",
+            textContent: "no screenshot — re-save it from the popup on the page itself",
+          }),
+      host ? el("span", { className: "cool-host", textContent: `↗ ${host}` }) : null
+    );
+    // notes are markdown on the site — [links](url) work — and toHtml escapes
+    drawerNote.innerHTML = item.note ? toHtml(item.note) : "";
+    drawer.dataset.open = "true";
+  }
+
+  function closeDrawerSoon() {
+    clearTimeout(closeTimer);
+    closeTimer = setTimeout(() => (drawer.dataset.open = "false"), CLOSE_DELAY_MS);
+  }
+
   function entryRow(list, item) {
-    if (editing?.itemId === item.id) return el("li", {}, entryForm(list, item));
+    if (editing?.itemId === item.id) return entryForm(list, item);
 
     const host = hostname(item.url);
     const text = item.label || item.title;
 
     const name = item.url
       ? el("a", { href: item.url, target: "_blank", rel: "noopener noreferrer", textContent: text })
-      : el("span", { textContent: text });
+      : el("span", { className: "entry-text", textContent: text });
+    name.onmouseenter = () => showInDrawer(item);
+    name.onmouseleave = closeDrawerSoon;
 
-    const shot = item.shot
-      ? el("img", {
-          className: "entry-shot",
-          src: site + item.shot,
-          alt: "",
-          loading: "lazy",
-          // the file only exists once the commit that added it has deployed
-          onerror() {
-            this.remove();
-          },
-        })
-      : null;
+    const favicon = el("span", { className: "favicon" });
+    if (host) favicon.style.backgroundImage = `url(https://www.google.com/s2/favicons?domain=${host}&sz=32)`;
 
-    const row = el("li", { draggable: true }, [
-      shot,
-      el("span", { className: "entry-main" }, [
-        name,
-        host ? el("span", { className: "entry-host", textContent: ` (${host})` }) : null,
-        item.note ? el("span", { className: "entry-note", textContent: ` — ${item.note}` }) : null,
-      ]),
+    const row = el("div", { className: "cool-row", draggable: true }, [
+      el("span", { className: "bullet" }),
+      favicon,
+      name,
       el("button", {
         type: "button",
         textContent: "ed",
@@ -169,7 +200,7 @@ export function createCoolView({ root, say }) {
       }),
       deleteButton(`item:${item.id}`, () =>
         commit(
-          `cool: remove "${item.title}" from ${list.title}`,
+          `cache: remove "${item.title}" from ${list.title}`,
           (draft, files) => files.push(...shotRemovals([removeItem(draft, list.id, item.id)])),
           "removed"
         )
@@ -207,10 +238,10 @@ export function createCoolView({ root, say }) {
       const patch = { title: name, description: description.value.trim() };
 
       if (list) {
-        commit(`cool: rename list to "${name}"`, (draft) => updateList(draft, list.id, patch), "updated");
+        commit(`cache: rename list to "${name}"`, (draft) => updateList(draft, list.id, patch), "updated");
       } else {
         commit(
-          `cool: add list "${name}"`,
+          `cache: add list "${name}"`,
           (draft) => updateList(draft, addList(draft, name), patch),
           "list added"
         );
@@ -239,7 +270,7 @@ export function createCoolView({ root, say }) {
 
   function listSection(list) {
     const head = el("div", { className: "list-bar" }, [
-      el("h2", { textContent: list.title }),
+      el("span", { className: "label", textContent: list.title }),
       el("span", { className: "count", textContent: `${list.items.length}` }),
       el("button", {
         type: "button",
@@ -251,7 +282,7 @@ export function createCoolView({ root, say }) {
       }),
       deleteButton(`list:${list.id}`, () =>
         commit(
-          `cool: delete list "${list.title}"`,
+          `cache: delete list "${list.title}"`,
           (draft, files) => files.push(...shotRemovals(removeList(draft, list.id).items)),
           "list deleted"
         )
@@ -265,9 +296,9 @@ export function createCoolView({ root, say }) {
     else if (list.description) body.push(el("p", { className: "list-desc", textContent: list.description }));
 
     body.push(
-      list.items.length
-        ? el("ul", { className: "entries" }, list.items.map((item) => entryRow(list, item)))
-        : el("p", { className: "empty", textContent: "empty" })
+      ...(list.items.length
+        ? list.items.map((item) => entryRow(list, item))
+        : [el("p", { className: "empty", textContent: "empty for now." })])
     );
 
     body.push(
@@ -305,7 +336,7 @@ export function createCoolView({ root, say }) {
       dragging = null;
       section.classList.remove("drop-target");
       commit(
-        `cool: move "${title}" to ${list.title}`,
+        `cache: move "${title}" to ${list.title}`,
         (draft) => moveItem(draft, listId, itemId, list.id),
         `moved to ${list.title}`
       );
@@ -332,7 +363,8 @@ export function createCoolView({ root, say }) {
           })
     );
 
-    root.replaceChildren(...sections);
+    // the drawer outlives a render, so a commit does not blink it shut
+    root.replaceChildren(el("div", { className: "cool-lists" }, sections), drawer);
   }
 
   return {
