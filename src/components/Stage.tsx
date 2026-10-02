@@ -18,7 +18,7 @@ import { scoreBreakdown, type Breakdown } from '@/lib/map/score';
 import { SQRT3 } from '@/lib/map/hex';
 import { generateTerrain } from '@/lib/map/terrain';
 import type { ToolId } from '@/lib/map/tools';
-import { tutorialIsland, type Island } from '@/lib/map/tutorial';
+import { islandSpan, tutorialIsland, type Island } from '@/lib/map/tutorial';
 
 /** The three ways to play with the map. "site" is none of them: the card is up. */
 export const MODES = ['idle', 'free', 'game'] as const;
@@ -85,8 +85,18 @@ export const useMapMode = () => useContext(ModeContext);
 /** Hex radius in px that the grid is sized for when a map is made. */
 const TILE_PX = 24;
 
-/** The tutorial's island is small, so it is drawn bigger. */
+/** The tutorial's island is small, so it is drawn bigger where there's room. */
 const TUTORIAL_TILE_PX = 36;
+
+/** Below this width the site is laid out for a phone (globals.css has the same breakpoint). */
+const PHONE_PX = 900;
+
+/**
+ * On a phone, what the game's UI covers: the status above, the tutorial card
+ * and toolbar below — the toolbar taking two rows on the narrowest (see
+ * globals.css).
+ */
+const phoneCovered = (w: number) => ({ top: 90, bottom: w < 380 ? 310 : 260 });
 
 /** Remembers, per browser, that the tutorial has been played or skipped. */
 const TUTORIAL_KEY = 'transit-control:tutorial-done';
@@ -194,11 +204,22 @@ export default function Stage({ children }: { children: ReactNode }) {
     return emptyBoard(generateTerrain(gridFor(stage.clientWidth, stage.clientHeight), seed));
   }, []);
 
-  // the tutorial's island instead, sized to the window the same way
+  // the tutorial's island instead: on its side on a tall screen, with tiles
+  // small enough to fit it all in the room the UI leaves
   const freshIsland = useCallback(() => {
     const stage = stageRef.current;
     if (!stage) return;
-    const made = tutorialIsland(gridFor(stage.clientWidth, stage.clientHeight, TUTORIAL_TILE_PX));
+    const w = stage.clientWidth;
+    const h = stage.clientHeight;
+    const orientation = h > w ? 'tall' : 'wide';
+    const covered = w < PHONE_PX ? phoneCovered(w) : { top: 0, bottom: 0 };
+    const room = h - covered.top - covered.bottom;
+    const span = islandSpan(orientation);
+    const tilePx = Math.min(TUTORIAL_TILE_PX, w / (SQRT3 * span.cols), room / (1.5 * span.rows));
+    const made = tutorialIsland(gridFor(w, h, tilePx), orientation, {
+      x: 0.5,
+      y: (covered.top + room / 2) / h,
+    });
     setIsland(made);
     setScene({ board: made.board });
   }, []);

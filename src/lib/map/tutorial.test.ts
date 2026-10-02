@@ -6,21 +6,23 @@ import { canPairTunnel, isHouse, layRoute, place, placeTunnel, route } from './b
 import { hexDistance, neighbors, type Grid } from './hex.ts';
 import { networks, score } from './score.ts';
 import { LAND, WATER } from './terrain.ts';
-import { tutorialIsland } from './tutorial.ts';
+import { tutorialIsland, type Orientation } from './tutorial.ts';
 
-const GRIDS: Grid[] = [
-  { cols: 25, rows: 20 },
-  { cols: 34, rows: 25 },
-  { cols: 18, rows: 14 },
+const GRIDS: [Grid, Orientation][] = [
+  [{ cols: 25, rows: 20 }, 'wide'],
+  [{ cols: 34, rows: 25 }, 'wide'],
+  [{ cols: 18, rows: 14 }, 'wide'],
+  [{ cols: 13, rows: 25 }, 'tall'],
+  [{ cols: 12, rows: 20 }, 'tall'],
 ];
 
 test('the island is the same map every time', () => {
-  for (const grid of GRIDS) assert.deepEqual(tutorialIsland(grid).board.tiles, tutorialIsland(grid).board.tiles);
+  for (const [grid, o] of GRIDS) assert.deepEqual(tutorialIsland(grid, o).board.tiles, tutorialIsland(grid, o).board.tiles);
 });
 
 test('each home is a house of two, the main two too far apart to share a station', () => {
-  for (const grid of GRIDS) {
-    const { board, homes } = tutorialIsland(grid);
+  for (const [grid, o] of GRIDS) {
+    const { board, homes } = tutorialIsland(grid, o);
     for (const h of Object.values(homes)) assert.equal(board.build[h], 2);
     assert.ok(hexDistance(board, homes.a, homes.b) > 2);
     assert.equal(board.build.filter(isHouse).length, 3);
@@ -28,8 +30,8 @@ test('each home is a house of two, the main two too far apart to share a station
 });
 
 test('the islet is only reachable by a tunnel between the two shores', () => {
-  for (const grid of GRIDS) {
-    const { board, homes, shores } = tutorialIsland(grid);
+  for (const [grid, o] of GRIDS) {
+    const { board, homes, shores } = tutorialIsland(grid, o);
     assert.ok(shores.every((s) => board.tiles[s] === LAND && neighbors(board, s).some((n) => board.tiles[n] === WATER)));
     assert.ok(canPairTunnel(board, shores[0], shores[1]));
 

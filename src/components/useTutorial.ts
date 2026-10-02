@@ -100,7 +100,7 @@ const STEPS: Step[] = [
   {
     id: 'tunnel',
     title: 'Tunnels',
-    text: 'Only a tunnel crosses water. Click this shore, then that one.',
+    text: 'Only a tunnel crosses water. Tap this shore, then that one.',
     hint: 'tunnel',
     tiles: ({ board, island }) => island.shores.filter((s) => canPlace(board, 'tunnel', s)),
     done: ({ board }) => tunnelPairs(board) > 0,
@@ -121,15 +121,15 @@ const STEPS: Step[] = [
   {
     id: 'inspect',
     title: 'Inspect',
-    text: 'Press esc, then click any tile to see what it’s worth.',
+    text: 'Pick the magnifier, then any tile, to see what it’s worth.',
     hint: 'select',
     done: ({ selecting, pinned }) => selecting && pinned >= 0,
   },
   {
     id: 'undo',
     title: 'Undo',
-    text: 'Right-click erases. Ctrl+Z brings it back. Try both.',
-    hint: 'undo',
+    text: 'Erase anything, then undo it.',
+    hint: ({ erased }) => (erased ? 'undo' : 'erase'),
     done: ({ erased, undid }) => erased && undid,
   },
   {

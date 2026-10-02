@@ -18,7 +18,6 @@ const MAIN = [
   [0, 0],
   [2, 0],
 ];
-const ISLET = [9, 0];
 const RIDGE = [
   [1, -3],
   [2, -3],
@@ -26,14 +25,26 @@ const RIDGE = [
 ];
 const HOME_A = [-2, 1];
 const HOME_B = [4, -1];
-const HOME_C = [9, 0];
-/** The two shores facing each other straight across the strait. */
-const SHORES = [
-  [5, 0],
-  [8, 0],
-];
-// the island spans q -3 to 10, so the anchor sits this far left of the middle
-const SPAN_MIDDLE = 3.5;
+
+/**
+ * Where the islet sits: east of the main island on a wide screen, south of it
+ * on a tall one, so the whole map fits either way. Its home is its middle
+ * tile; the shores face each other straight across the strait. The box is
+ * the island's extent in tile widths (x = q + r/2) and rows, margin included.
+ */
+const LAYOUTS = {
+  wide: { islet: [9, 0], shores: [[5, 0], [8, 0]], box: { x: [-4, 11], y: [-4, 4] } },
+  tall: { islet: [0, 7], shores: [[0, 3], [0, 6]], box: { x: [-4, 6], y: [-4, 9] } },
+};
+
+export type Orientation = keyof typeof LAYOUTS;
+
+/** The island's size in tiles, margin included, for picking a tile size that fits it. */
+export function islandSpan(orientation: Orientation): { cols: number; rows: number } {
+  const { x, y } = LAYOUTS[orientation].box;
+  // and half a tile more each way, for where the island lands after rounding
+  return { cols: x[1] - x[0] + 1, rows: y[1] - y[0] + 1 };
+}
 
 export type Island = {
   board: Board;
@@ -43,10 +54,18 @@ export type Island = {
   shores: [number, number];
 };
 
-export function tutorialIsland(grid: Grid): Island {
-  const midRow = Math.floor(grid.rows / 2);
-  const midQ = Math.floor(grid.cols / 2) - (midRow - (midRow & 1)) / 2;
-  const anchorQ = Math.round(midQ - SPAN_MIDDLE);
+/**
+ * The island on a grid, centred on the point `at` (fractions of the grid's
+ * width and height), so it can sit in whatever part of the screen the UI
+ * leaves free.
+ */
+export function tutorialIsland(grid: Grid, orientation: Orientation = 'wide', at = { x: 0.5, y: 0.5 }): Island {
+  const { islet, shores, box } = LAYOUTS[orientation];
+  const midRow = Math.round(grid.rows * at.y - (box.y[0] + box.y[1]) / 2);
+  const midX = grid.cols * at.x - (box.x[0] + box.x[1]) / 2;
+  // x = q + r/2 for the anchor's row; the map draws column centres a
+  // quarter tile right of the grid's middle, hence the nudge before rounding
+  const anchorQ = Math.round(midX - midRow / 2 - 0.25);
   const tileAt = ([dq, dr]: number[]) => {
     const r = midRow + dr;
     const col = anchorQ + dq + (r - (r & 1)) / 2;
@@ -59,15 +78,15 @@ export function tutorialIsland(grid: Grid): Island {
     const q = colOf(grid, i) - (r - (r & 1)) / 2 - anchorQ;
     const dr = r - midRow;
     const onMain = MAIN.some(([mq, mr]) => dist(q, dr, mq, mr) <= 3);
-    if (onMain || dist(q, dr, ISLET[0], ISLET[1]) <= 1) tiles[i] = LAND;
+    if (onMain || dist(q, dr, islet[0], islet[1]) <= 1) tiles[i] = LAND;
   }
   for (const t of RIDGE) tiles[tileAt(t)] = MOUNTAIN;
 
-  const homes = { a: tileAt(HOME_A), b: tileAt(HOME_B), c: tileAt(HOME_C) };
+  const homes = { a: tileAt(HOME_A), b: tileAt(HOME_B), c: tileAt(islet) };
   let board = emptyBoard({ ...grid, seed: ISLAND_SEED, tiles });
   for (const home of Object.values(homes)) {
     board = place(board, 'house', home)!;
     board = place(board, 'house', home)!;
   }
-  return { board, homes, shores: [tileAt(SHORES[0]), tileAt(SHORES[1])] };
+  return { board, homes, shores: [tileAt(shores[0]), tileAt(shores[1])] };
 }

@@ -590,7 +590,9 @@ a:hover {
   pointer-events: none;
   transition:
     top 380ms cubic-bezier(0.6, 0, 0.2, 1),
+    left 380ms cubic-bezier(0.6, 0, 0.2, 1),
     height 380ms cubic-bezier(0.6, 0, 0.2, 1),
+    width 380ms cubic-bezier(0.6, 0, 0.2, 1),
     opacity 200ms ease;
 }
 
@@ -1095,11 +1097,59 @@ a:hover {
     display: none;
   }
 
-  /* phones get the map behind the card only */
-  .tab[data-tab="/play"],
-  .status {
+  .tab {
+    padding: 0 6px;
+  }
+
+  /* the game and free play on a phone: the toolbar lies along the bottom,
+     one row for the game's few tools and two for free play's */
+  .card[data-size="tool"] {
+    top: calc(100% - 16px - var(--toolbar-height, 104px));
+    left: 16px;
+    right: 24px;
+    bottom: 16px;
+    padding: 0 6px;
+  }
+
+  .stage[data-mode="game"] .card {
+    --toolbar-height: 60px;
+  }
+
+  .toolbar {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-content: center;
+  }
+
+  .toolbar-divider {
+    width: 1px;
+    height: 30px;
+    margin: 0 4px;
+  }
+
+  /* the tool cards open on hover, which a phone doesn't have */
+  .tile-info {
     display: none;
   }
+
+  /* the status keeps to the day and the score; the breakdown needs a hover */
+  .status {
+    font-size: 12px;
+  }
+
+  .status-parts {
+    display: none;
+  }
+
+  .status-day {
+    gap: 6px;
+    margin-right: 10px;
+  }
+
+  .day-bar {
+    width: 56px;
+  }
+
 }
 
 /* ---------- tutorial ---------- */
@@ -1208,6 +1258,34 @@ a:hover {
   from {
     opacity: 0;
     transform: translateY(16px);
+  }
+}
+
+/* on a phone, across the bottom just above the toolbar */
+@media (max-width: 899px) {
+  .tutorial {
+    left: 16px;
+    right: 24px;
+    width: auto;
+    bottom: calc(16px + 60px + 22px);
+    gap: 6px;
+    padding: 14px 18px;
+    font-size: 13px;
+  }
+
+  .tutorial-title {
+    font-size: 22px;
+  }
+}
+
+/* too narrow for the game's tools in one row: two, like free play */
+@media (max-width: 379px) {
+  .stage[data-mode="game"] .card {
+    --toolbar-height: 104px;
+  }
+
+  .tutorial {
+    bottom: calc(16px + 104px + 22px);
   }
 }
 
