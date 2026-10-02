@@ -18,6 +18,10 @@ export default function IntroPage() {
         tunnels, and all the rail you can draw. connect the town and score
         enough by sundown to make it to tomorrow.
       </p>
+      <p>
+        and every other day the land fights back: a flood or a landslide
+        tears through your rail, so build to rebuild.
+      </p>
       <IntroActions />
     </>
   );

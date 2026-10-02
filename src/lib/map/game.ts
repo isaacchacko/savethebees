@@ -21,8 +21,8 @@ export function targetFor(b: Board, day: number): number {
   return Math.max(1, Math.round(TARGET_SHARE * maxScore(b, allowance(day))));
 }
 
-/** Every fifth day the land turns on the town (see sim.catastrophe). */
-export const isCatastropheDay = (day: number) => day % 5 === 0;
+/** Every other day the land turns on the town (see sim.catastrophe). */
+export const isCatastropheDay = (day: number) => day % 2 === 0;
 
 /** How far into a catastrophe day it strikes. */
 export const CATASTROPHE_AT = 0.35;

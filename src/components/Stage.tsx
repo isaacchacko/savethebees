@@ -3,7 +3,6 @@
 import { usePathname, useRouter } from 'next/navigation';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
-import { ExitGlyph } from '@/components/glyphs';
 import GameOver from '@/components/GameOver';
 import MapCanvas, { type Scene } from '@/components/MapCanvas';
 import { useFreePlay } from '@/components/useFreePlay';
@@ -200,17 +199,13 @@ export default function Stage({ children }: { children: ReactNode }) {
           onPointer={play.onPointer}
         />
         {children}
-        {/* idle has no toolbar and no nav, so this X is its only way back;
-            the fp and game pages have theirs in the toolbar */}
         {mode === 'game' && game.phase === 'over' && game.stats ? (
           <GameOver stats={game.stats} reached={game.target} onAgain={freshGameAgain} />
         ) : null}
+        {/* watching (idle) has no toolbar and no nav: a click anywhere on the
+            map is the way back */}
         {mode === 'idle' ? (
-          <div className="modebar">
-            <button type="button" className="map-btn" aria-label="exit" onClick={() => setMode('site')}>
-              <ExitGlyph />
-            </button>
-          </div>
+          <button type="button" className="watch-exit" aria-label="back to the site" onClick={() => setMode('site')} />
         ) : null}
       </div>
     </ModeContext.Provider>

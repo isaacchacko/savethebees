@@ -62,7 +62,7 @@ function statsOf(b: Board, days: number, best: number, catastrophes: number): St
 
 /**
  * The game page's clock. Each day runs for DAY_MS while new residents turn up
- * at odd intervals, scattered; every fifth day a catastrophe strikes partway
+ * at odd intervals, scattered; every other day a catastrophe strikes partway
  * through. When the day runs out the score is held against its target — 90%
  * of what the planner could do with the same people and allowance — and
  * reaching it earns a breather, with more to build with, before the next;

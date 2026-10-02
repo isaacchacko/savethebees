@@ -181,7 +181,8 @@ export function tunnelToward(b: Board, s: number, t: number): [number, number] |
  *    water is in the way, and if even that fails, by reshaping the land:
  *    the first water or mountain tile on the straight line between them is
  *    turned to land;
- * 3. a busy station with no park on its network gets one beside it.
+ * 3. a busy station with no park beside it gets one, facing a mountain
+ *    where it can.
  *
  * Null when everyone is served and connected.
  */
@@ -249,21 +250,24 @@ export function planStep(b: Board, random: Rng): Step | null {
     }
   }
 
-  // 3. a park by a busy station whose network has none
-  const parkNets = new Set<number>();
-  for (let i = 0; i < b.build.length; i++) {
-    if (b.build[i] !== PARK) continue;
-    for (const n of neighbors(b, i)) if (net[n] >= 0) parkNets.add(net[n]);
-  }
-  const busy = all
-    .filter((s) => !parkNets.has(net[s]))
-    .filter((s) => neighbors(b, s).filter((n) => isHouse(b.build[n])).length >= 2);
-  for (const s of busy) {
-    const spots = neighbors(b, s).filter((t) => canPlace(b, 'park', t));
-    if (!spots.length) continue;
-    const spot = pick(random, spots);
-    const next = place(b, 'park', spot);
-    if (next) return { board: next, origin: spot };
+  // 3. parks: a busy station (two or more homes beside it) with no park of its
+  // own gets one, on the free side touching the most mountain for the view,
+  // up to about one park for every four people
+  const people = houses(b).reduce((n, h) => n + b.build[h], 0);
+  const parks = b.build.reduce((n, v) => n + (v === PARK ? 1 : 0), 0);
+  if (parks < people / 4) {
+    const busy = all
+      .filter((s) => !neighbors(b, s).some((n) => b.build[n] === PARK))
+      .filter((s) => neighbors(b, s).filter((n) => isHouse(b.build[n])).length >= 2);
+    for (const s of busy) {
+      const spots = neighbors(b, s).filter((t) => canPlace(b, 'park', t));
+      if (!spots.length) continue;
+      const view = (t: number) => neighbors(b, t).filter((n) => b.tiles[n] === MOUNTAIN).length;
+      const best = Math.max(...spots.map(view));
+      const spot = pick(random, spots.filter((t) => view(t) === best));
+      const next = place(b, 'park', spot);
+      if (next) return { board: next, origin: spot };
+    }
   }
   return null;
 }
@@ -295,7 +299,7 @@ export function tunnelPairs(b: Board): number {
 }
 
 /**
- * Every fifth day of the game, the land turns on the town: a flood or a
+ * Every other day of the game, the land turns on the town: a flood or a
  * landslide around a spot near the rail. It only ever remakes open ground,
  * rail, mountains and water — homes, stations, parks and tunnels (and the
  * water their tunnels run under) are left standing — but any rail it lands

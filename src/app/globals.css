@@ -496,35 +496,16 @@ a:hover {
     visibility 0s linear 420ms;
 }
 
-/* bottom left on the idle and game pages: the way back to the site */
-.modebar {
+/* watching the town: the whole map is the way back to the site */
+.watch-exit {
   position: absolute;
+  inset: 0;
   z-index: 2;
-  left: 56px;
-  bottom: 18px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 13px;
-}
-
-.map-btn {
-  display: flex;
-  align-items: center;
-  align-self: stretch;
-  font: inherit;
-  padding: 4px 10px;
   border: 0;
-  background: var(--paper);
-  color: var(--ink);
+  padding: 0;
+  background: transparent;
   cursor: pointer;
 }
-
-.map-btn:hover {
-  background: var(--ink);
-  color: var(--paper);
-}
-
 
 /* "game" in the footer: a button dressed as the links beside it, held in
    their hover look while the intro page is up */
@@ -1130,7 +1111,6 @@ a:hover {
   }
 
   /* phones get the map behind the card only */
-  .modebar,
   .game-link,
   .status {
     display: none;

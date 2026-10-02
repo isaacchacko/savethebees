@@ -215,7 +215,7 @@ station on its own already scores for its neighbours.
   The target updates as people arrive, and the day is judged on the board it
   ends with. Reach it and you get the next breather; miss it and it's game
   over.
-- **Catastrophes:** every fifth day, 35% of the way through, a flood or a
+- **Catastrophes:** every other day, 35% of the way through, a flood or a
   landslide hits around the rail. It only remakes open ground, rail,
   mountains and water. Houses, stations, parks, tunnels and the water under
   tunnels are left alone, but any rail it lands on is gone. The breather

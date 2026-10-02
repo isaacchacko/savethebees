@@ -25,8 +25,8 @@ test("the target is 90% of the planner's best with the same people and allowance
   assert.ok(targetFor(b, 4) >= targetFor(b, 1));
 });
 
-test('catastrophes come every fifth day', () => {
-  assert.deepEqual([1, 2, 3, 4, 5, 6, 10, 15].map(isCatastropheDay), [false, false, false, false, true, false, true, true]);
+test('catastrophes come every other day', () => {
+  assert.deepEqual([1, 2, 3, 4, 5, 6, 10, 15].map(isCatastropheDay), [false, true, false, true, false, true, true, false]);
 });
 
 test('the allowance only ever grows', () => {
