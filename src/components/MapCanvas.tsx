@@ -121,7 +121,9 @@ export default function MapCanvas({
   preview = null,
   pendingTunnel = -1,
   labels = [],
+  hints = [],
   onPointer,
+  onPress,
 }: {
   scene: Scene | null;
   interactive?: boolean;
@@ -129,13 +131,17 @@ export default function MapCanvas({
   preview?: Preview | null;
   pendingTunnel?: number;
   labels?: TileLabel[];
+  /** Tiles the tutorial points at, ringed and breathing. */
+  hints?: number[];
   onPointer?: (e: TilePointer) => void;
+  /** A click on the map while it isn't interactive. */
+  onPress?: () => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const shown = useRef<Board | null>(null);
   const tweens = useRef<Tweens | null>(null);
-  const overlay = useRef({ ghost, preview, pendingTunnel, labels });
-  overlay.current = { ghost, preview, pendingTunnel, labels };
+  const overlay = useRef({ ghost, preview, pendingTunnel, labels, hints });
+  overlay.current = { ghost, preview, pendingTunnel, labels, hints };
   const layout = useRef({ s: 0, ox: 0, oy: 0 });
   const frame = useRef(0);
   // starts the frame loop if it is idle; set once the canvas is mounted
@@ -255,7 +261,7 @@ export default function MapCanvas({
         }
       }
 
-      const { ghost: g, preview, pendingTunnel: pending, labels: tags } = overlay.current;
+      const { ghost: g, preview, pendingTunnel: pending, labels: tags, hints: pointed } = overlay.current;
 
       // each tunnel's run under the water, as a faint dashed line between its
       // mouths — and the one a second click would make, while it is valid
@@ -359,6 +365,24 @@ export default function MapCanvas({
         ctx.globalAlpha = 1;
       }
 
+      // what the tutorial wants built on or used, in rings that breathe
+      if (pointed.length) {
+        const pulse = 0.5 + 0.5 * Math.sin(now / 260);
+        ctx.setLineDash([s * 0.3, s * 0.18]);
+        ctx.lineDashOffset = -now / 40;
+        ctx.strokeStyle = COLORS.ink;
+        ctx.lineWidth = 2.5;
+        ctx.globalAlpha = 0.55 + 0.45 * pulse;
+        for (const tile of pointed) {
+          const [x, y] = at(tile);
+          hexPath(ctx, x, y, s * (0.78 + 0.08 * pulse));
+          ctx.stroke();
+        }
+        ctx.globalAlpha = 1;
+        ctx.setLineDash([]);
+        ctx.lineDashOffset = 0;
+      }
+
       // select mode: each tile's worth as a paper tag above it, the pinned
       // tile outlined in ink; a tile worth nothing gets no tag
       for (const { tile, value, pinned } of tags) {
@@ -389,7 +413,7 @@ export default function MapCanvas({
         ctx.fillText(text, x, by + bh / 2 + 1);
       }
 
-      return now < t.end || pending >= 0;
+      return now < t.end || pending >= 0 || pointed.length > 0;
     };
 
     const loop = (now: number) => {
@@ -410,7 +434,7 @@ export default function MapCanvas({
   }, []);
 
   // overlays change without the board changing
-  useEffect(() => kick.current(), [ghost, preview, pendingTunnel, labels]);
+  useEffect(() => kick.current(), [ghost, preview, pendingTunnel, labels, hints]);
 
   useEffect(() => {
     if (!scene) return;
@@ -563,11 +587,13 @@ export default function MapCanvas({
       ref={canvasRef}
       className="terrain"
       data-interactive={interactive ? 'true' : 'false'}
+      data-pressable={onPress ? 'true' : 'false'}
       aria-hidden
       onPointerDown={send('down')}
       onPointerMove={send('move')}
       onPointerUp={send('up')}
       onPointerLeave={send('leave')}
+      onClick={() => !interactive && onPress?.()}
       onContextMenu={(e) => interactive && e.preventDefault()}
     />
   );

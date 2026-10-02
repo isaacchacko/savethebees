@@ -10,7 +10,14 @@ import { SlideContext, SlideLink, type Slide } from '@/components/slide';
 import { FP_HREF, GAME_HREF, useMapMode } from '@/components/Stage';
 import SfClock from '@/components/SfClock';
 
+/**
+ * The intro page: the pitch for the game, with the buttons into the game page
+ * and the fp page. It is the game tab, left of home.
+ */
+const INTRO_HREF = '/play';
+
 const TABS = [
+  { href: INTRO_HREF, label: 'game' },
   { href: '/', label: 'home' },
   { href: '/about', label: 'about' },
   { href: '/now', label: 'now' },
@@ -19,19 +26,12 @@ const TABS = [
   { href: '/library', label: 'library' },
 ];
 
-/**
- * The intro page: the pitch for the game, with the buttons into the game page
- * and the fp page. It is off the nav on purpose — the only way in is "game" in
- * the card's footer — so it lives under the home tab.
- */
-const INTRO_HREF = '/play';
-
 // left to right as they sit in the nav, so a slide knows which way to go
 const ORDER = TABS.map((t) => t.href);
 
-/** Where a path sits left to right; the intro page slots just after home. */
+/** Where a path sits left to right. */
 function rank(pathname: string): number {
-  return pathname === INTRO_HREF ? 0.5 : ORDER.indexOf(tabFor(pathname) ?? '');
+  return ORDER.indexOf(tabFor(pathname) ?? '');
 }
 
 const SOCIALS = [
@@ -72,8 +72,8 @@ function slideIn(el: HTMLElement, dir: number) {
  * says hi. A post shares its index's heading, so opening one leaves it put.
  */
 function titleFor(pathname: string): string {
-  if (pathname === INTRO_HREF) return 'Transit Control';
   const tab = tabFor(pathname);
+  if (tab === INTRO_HREF) return 'Transit Control';
   if (!tab || tab === '/') return 'howdy!';
   return TABS.find((t) => t.href === tab)?.label ?? 'howdy!';
 }
@@ -83,16 +83,17 @@ const onMap = (pathname: string) => pathname === FP_HREF || pathname === GAME_HR
 
 /** The tab a path lives under, or null for pages off the nav like /arch. */
 function tabFor(pathname: string): string | null {
-  // the intro and fp pages both sit under home, so the card never takes some
-  // other tab's size on the way between them
-  if (pathname === '/' || pathname === INTRO_HREF || onMap(pathname)) return '/';
+  // the fp and game pages sit under the game tab with the intro page they
+  // are entered from
+  if (pathname === INTRO_HREF || onMap(pathname)) return INTRO_HREF;
+  if (pathname === '/') return '/';
   return (
     ORDER.find((href) => href !== '/' && (pathname === href || pathname.startsWith(href + '/'))) ??
     null
   );
 }
 
-/** home (and the intro page under it) is a small card in the corner; the list-heavy tabs take the width */
+/** home is a small card in the corner; the list-heavy tabs take the width */
 function sizeFor(tab: string | null): 'sm' | 'md' | 'lg' {
   if (tab === '/') return 'sm';
   if (tab === '/blog' || tab === '/library') return 'lg';
@@ -106,8 +107,8 @@ export default function Card({ children }: { children: ReactNode }) {
   // set on click rather than on arrival, so the indicator and the card's size
   // move while the old page is still sliding out
   const [tab, setTab] = useState(() => tabFor(pathname));
-  // where the card is headed, set on click like `tab`: the intro page shares the
-  // home tab, so the footer's "game" needs the path itself to light up early
+  // where the card is headed, set on click like `tab`: the game tab covers the
+  // intro page and the map pages, which take very different cards
   const [dest, setDest] = useState(pathname);
   const cardRef = useRef<HTMLDivElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
@@ -227,9 +228,7 @@ export default function Card({ children }: { children: ReactNode }) {
       <div
         ref={cardRef}
         className="card"
-        // the intro page lives under home's tab but has more to say, so it
-        // takes the full-height card rather than home's corner one
-        data-size={onMap(dest) ? 'tool' : dest === INTRO_HREF ? 'md' : sizeFor(tab)}
+        data-size={onMap(dest) ? 'tool' : sizeFor(tab)}
         data-view={mode === 'free' || mode === 'game' ? 'tool' : 'page'}
       >
         <h1 ref={titleRef} className="card-title">
@@ -249,15 +248,6 @@ export default function Card({ children }: { children: ReactNode }) {
               {s.label}
             </a>
           ))}
-          {/* the only way into the game, passing for one more footer link */}
-          <button
-            type="button"
-            className="game-link"
-            aria-pressed={dest === INTRO_HREF}
-            onClick={() => go(dest === INTRO_HREF ? '/' : INTRO_HREF)}
-          >
-            game
-          </button>
           <SfClock />
         </footer>
         {mode === 'free' || mode === 'game' ? <FreeToolbar /> : null}

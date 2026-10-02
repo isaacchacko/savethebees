@@ -46,7 +46,10 @@ const HIDE_AFTER_MS = 150;
  * and it slides to the next tool when you pick one.
  */
 export default function FreeToolbar() {
-  const { mode, left, newTerrain, tool: selected, setTool, undo, canUndo, selecting, setSelecting } = useMapMode();
+  const { mode, left, newTerrain, tool: selected, setTool, undo, canUndo, selecting, setSelecting, tutorial } =
+    useMapMode();
+  // what the tutorial's step wants pressed, if anything
+  const hint = tutorial?.hint ?? null;
   const tools = mode === 'game' ? TOOLS.filter((t) => GAME_TOOLS.has(t.id)) : TOOLS;
   const toolsRef = useRef(tools);
   toolsRef.current = tools;
@@ -229,6 +232,7 @@ export default function FreeToolbar() {
           aria-label="undo"
           title="undo (ctrl/cmd + z)"
           disabled={!canUndo}
+          data-hint={hint === 'undo' ? 'true' : undefined}
           onMouseDown={noFocus}
           onClick={undo}
         >
@@ -248,6 +252,7 @@ export default function FreeToolbar() {
               onMouseDown={noFocus}
               onClick={() => setSelected(t.id)}
               data-tool={t.id}
+              data-hint={hint === t.id ? 'true' : undefined}
               onMouseEnter={() => peek(t.id)}
               onMouseLeave={hideSoon}
               onFocus={() => peek(t.id)}
@@ -270,6 +275,7 @@ export default function FreeToolbar() {
                 onMouseDown={noFocus}
                 onClick={() => setSelecting(true)}
                 data-tool="select"
+                data-hint={hint === 'select' ? 'true' : undefined}
                 onMouseEnter={() => peek('select')}
                 onMouseLeave={hideSoon}
                 onFocus={() => peek('select')}

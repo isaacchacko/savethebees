@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Scene } from '@/components/MapCanvas';
 import { PARK, STATION, isHouse, type Board } from '@/lib/map/board';
-import { CATASTROPHE_AT, DAY_MS, SPREAD, arrivals, isCatastropheDay, targetFor, type Stats } from '@/lib/map/game';
+import { CATASTROPHE_AT, DAY_MS, TUTORIAL_DAY_MS, SPREAD, arrivals, isCatastropheDay, targetFor, type Stats } from '@/lib/map/game';
 import { neighbors } from '@/lib/map/hex';
 import { score } from '@/lib/map/score';
 import { catastrophe, spawnHousing, tunnelPairs } from '@/lib/map/sim';
@@ -25,6 +25,8 @@ export type GameView = {
   stats: Stats | null;
   /** What just hit the town, shown for a few seconds after it strikes. */
   alert: string | null;
+  /** Catastrophes so far this game. */
+  struck: number;
   startDay: () => void;
   /** A whole new game, on a new map. */
   restart: () => void;
@@ -68,13 +70,17 @@ function statsOf(b: Board, days: number, best: number, catastrophes: number): St
  * reaching it earns a breather, with more to build with, before the next;
  * falling short ends it. `fresh` starts a new game when the page
  * is entered; `spawned` is told about each arrival so undo can forget it.
+ *
+ * The tutorial plays one shorter day with a catastrophe in it, and ends there
+ * whatever the score.
  */
 export function useGame(
   board: Board | null,
   commit: (scene: Scene) => void,
   active: boolean,
   fresh: () => void,
-  spawned: () => void
+  spawned: () => void,
+  tutorial = false
 ) {
   const [phase, setPhase] = useState<Phase>('break');
   const [day, setDay] = useState(1);
@@ -86,7 +92,7 @@ export function useGame(
   const nextArrival = useRef(0);
   const strikesAt = useRef(Infinity);
   const best = useRef(0);
-  const catastrophes = useRef(0);
+  const [struck, setStruck] = useState(0);
   const [alert, setAlert] = useState<string | null>(null);
   const alertTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   useEffect(() => () => clearTimeout(alertTimer.current), []);
@@ -107,8 +113,8 @@ export function useGame(
     setLeft(1);
     setStats(null);
     setAlert(null);
+    setStruck(0);
     best.current = 0;
-    catastrophes.current = 0;
   }, [fresh]);
 
   // a new game every time the page is entered
@@ -116,14 +122,16 @@ export function useGame(
     if (active) restart();
   }, [active, restart]);
 
+  const dayMs = tutorial ? TUTORIAL_DAY_MS : DAY_MS;
+
   const startDay = useCallback(() => {
     const now = performance.now();
-    endsAt.current = now + DAY_MS;
+    endsAt.current = now + dayMs;
     nextArrival.current = now + 1500;
-    strikesAt.current = isCatastropheDay(day) ? now + DAY_MS * CATASTROPHE_AT : Infinity;
+    strikesAt.current = tutorial || isCatastropheDay(day) ? now + dayMs * CATASTROPHE_AT : Infinity;
     setLeft(1);
     setPhase('day');
-  }, [day]);
+  }, [day, dayMs, tutorial]);
 
   useEffect(() => {
     if (!active || phase !== 'day') return;
@@ -138,7 +146,7 @@ export function useGame(
         const hit = catastrophe(b, Math.random);
         commit(hit);
         spawned();
-        catastrophes.current++;
+        setStruck((n) => n + 1);
         setAlert(hit.kind === 'flood' ? 'Flood!' : 'Landslide!');
         clearTimeout(alertTimer.current);
         alertTimer.current = setTimeout(() => setAlert(null), 5000);
@@ -151,23 +159,23 @@ export function useGame(
           commit(step);
           spawned();
         }
-        nextArrival.current = now + (DAY_MS / arrivals(day)) * (0.5 + Math.random());
+        nextArrival.current = now + (dayMs / arrivals(day)) * (0.5 + Math.random());
       }
 
       const remaining = endsAt.current - now;
-      setLeft(Math.max(0, remaining / DAY_MS));
+      setLeft(Math.max(0, remaining / dayMs));
       if (remaining > 0) return;
-      if (score(b) >= targetFor(b, day)) {
+      if (!tutorial && score(b) >= targetFor(b, day)) {
         setDay(day + 1);
         setPhase('break');
       } else {
-        setStats(statsOf(b, day - 1, best.current, catastrophes.current));
+        setStats(statsOf(b, day - 1, best.current, struck));
         setPhase('over');
       }
     }, 200);
     return () => clearInterval(id);
-  }, [active, phase, day, commit, spawned]);
+  }, [active, phase, day, dayMs, tutorial, struck, commit, spawned]);
 
-  const view: GameView = { phase, day, left, target, stats, alert, startDay, restart };
+  const view: GameView = { phase, day, left, target, stats, alert, struck, startDay, restart };
   return view;
 }

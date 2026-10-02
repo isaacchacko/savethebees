@@ -296,6 +296,11 @@ a:hover {
   cursor: crosshair;
 }
 
+/* behind the site's pages, the map is a way into watching it */
+.terrain[data-pressable="true"] {
+  cursor: pointer;
+}
+
 /* on the fp and game pages, a dark vignette at every edge, just enough to
    sink the tiles the window cuts in half; above the map, below the card and
    nav, and never in the way of a click. Card renders it, so it can come on
@@ -505,26 +510,6 @@ a:hover {
   padding: 0;
   background: transparent;
   cursor: pointer;
-}
-
-/* "game" in the footer: a button dressed as the links beside it, held in
-   their hover look while the intro page is up */
-.game-link {
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--ink);
-  font: inherit;
-  text-decoration: underline dotted;
-  text-underline-offset: 3px;
-  cursor: pointer;
-}
-
-.game-link:hover,
-.game-link[aria-pressed="true"] {
-  background: var(--ink);
-  color: var(--paper);
-  text-decoration: none;
 }
 
 /* the intro page's two ways in; the game page is the main one, so its
@@ -1111,9 +1096,125 @@ a:hover {
   }
 
   /* phones get the map behind the card only */
-  .game-link,
+  .tab[data-tab="/play"],
   .status {
     display: none;
+  }
+}
+
+/* ---------- tutorial ---------- */
+
+/* one step at a time, in the corner the island leaves free: a small card in
+   the site card's look, sliding up fresh for each step */
+.tutorial {
+  position: absolute;
+  z-index: 2;
+  left: 56px;
+  bottom: 48px;
+  width: min(340px, calc(100vw - 112px));
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px 24px 18px;
+  background: var(--paper);
+  box-shadow: 8px 8px 0 var(--ink);
+  font-size: 14px;
+  line-height: 1.6;
+  animation: tutorial-in 420ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.tutorial p {
+  margin: 0;
+}
+
+.tutorial-count {
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.tutorial-title {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.tutorial-tick {
+  color: var(--accent);
+  font-size: 22px;
+  opacity: 0;
+  transform: scale(0.4);
+  transition:
+    opacity 200ms ease,
+    transform 320ms cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+.tutorial[data-met="true"] .tutorial-tick {
+  opacity: 1;
+  transform: none;
+}
+
+.tutorial-actions {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-top: 4px;
+}
+
+.tutorial-actions:empty {
+  display: none;
+}
+
+/* a quiet text button: skip, and the intro page's way back to the tutorial */
+.tutorial-skip {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 12px;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.tutorial-skip:hover {
+  color: var(--ink);
+}
+
+.intro-actions .tutorial-skip {
+  align-self: center;
+}
+
+/* what the step wants pressed: a dashed terracotta ring that breathes */
+[data-hint="true"] {
+  outline: 2px dashed var(--accent);
+  outline-offset: 3px;
+  animation: hint-breathe 1.1s ease-in-out infinite;
+}
+
+@keyframes hint-breathe {
+  50% {
+    outline-offset: 6px;
+  }
+}
+
+@keyframes tutorial-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tutorial,
+  [data-hint="true"] {
+    animation: none;
   }
 }
 

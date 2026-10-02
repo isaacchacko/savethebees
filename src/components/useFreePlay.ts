@@ -78,6 +78,8 @@ export function useFreePlay(
   const history = useRef<Board[]>([]);
   const before = useRef<Board | null>(null);
   const [undoable, setUndoable] = useState(0);
+  // how many times undo has been used, for the tutorial to notice
+  const [undos, setUndos] = useState(0);
 
   // a half-placed tunnel means nothing once the tool or the map changes
   useEffect(() => setPendingTunnel(-1), [tool, board?.seed]);
@@ -114,6 +116,7 @@ export function useFreePlay(
     const prev = history.current.pop();
     if (!prev) return;
     setUndoable(history.current.length);
+    setUndos((n) => n + 1);
     press.current = null;
     before.current = null;
     setPreview(null);
@@ -256,5 +259,5 @@ export function useFreePlay(
     return out;
   }, [board, selecting, pinned, hover]);
 
-  return { onPointer, ghost, preview, pendingTunnel, labels, undo, canUndo: undoable > 0, clearHistory };
+  return { onPointer, ghost, preview, pendingTunnel, labels, pinned, undo, undos, canUndo: undoable > 0, clearHistory };
 }

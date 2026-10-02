@@ -5,9 +5,11 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import type { ReactNode } from 'react';
 import GameOver from '@/components/GameOver';
 import MapCanvas, { type Scene } from '@/components/MapCanvas';
+import TutorialCard from '@/components/TutorialCard';
 import { useFreePlay } from '@/components/useFreePlay';
 import { useGame, type GameView } from '@/components/useGame';
 import { useTownSim } from '@/components/useTownSim';
+import { useTutorial, type TutorialView } from '@/components/useTutorial';
 import { emptyBoard, type Board } from '@/lib/map/board';
 import { affordable, left as leftToBuild, type Allowance } from '@/lib/map/game';
 import { rng } from '@/lib/map/noise';
@@ -16,6 +18,7 @@ import { scoreBreakdown, type Breakdown } from '@/lib/map/score';
 import { SQRT3 } from '@/lib/map/hex';
 import { generateTerrain } from '@/lib/map/terrain';
 import type { ToolId } from '@/lib/map/tools';
+import { tutorialIsland, type Island } from '@/lib/map/tutorial';
 
 /** The three ways to play with the map. "site" is none of them: the card is up. */
 export const MODES = ['idle', 'free', 'game'] as const;
@@ -42,6 +45,12 @@ const ModeContext = createContext<{
   game: GameView | null;
   /** What the game still lets you build, when it's on. */
   left: Allowance | null;
+  /** The tutorial's step, while the game is running it. */
+  tutorial: TutorialView | null;
+  /** Whether the tutorial has been played or skipped; null until it's known. */
+  tutorialDone: boolean | null;
+  /** Runs the tutorial again on the next game. */
+  replayTutorial: () => void;
 }>({
   mode: 'site',
   setMode: () => {},
@@ -55,6 +64,9 @@ const ModeContext = createContext<{
   setSelecting: () => {},
   game: null,
   left: null,
+  tutorial: null,
+  tutorialDone: null,
+  replayTutorial: () => {},
 });
 
 /** The fp page has a url of its own, so a reload keeps you in free play. */
@@ -73,14 +85,37 @@ export const useMapMode = () => useContext(ModeContext);
 /** Hex radius in px that the grid is sized for when a map is made. */
 const TILE_PX = 24;
 
+/** The tutorial's island is small, so it is drawn bigger. */
+const TUTORIAL_TILE_PX = 36;
+
+/** Remembers, per browser, that the tutorial has been played or skipped. */
+const TUTORIAL_KEY = 'transit-control:tutorial-done';
+
+function readTutorialDone(): boolean {
+  try {
+    return localStorage.getItem(TUTORIAL_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function writeTutorialDone(done: boolean) {
+  try {
+    if (done) localStorage.setItem(TUTORIAL_KEY, '1');
+    else localStorage.removeItem(TUTORIAL_KEY);
+  } catch {
+    // private windows and blocked storage just see the tutorial again
+  }
+}
+
 /**
  * Enough tiles to cover a w × h box, with a ring spare on every side. The grid
  * is fixed when a map is made; a later resize scales it instead (see the spec).
  */
-function gridFor(w: number, h: number) {
+function gridFor(w: number, h: number, tilePx = TILE_PX) {
   return {
-    cols: Math.ceil(w / (SQRT3 * TILE_PX)) + 2,
-    rows: Math.ceil(h / (1.5 * TILE_PX)) + 3,
+    cols: Math.ceil(w / (SQRT3 * tilePx)) + 2,
+    rows: Math.ceil(h / (1.5 * tilePx)) + 3,
   };
 }
 
@@ -91,7 +126,9 @@ const randomSeed = () => Math.floor(Math.random() * 2 ** 32);
  * entered from the intro page ("free" is the fp page, "game" the game page).
  * The card gets out of the way (globals.css keys off data-mode): it slides off
  * for idle and the game page, and shrinks to the toolbar on the fp page. The
- * nav hides in all of them, so each has its own X to bring the card back.
+ * nav hides in all of them, so each has its own X to bring the card back —
+ * idle's is the map itself, which is also the way into it from any page but
+ * the intro. The first game in a browser is the tutorial.
  */
 export default function Stage({ children }: { children: ReactNode }) {
   const stageRef = useRef<HTMLDivElement>(null);
@@ -115,6 +152,36 @@ export default function Stage({ children }: { children: ReactNode }) {
     },
     [pathname, router]
   );
+
+  // leaving idle lands on the intro page; from any other page the card waits
+  // off screen until the intro is there to slide back in with
+  const leavingWatch = useRef(false);
+  const leaveWatch = useCallback(() => {
+    if (pathname === INTRO_HREF) {
+      setStateMode('site');
+      return;
+    }
+    leavingWatch.current = true;
+    router.push(INTRO_HREF);
+  }, [pathname, router]);
+  useEffect(() => {
+    if (pathname !== INTRO_HREF || !leavingWatch.current) return;
+    leavingWatch.current = false;
+    setStateMode('site');
+  }, [pathname]);
+
+  const [tutorialDone, setTutorialDone] = useState<boolean | null>(null);
+  useEffect(() => setTutorialDone(readTutorialDone()), []);
+  const finishTutorial = useCallback(() => {
+    writeTutorialDone(true);
+    setTutorialDone(true);
+  }, []);
+  const replayTutorial = useCallback(() => {
+    writeTutorialDone(false);
+    setTutorialDone(false);
+  }, []);
+  const inTutorial = mode === 'game' && tutorialDone === false;
+  const [island, setIsland] = useState<Island | null>(null);
   const [scene, setScene] = useState<Scene | null>(null);
   const [tool, setTool] = useState<ToolId>('house');
   const [selecting, setSelecting] = useState(false);
@@ -127,6 +194,15 @@ export default function Stage({ children }: { children: ReactNode }) {
     return emptyBoard(generateTerrain(gridFor(stage.clientWidth, stage.clientHeight), seed));
   }, []);
 
+  // the tutorial's island instead, sized to the window the same way
+  const freshIsland = useCallback(() => {
+    const stage = stageRef.current;
+    if (!stage) return;
+    const made = tutorialIsland(gridFor(stage.clientWidth, stage.clientHeight, TUTORIAL_TILE_PX));
+    setIsland(made);
+    setScene({ board: made.board });
+  }, []);
+
   // a new map comes with a town already on it, which then keeps growing
   const newTerrain = useCallback(() => {
     const seed = randomSeed();
@@ -137,13 +213,17 @@ export default function Stage({ children }: { children: ReactNode }) {
   // the game starts on bare land with a few people already there and no
   // stations yet: building those is the player's job
   const freshGame = useCallback(() => {
+    if (inTutorial) {
+      freshIsland();
+      return;
+    }
     const seed = randomSeed();
     let b: Board | null = freshMap(seed);
     if (!b) return;
     const random = rng(seed);
     for (let k = 0; k < 3; k++) b = spawnHousing(b, random)?.board ?? b;
     setScene({ board: b });
-  }, [freshMap]);
+  }, [freshMap, freshIsland, inTutorial]);
 
   useEffect(newTerrain, [newTerrain]);
 
@@ -153,7 +233,9 @@ export default function Stage({ children }: { children: ReactNode }) {
   const dayRef = useRef(1);
   const allow = useCallback((next: Board) => mode !== 'game' || affordable(next, dayRef.current), [mode]);
   const play = useFreePlay(board, tool, setScene, playing, selecting, allow);
-  const game = useGame(board, setScene, mode === 'game', freshGame, play.clearHistory);
+  // held back until it's known whether this game is the tutorial, so a first
+  // visit doesn't flash a random map before the island
+  const game = useGame(board, setScene, mode === 'game' && tutorialDone !== null, freshGame, play.clearHistory, inTutorial);
   dayRef.current = game.day;
   useTownSim(board, setScene, mode === 'site' || mode === 'idle', newTerrain);
   // on the map with hands on: free play, or a game that isn't over
@@ -170,6 +252,14 @@ export default function Stage({ children }: { children: ReactNode }) {
     () => (board ? scoreBreakdown(board) : { total: 0, housing: 0, park: 0, mountain: 0 }),
     [board]
   );
+  const tutorial = useTutorial(inTutorial, island, {
+    board,
+    game,
+    score: points,
+    selecting,
+    pinned: play.pinned,
+    undos: play.undos,
+  });
 
   return (
     <ModeContext.Provider
@@ -186,6 +276,9 @@ export default function Stage({ children }: { children: ReactNode }) {
         setSelecting,
         game: mode === 'game' ? game : null,
         left: mode === 'game' && board ? leftToBuild(board, game.day) : null,
+        tutorial,
+        tutorialDone,
+        replayTutorial,
       }}
     >
       <div ref={stageRef} className="stage" data-mode={mode}>
@@ -196,16 +289,21 @@ export default function Stage({ children }: { children: ReactNode }) {
           preview={play.preview}
           pendingTunnel={building ? play.pendingTunnel : -1}
           labels={building ? play.labels : []}
+          hints={tutorial?.tiles}
           onPointer={play.onPointer}
+          // on any page but the intro, which has its own Watch button, the
+          // map behind the card is a way into watching
+          onPress={mode === 'site' && pathname !== INTRO_HREF ? () => setMode('idle') : undefined}
         />
         {children}
-        {mode === 'game' && game.phase === 'over' && game.stats ? (
+        {tutorial ? <TutorialCard step={tutorial} onFinish={finishTutorial} /> : null}
+        {mode === 'game' && !inTutorial && game.phase === 'over' && game.stats ? (
           <GameOver stats={game.stats} reached={game.target} onAgain={freshGameAgain} />
         ) : null}
         {/* watching (idle) has no toolbar and no nav: a click anywhere on the
-            map is the way back */}
+            map is the way back, to the intro page */}
         {mode === 'idle' ? (
-          <button type="button" className="watch-exit" aria-label="back to the site" onClick={() => setMode('site')} />
+          <button type="button" className="watch-exit" aria-label="back to the site" onClick={leaveWatch} />
         ) : null}
       </div>
     </ModeContext.Provider>

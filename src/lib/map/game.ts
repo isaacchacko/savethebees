@@ -8,6 +8,9 @@ import { tunnelPairs } from './sim.ts';
 /** How long a day lasts. */
 export const DAY_MS = 45_000;
 
+/** The tutorial's one day, shorter: it is there to show a day, not to test one. */
+export const TUTORIAL_DAY_MS = 30_000;
+
 /** How close to the planner's best a day has to come. */
 export const TARGET_SHARE = 0.9;
 

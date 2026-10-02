@@ -27,8 +27,10 @@ const PARTS: { part: Exclude<keyof Breakdown, 'total'>; tool: ToolId; label: str
  * catastrophe day, and the news when one strikes.
  */
 export default function GameStatus({ hidden }: { hidden: boolean }) {
-  const { score, game } = useMapMode();
-  const between = game?.phase === 'break';
+  const { score, game, tutorial } = useMapMode();
+  // the tutorial holds the day back until it gets to it
+  const between = game?.phase === 'break' && (!tutorial || tutorial.canStart);
+  const hint = tutorial?.hint;
 
   useEffect(() => {
     if (!between || !game) return;
@@ -49,10 +51,15 @@ export default function GameStatus({ hidden }: { hidden: boolean }) {
           {between && isCatastropheDay(game.day) ? <span className="status-alert">catastrophe due</span> : null}
           {game.alert ? <span className="status-alert">{game.alert}</span> : null}
           {between ? (
-            <button type="button" className="status-go" onClick={game.startDay}>
+            <button
+              type="button"
+              className="status-go"
+              data-hint={hint === 'start' ? 'true' : undefined}
+              onClick={game.startDay}
+            >
               Start day {game.day} ▸
             </button>
-          ) : (
+          ) : game.phase === 'break' ? null : (
             <span className="day-bar" role="progressbar" aria-valuenow={Math.round(game.left * 100)} aria-label="day left">
               <span style={{ transform: `scaleX(${game.left})` }} />
             </span>
@@ -67,7 +74,7 @@ export default function GameStatus({ hidden }: { hidden: boolean }) {
           </span>
         ))}
       </span>
-      <span className="status-score">
+      <span className="status-score" data-hint={hint === 'score' ? 'true' : undefined}>
         <span>Score</span>
         <RollingNumber value={score.total} />
         {game ? (
