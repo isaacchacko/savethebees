@@ -279,6 +279,11 @@ a:hover {
   margin-left: auto;
   color: var(--muted);
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.clock-short {
+  display: none;
 }
 
 /* ---------- map ---------- */
@@ -1100,6 +1105,22 @@ a:hover {
 
   .tab {
     padding: 0 6px;
+  }
+
+  /* closer links, and on the narrowest phones the clock drops to a line of
+     its own rather than splitting */
+  .card-footer {
+    flex-wrap: wrap;
+    gap: 6px 12px;
+  }
+
+  /* the footer is too narrow for SF time with its offset: just the time */
+  .clock-full {
+    display: none;
+  }
+
+  .clock-short {
+    display: inline;
   }
 
   /* the game and free play on a phone: the toolbar lies along the bottom,
