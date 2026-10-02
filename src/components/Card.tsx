@@ -219,7 +219,9 @@ export default function Card({ children }: { children: ReactNode }) {
       <div
         ref={cardRef}
         className="card"
-        data-size={onMap(dest) ? 'tool' : sizeFor(tab)}
+        // the intro page lives under home's tab but has more to say, so it
+        // takes the full-height card rather than home's corner one
+        data-size={onMap(dest) ? 'tool' : dest === INTRO_HREF ? 'md' : sizeFor(tab)}
         data-view={mode === 'free' || mode === 'game' ? 'tool' : 'page'}
       >
         <h1 ref={titleRef} className="card-title">
