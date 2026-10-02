@@ -1,54 +1,27 @@
 'use client';
 
-import { useState } from 'react';
-import { FiCheck, FiCopy } from 'react-icons/fi';
+import { useEffect, useRef, useState } from 'react';
 
-export default function CopyButton({
-  value,
-  label = 'copy',
-}: {
-  value: string;
-  label?: string;
-}) {
+export default function CopyButton({ value }: { value: string }) {
   const [copied, setCopied] = useState(false);
+  const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  useEffect(() => () => clearTimeout(timer.current), []);
 
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(value);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
     } catch {
-      // clipboard unavailable, nothing to do
+      return; // clipboard unavailable, nothing to do
     }
+    setCopied(true);
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => setCopied(false), 1400);
   };
 
   return (
-    <button
-      type="button"
-      onClick={copy}
-      className="copy-btn"
-      data-copied={copied ? 'true' : 'false'}
-      aria-label={copied ? 'copied' : label}
-      title={copied ? 'copied' : label}
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        verticalAlign: 'middle',
-        marginLeft: '0.35em',
-        padding: 0,
-        border: 0,
-        background: 'none',
-        cursor: 'pointer',
-        lineHeight: 0,
-        fontSize: 'inherit',
-      }}
-    >
-      {copied ? (
-        <FiCheck size="1em" aria-hidden />
-      ) : (
-        <FiCopy size="1em" aria-hidden />
-      )}
+    <button type="button" onClick={copy} className="copy-btn">
+      {copied ? 'copied' : 'copy'}
     </button>
   );
 }

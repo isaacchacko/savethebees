@@ -16,9 +16,16 @@ export default function NowPlaying() {
   return (
     // reserve one line up front so the trigger appearing after load never
     // shifts the content below it
-    <div style={{ minHeight: '1.6em' }}>
+    <div className="now-playing">
       {playing ? (
-        <HoverPreview trigger={<>i&rsquo;m listening to music rn!</>}>
+        <HoverPreview
+          trigger={
+            <>
+              <span className="now-playing-dot" />
+              i&rsquo;m listening to music rn!
+            </>
+          }
+        >
           <div
             style={{
               display: 'flex',
@@ -37,8 +44,7 @@ export default function NowPlaying() {
                 height={120}
                 style={{
                   display: 'block',
-                  border: '1px solid var(--border)',
-                  borderRadius: 4,
+                  border: '1px solid var(--ink)',
                   flexShrink: 0,
                 }}
               />

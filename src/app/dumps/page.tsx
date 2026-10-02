@@ -1,9 +1,8 @@
-import Link from "next/link";
-import Shell from "@/components/Shell";
+import { SlideLink } from "@/components/slide";
 import { getAllDumps } from "@/lib/dumps";
 
 export const metadata = {
-  title: "yap — isaacchacko.com",
+  title: "traces — isaacchacko.com",
   description: "Write-ups on how things work.",
 };
 
@@ -13,25 +12,30 @@ function monthYear(date: string): string {
   return match ? `${match[2]}/${match[1].slice(2)}` : "";
 }
 
-export default function YapPage() {
+export default function TracesPage() {
   const dumps = getAllDumps();
 
   return (
-    <Shell cmd="ls -l dumps/">
-      <h2 style={{ marginTop: 0 }}>yap</h2>
-      <p>write-ups on how things work. each page is a markdown file.</p>
+    <>
+      <p>just let a man yap</p>
       {dumps.length === 0 ? (
         <p>nothing here yet.</p>
       ) : (
-        <ul className="yap-list">
+        <div className="trace-list">
           {dumps.map((dump) => (
-            <li key={dump.slug}>
-              <Link href={`/dumps/${dump.slug}`}>{dump.title}</Link>
-              <span className="yap-date">{monthYear(dump.date)}</span>
-            </li>
+            <SlideLink
+              key={dump.slug}
+              href={`/dumps/${dump.slug}`}
+              dir={1}
+              className="trace-row"
+            >
+              <span className="trace-title">{dump.title}</span>
+              <span className="muted tabular">{monthYear(dump.date)}</span>
+              <span className="trace-desc">{dump.description}</span>
+            </SlideLink>
           ))}
-        </ul>
+        </div>
       )}
-    </Shell>
+    </>
   );
 }

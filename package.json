@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "node extension/store.test.mjs"
+    "test": "node extension/store.test.mjs && node --test src/lib/map/*.test.ts"
   },
   "dependencies": {
     "@microfleet/ioredis-lock": "^6.0.1",

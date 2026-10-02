@@ -1,12 +1,10 @@
-import Shell from "@/components/Shell";
-
 /** Place the walkthrough clip at this path under `public/`. */
 const ARCH_VIDEO_SRC = "/arch/rice.mp4";
 
 export default function ArchPage() {
   return (
-    <Shell cmd="fastfetch">
-    <h2 style={{ marginTop: 0 }}>arch linux &amp; ricing</h2>
+    <>
+    <h2>arch linux &amp; ricing</h2>
     <p>check out my setup!</p>
 
     <video
@@ -17,10 +15,8 @@ export default function ArchPage() {
         width: "100%",
         aspectRatio: "16 / 9",
         background: "#000",
-        border: "1px solid var(--border)",
-        borderRadius: 4,
+        border: "1px solid var(--ink)",
         display: "block",
-        margin: "1.5rem 0",
       }}
     >
       <source src={ARCH_VIDEO_SRC} type="video/mp4" />
@@ -163,6 +159,6 @@ export default function ArchPage() {
       around to cleaning them up and uploading them, so they&apos;re on
       request for now.
     </p>
-    </Shell>
+    </>
   );
 }

@@ -10,10 +10,13 @@ export type HoverPreviewProps = {
   children: ReactNode;
 };
 
+// viewport coordinates: the box is position: fixed, so a scrolling ancestor
+// with overflow hidden (the site's card) cannot clip it
 type Position = {
   placeAbove: boolean;
-  /** left offset of the box, relative to the wrapper */
   left: number;
+  /** the trigger's top edge when placed above, its bottom edge when below */
+  edge: number;
   /** height cap so the box always fits the chosen side */
   maxHeight: number;
 };
@@ -72,7 +75,7 @@ export default function HoverPreview({ trigger, children }: HoverPreviewProps) {
       leftVp = Math.min(Math.max(leftVp, MARGIN), vw - MARGIN - boxWidth);
     }
 
-    setPos({ placeAbove, left: leftVp - w.left, maxHeight });
+    setPos({ placeAbove, left: leftVp, edge: placeAbove ? w.top : w.bottom, maxHeight });
   }, []);
 
   const handleEnter = useCallback(() => {
@@ -99,13 +102,13 @@ export default function HoverPreview({ trigger, children }: HoverPreviewProps) {
       ? {
           left: pos.left,
           top: 'auto',
-          bottom: '100%',
+          bottom: window.innerHeight - pos.edge,
           paddingTop: 0,
           paddingBottom: BRIDGE,
         }
       : {
           left: pos.left,
-          top: '100%',
+          top: pos.edge,
           bottom: 'auto',
           paddingTop: BRIDGE,
           paddingBottom: 0,
