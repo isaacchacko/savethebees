@@ -1,12 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <circle cx="32" cy="32" r="31" fill="#ffcc4d" />
-  <circle cx="22" cy="26" r="5" fill="#664500" />
-  <circle cx="42" cy="26" r="5" fill="#664500" />
-  <path
-    d="M21 40 Q32 48 43 40"
-    fill="none"
-    stroke="#664500"
-    stroke-width="4.5"
-    stroke-linecap="round"
+  <polygon
+    points="32,2 58,17 58,47 32,62 6,47 6,17"
+    fill="#12200a"
+    stroke="#12200a"
+    stroke-width="4"
+    stroke-linejoin="round"
   />
+  <path d="M6 32 Q32 32 45 54.5" fill="none" stroke="#b9d69e" stroke-width="8" />
+  <circle cx="28.75" cy="37.6" r="9" fill="#12200a" stroke="#b9d69e" stroke-width="4" />
 </svg>
