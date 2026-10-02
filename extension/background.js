@@ -26,7 +26,7 @@ function prettyUrl(url) {
 
 async function buildMenus() {
   await chrome.contextMenus.removeAll();
-  chrome.contextMenus.create({ id: ROOT, title: "add to cache", contexts: CONTEXTS });
+  chrome.contextMenus.create({ id: ROOT, title: "add to library", contexts: CONTEXTS });
 
   const cached = await getCached();
   const lists = cached?.data?.lists || [];
@@ -81,7 +81,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   try {
     if (info.menuItemId === REFRESH) {
       await fetchCool();
-      notify("cache", "lists refreshed");
+      notify("library", "lists refreshed");
       return;
     }
     if (!String(info.menuItemId).startsWith(LIST_PREFIX)) return;
@@ -93,13 +93,13 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     // whose page is not open — gets saved without a screenshot.
     const shot = info.linkUrl ? null : await capture();
 
-    await mutate(`cache: add "${entry.title}" to ${listId}`, (data, files) => {
+    await mutate(`library: add "${entry.title}" to ${listId}`, (data, files) => {
       const id = addItem(data, listId, entry, shot);
       if (shot) files.push({ path: shotPath(id), base64: shot.base64 });
     });
-    notify("cache", `added "${entry.title}" to ${listId}`);
+    notify("library", `added "${entry.title}" to ${listId}`);
   } catch (error) {
-    notify("cache — failed", error.message);
+    notify("library — failed", error.message);
   }
 });
 

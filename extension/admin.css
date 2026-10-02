@@ -490,14 +490,14 @@ body {
   line-height: 1.5;
 }
 
-/* ─────────────────────── traces: the write-up list ──────────────────────── */
+/* ─────────────────────── blog: the post list ──────────────────────── */
 
 .picker {
   display: flex;
   flex-direction: column;
 }
 
-/* a row of the traces index, with del pinned on the end */
+/* a row of the blog index, with del pinned on the end */
 .picker .row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto auto;
@@ -519,27 +519,27 @@ body {
 
 .picker .open:hover,
 .picker .open:hover .muted,
-.picker .open:hover .trace-desc {
+.picker .open:hover .blog-desc {
   color: var(--paper);
 }
 
-.trace-title {
+.blog-title {
   font-size: 18px;
   font-weight: 700;
 }
 
-.trace-desc {
+.blog-desc {
   font-size: 13px;
   color: var(--muted);
 }
 
-.trace-desc:empty::before {
+.blog-desc:empty::before {
   content: "no description";
   font-style: italic;
   color: var(--accent);
 }
 
-.trace-private {
+.blog-private {
   font-size: 12px;
   color: var(--accent);
   letter-spacing: 0.08em;
@@ -565,7 +565,7 @@ body {
   flex: 1;
 }
 
-/* ─────────────────────────── cache, editable ─────────────────────────────── */
+/* ─────────────────────────── library, editable ─────────────────────────────── */
 
 /* the site's layout: lists on the left, a drawer on the right that shows the
    hovered entry's screenshot and note */

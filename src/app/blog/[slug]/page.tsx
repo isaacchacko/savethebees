@@ -16,7 +16,7 @@ export async function generateMetadata({
 }) {
   const { slug } = await params;
   const dump = getDump(slug);
-  if (!dump) return { title: "traces — isaacchacko.com" };
+  if (!dump) return { title: "blog — isaacchacko.com" };
 
   return {
     title: `${dump.title} — isaacchacko.com`,
@@ -48,8 +48,8 @@ export default async function DumpPage({
   return (
     <article className="stack post">
       <div className="post-meta">
-        <SlideLink href="/dumps" dir={-1} className="chip-link">
-          ← traces
+        <SlideLink href="/blog" dir={-1} className="chip-link">
+          ← blog
         </SlideLink>
         <span className="muted tabular">
           {date ? `${date} · ` : ""}

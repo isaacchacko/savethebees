@@ -1,4 +1,4 @@
-// The /cool page (the site's "cache" tab), editable. The popup can do all of
+// The /cool page (the site's "library" tab), editable. The popup can do all of
 // this too, but in a 22rem-wide popup; here every list is open at once, laid
 // out as the site lays them out — hovering an entry slides its screenshot and
 // note into the drawer on the right — and moving one is a drag rather than a
@@ -88,13 +88,13 @@ export function createCoolView({ root, say }) {
 
       if (item) {
         commit(
-          `cache: update "${values.title}" in ${list.title}`,
+          `library: update "${values.title}" in ${list.title}`,
           (draft) => updateItem(draft, list.id, item.id, values),
           "updated"
         );
       } else {
         commit(
-          `cache: add "${values.title || values.url}" to ${list.title}`,
+          `library: add "${values.title || values.url}" to ${list.title}`,
           (draft) => addItem(draft, list.id, { ...values, title: values.title || values.url }),
           `added to ${list.title}`
         );
@@ -200,7 +200,7 @@ export function createCoolView({ root, say }) {
       }),
       deleteButton(`item:${item.id}`, () =>
         commit(
-          `cache: remove "${item.title}" from ${list.title}`,
+          `library: remove "${item.title}" from ${list.title}`,
           (draft, files) => files.push(...shotRemovals([removeItem(draft, list.id, item.id)])),
           "removed"
         )
@@ -238,10 +238,10 @@ export function createCoolView({ root, say }) {
       const patch = { title: name, description: description.value.trim() };
 
       if (list) {
-        commit(`cache: rename list to "${name}"`, (draft) => updateList(draft, list.id, patch), "updated");
+        commit(`library: rename list to "${name}"`, (draft) => updateList(draft, list.id, patch), "updated");
       } else {
         commit(
-          `cache: add list "${name}"`,
+          `library: add list "${name}"`,
           (draft) => updateList(draft, addList(draft, name), patch),
           "list added"
         );
@@ -282,7 +282,7 @@ export function createCoolView({ root, say }) {
       }),
       deleteButton(`list:${list.id}`, () =>
         commit(
-          `cache: delete list "${list.title}"`,
+          `library: delete list "${list.title}"`,
           (draft, files) => files.push(...shotRemovals(removeList(draft, list.id).items)),
           "list deleted"
         )
@@ -336,7 +336,7 @@ export function createCoolView({ root, say }) {
       dragging = null;
       section.classList.remove("drop-target");
       commit(
-        `cache: move "${title}" to ${list.title}`,
+        `library: move "${title}" to ${list.title}`,
         (draft) => moveItem(draft, listId, itemId, list.id),
         `moved to ${list.title}`
       );

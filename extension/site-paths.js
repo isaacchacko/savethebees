@@ -10,15 +10,16 @@
 export function editorFor(pathname) {
   const path = pathname.replace(/\/+$/, "") || "/";
 
-  if (["/about", "/now", "/running", "/cool"].includes(path)) {
+  if (["/about", "/now", "/running", "/library"].includes(path)) {
     return { page: path.slice(1) };
   }
 
-  // learnings redirects to dumps on the site, so an old url still resolves
-  if (path === "/dumps" || path === "/learnings") return { page: "dumps" };
+  // the old names redirect on the site, so an old url still resolves here too
+  if (path === "/cool") return { page: "library" };
+  if (["/blog", "/dumps", "/learnings"].includes(path)) return { page: "blog" };
 
-  const dump = /^\/(?:dumps|learnings)\/([^/]+)$/.exec(path);
-  if (dump) return { page: "dumps", slug: decodeURIComponent(dump[1]) };
+  const post = /^\/(?:blog|dumps|learnings)\/([^/]+)$/.exec(path);
+  if (post) return { page: "blog", slug: decodeURIComponent(post[1]) };
 
   return null;
 }

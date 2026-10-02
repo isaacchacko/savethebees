@@ -137,7 +137,7 @@ async function save() {
   const attach = useShot.checked ? shot : null;
   let savedTo = listSelect.value;
   const ok = await commit(
-    `cache: add "${entry.title}" to ${target}`,
+    `library: add "${entry.title}" to ${target}`,
     (draft, files) => {
       savedTo = makingList ? addList(draft, newListTitle) : listSelect.value;
       const id = addItem(draft, savedTo, entry, attach);
@@ -194,7 +194,7 @@ function itemEditor(list, item) {
         textContent: "save",
         onclick: () =>
           commit(
-            `cache: update "${title.value.trim()}" in ${list.title}`,
+            `library: update "${title.value.trim()}" in ${list.title}`,
             (draft) =>
               updateItem(draft, list.id, item.id, {
                 title: title.value.trim(),
@@ -237,14 +237,14 @@ function listEditor(list) {
     }
     if (list) {
       commit(
-        `cache: rename list to "${name}"`,
+        `library: rename list to "${name}"`,
         (draft) =>
           updateList(draft, list.id, { title: name, description: description.value.trim() }),
         "updated"
       );
     } else {
       commit(
-        `cache: add list "${name}"`,
+        `library: add list "${name}"`,
         (draft) => updateList(draft, addList(draft, name), { description: description.value.trim() }),
         "list added"
       );
@@ -287,7 +287,7 @@ function renderItem(list, item) {
     }),
     deleteButton(`item:${item.id}`, "del", () =>
       commit(
-        `cache: remove "${item.title}" from ${list.title}`,
+        `library: remove "${item.title}" from ${list.title}`,
         (draft, files) => files.push(...shotRemovals([removeItem(draft, list.id, item.id)])),
         "removed"
       )
@@ -333,7 +333,7 @@ function renderList(list) {
     }),
     deleteButton(`list:${list.id}`, "del", () =>
       commit(
-        `cache: delete list "${list.title}"`,
+        `library: delete list "${list.title}"`,
         (draft, files) => files.push(...shotRemovals(removeList(draft, list.id).items)),
         "list deleted"
       )
@@ -371,7 +371,7 @@ function renderList(list) {
     box.classList.remove("drop-target");
     expanded.add(list.id); // so you can see where it landed
     commit(
-      `cache: move "${title}" to ${list.title}`,
+      `library: move "${title}" to ${list.title}`,
       (draft) => moveItem(draft, listId, itemId, list.id),
       `moved to ${list.title}`
     );

@@ -2,11 +2,11 @@ import CoolLists from "@/components/CoolLists";
 import { getCoolLists } from "@/lib/cool";
 
 export const metadata = {
-  title: "cache — isaacchacko.com",
+  title: "library — isaacchacko.com",
   description: "Lists of cool things I find.",
 };
 
-export default function CoolPage() {
+export default function LibraryPage() {
   const lists = getCoolLists();
 
   return (

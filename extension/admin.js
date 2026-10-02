@@ -18,20 +18,22 @@ import { createCoolView } from "./admin-cool.js";
 import { editorFor } from "./site-paths.js";
 
 // labels and card sizes as the site's Card.tsx has them: home is the small
-// corner card, the list-heavy tabs take the width
+// corner card, the list-heavy tabs take the width. The card's heading is the
+// label, except on home, which says hi.
 const PAGES = [
   { id: "home", label: "home", size: "sm" },
   { id: "about", label: "about", size: "md", path: "content/pages/about.md" },
   { id: "now", label: "now", size: "md", path: "content/pages/now.md" },
   { id: "running", label: "runs", size: "md", path: "content/pages/running.md" },
-  { id: "dumps", label: "traces", size: "lg" },
-  { id: "cool", label: "cache", size: "lg" },
+  { id: "blog", label: "blog", size: "lg" },
+  { id: "library", label: "library", size: "lg" },
 ];
 
-const WORDS_PER_MINUTE = 200; // the site's, from dumps/[slug]/page.tsx
+const WORDS_PER_MINUTE = 200; // the site's, from blog/[slug]/page.tsx
 
 const nav = document.getElementById("nav");
 const card = document.getElementById("card");
+const cardTitle = card.querySelector(".card-title");
 const doc = document.getElementById("doc");
 const picker = document.getElementById("picker");
 const hint = document.getElementById("hint");
@@ -85,7 +87,7 @@ function refreshLive() {
   privateWarn.hidden = !privateBox.checked;
   if (!current?.isDump) return;
   const slug = current.path.split("/").pop().replace(/\.md$/, "");
-  setLive(`/dumps/${slug}`, privateBox.checked);
+  setLive(`/blog/${slug}`, privateBox.checked);
 }
 
 /** "2026-08-21" -> "08/21/26", as the post's header shows it. */
@@ -192,7 +194,7 @@ async function showDumps() {
   arming = null;
   setDirty(false);
   doc.classList.remove("post");
-  hint.textContent = "just let a man yap — each trace is a markdown file in content/dumps.";
+  hint.textContent = "just let a man yap — each post is a markdown file in content/dumps.";
   say("loading…");
 
   try {
@@ -218,7 +220,7 @@ async function showDumps() {
   }
 }
 
-/** "2026-08-21" -> "08/26", as the traces index shows it. */
+/** "2026-08-21" -> "08/26", as the blog index shows it. */
 function monthYear(date) {
   const match = /^(\d{4})-(\d{2})/.exec(date || "");
   return match ? `${match[2]}/${match[1].slice(2)}` : "";
@@ -231,9 +233,9 @@ function renderDumps(files) {
   const rows = files.map((file) => {
     const { name } = file;
     const open = el("button", { type: "button", className: "open" }, [
-      el("span", { className: "trace-title", textContent: file.title || name.replace(/\.md$/, "") }),
+      el("span", { className: "blog-title", textContent: file.title || name.replace(/\.md$/, "") }),
       el("span", { className: "muted tabular", textContent: monthYear(file.date) }),
-      el("span", { className: "trace-desc", textContent: file.description || "" }),
+      el("span", { className: "blog-desc", textContent: file.description || "" }),
     ]);
     open.onclick = () => {
       picker.hidden = true;
@@ -254,7 +256,7 @@ function renderDumps(files) {
       },
     });
 
-    const tag = isPrivate(file) ? el("span", { className: "trace-private", textContent: "private" }) : el("span");
+    const tag = isPrivate(file) ? el("span", { className: "blog-private", textContent: "private" }) : el("span");
     return el("div", { className: "row" }, [open, tag, remove]);
   });
 
@@ -262,7 +264,7 @@ function renderDumps(files) {
     el("button", {
       className: "new",
       type: "button",
-      textContent: "+ new trace",
+      textContent: "+ new post",
       onclick: () => newDump(files),
     })
   );
@@ -341,8 +343,9 @@ function selectPage(page) {
     if (button.dataset.id === page.id) button.setAttribute("aria-current", "page");
   }
   card.dataset.size = page.size;
-  // home and cache have nothing held back to save: cache commits every action
-  saveButton.hidden = revertButton.hidden = page.id === "home" || page.id === "cool";
+  cardTitle.textContent = page.id === "home" ? "howdy!" : page.label;
+  // home and library have nothing held back to save: library commits every action
+  saveButton.hidden = revertButton.hidden = page.id === "home" || page.id === "library";
   doc.classList.toggle("labelled", page.id === "about");
   doc.classList.remove("post");
   setLive(page.id === "home" ? "/" : `/${page.id}`);
@@ -358,12 +361,12 @@ function selectPage(page) {
     legend.hidden = true;
     meta.hidden = true;
     hint.textContent =
-      "home is a few lines of jsx and a spotify widget over the map — components, not prose, so there is nothing here to type over. about, now, runs and traces are markdown; cache is cool.json.";
+      "home is a few lines of jsx and a spotify widget over the map — components, not prose, so there is nothing here to type over. about, now, runs and blog are markdown; library is cool.json.";
     say("");
     return;
   }
-  if (page.id === "dumps") return showDumps();
-  if (page.id === "cool") {
+  if (page.id === "blog") return showDumps();
+  if (page.id === "library") {
     coolRoot.hidden = false;
     doc.contentEditable = "false";
     doc.innerHTML = "";

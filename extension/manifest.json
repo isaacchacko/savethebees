@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "cache",
+  "name": "library",
   "version": "2.0.0",
-  "description": "CRUD the cache on isaacchacko.com (and edit the rest of the site), straight from Chrome.",
+  "description": "CRUD the library on isaacchacko.com (and edit the rest of the site), straight from Chrome.",
   "permissions": ["storage", "contextMenus", "activeTab", "notifications"],
   "host_permissions": ["https://api.github.com/*"],
   "background": {
@@ -11,7 +11,7 @@
   },
   "action": {
     "default_popup": "popup.html",
-    "default_title": "add to cache"
+    "default_title": "add to library"
   },
   "options_page": "options.html",
   "icons": {

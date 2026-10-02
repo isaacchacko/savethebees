@@ -1,7 +1,7 @@
-# cache — the Chrome extension
+# library — the Chrome extension
 
-CRUD for the lists on [/cool](https://isaacchacko.com/cool) (the site's
-**cache** tab), and an editor for the rest of the site, from the browser.
+CRUD for the lists on [/library](https://isaacchacko.com/library) (the site's
+**library** tab), and an editor for the rest of the site, from the browser.
 
 There is no server in the loop. The extension edits `content/cool.json` in this
 repo directly through the GitHub contents API; Vercel sees the commit and
@@ -34,7 +34,7 @@ is someone editing this site's files.
 **Toolbar icon** — opens the popup with the current tab's title and URL already
 filled in. Pick a list, add a note if you want, save. The popup closes itself.
 
-**Right-click** — _add to cache → \<list\>_ on any page or link, no popup. A
+**Right-click** — _add to library → \<list\>_ on any page or link, no popup. A
 selection becomes the note on a page, or the title on a link. The submenu is
 built from the cached lists; _refresh lists_ re-reads them from GitHub.
 
@@ -68,9 +68,9 @@ the popup and the admin view cannot disagree about it.
 
 The popup's **edit website** button opens a stand-in for the site you can type
 into: the same card over the same green field, the same nav, the same
-markdown rendering, with about, now, runs and traces editable in place. The
+markdown rendering, with about, now, runs and blog editable in place. The
 card takes the size the site gives each tab — home the small corner card,
-about/now/runs the tall one, traces and cache the full width. Type over
+about/now/runs the tall one, blog and library the full width. Type over
 the text, hit save (or cmd-S), and it commits to `content/` — same conditional
 ref update as everything else here, so a change that landed elsewhere is a
 conflict rather than an overwrite.
@@ -80,7 +80,7 @@ over the map — components, not prose, with nothing to type over.
 
 ### The page's `# title` is not on the site
 
-The site drops a page's h1: the card already says "howdy!", and a post takes
+The site drops a page's h1: the card's heading already names the tab, and a post takes
 its title from the front matter. The line is still in the file, so the editor
 keeps it editable, but faded, struck through and labelled *not shown on the
 site* so nobody polishes a line no visitor will read.
@@ -104,7 +104,7 @@ open.
 ### Seeing it live
 
 **live ↗** in the titlebar opens whatever you are editing on the real site, in
-a new tab — `/about`, `/cool`, `/dumps/<slug>`, and so on. It is an anchor
+a new tab — `/about`, `/library`, `/blog/<slug>`, and so on. It is an anchor
 rather than a button so the url is there to copy or middle-click.
 
 For a write-up it points at the *saved* slug, not the one sitting in the field.
@@ -115,9 +115,9 @@ pending one. After a rename it follows to the new url.
 The site it points at is the **site url** in options, which defaults to
 isaacchacko.com.
 
-### The cache page, from the admin view
+### The library page, from the admin view
 
-The **cache** tab is the popup's manage view with room to breathe, laid out as
+The **library** tab is the popup's manage view with room to breathe, laid out as
 the site lays it out: every list open at once, each entry a bullet, a favicon
 and its label, and hovering one slides its screenshot and note into the drawer
 on the right. Moving an entry between lists is a drag rather than a trip
@@ -137,16 +137,17 @@ has deployed.
 
 ### Dumps are files, so the admin view CRUDs them
 
-The page is called **traces**; a single write-up is a dump. The route and the
-content directory stay `dumps`.
+The page is called **blog** and lives at `/blog`; the old `/dumps` and
+`/learnings` urls redirect there. A single post is still a dump in the code,
+and the content directory stays `content/dumps`.
 
-The **traces** tab lists every dump the way the site's index does — title,
+The **blog** tab lists every dump the way the site's index does — title,
 month and description, newest first — with a **del** next to it and a
-**+ new trace** button underneath. A private one is tagged. A missing
+**+ new post** button underneath. A private one is tagged. A missing
 description shows as *no description*, because the site's index shows an empty
 line there. Delete asks twice, the same as everywhere else here.
 
-Opening one shows the post's header as the site draws it: **← traces**, the
+Opening one shows the post's header as the site draws it: **← blog**, the
 date and read time (kept current as you type), then the title and description
 as inputs dressed as the real thing, because those are what the site reads,
 not the body. The date, slug and private flag sit under **front matter**,
@@ -296,7 +297,7 @@ really did commit underneath you. Try again.
 | `background.js`       | context menus and their handler                            |
 | `popup.js`            | the add form and the manage view                           |
 | `admin.js`            | the editable stand-in for the site                         |
-| `admin-cool.js`       | the cache page's lists, entries and drawer, editable       |
+| `admin-cool.js`       | the library page's lists, entries and drawer, editable       |
 | `site-paths.js`       | which admin page edits which url on the site               |
 | `markdown.js`         | markdown in, DOM out, and back again                       |
 | `shot.js`             | screenshot capture and shrinking                           |

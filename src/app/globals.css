@@ -860,14 +860,14 @@ a:hover {
   background: var(--ink);
 }
 
-/* traces */
+/* blog */
 
-.trace-list {
+.blog-list {
   display: flex;
   flex-direction: column;
 }
 
-.trace-row {
+.blog-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 0 32px;
@@ -876,18 +876,18 @@ a:hover {
   text-decoration: none;
 }
 
-.trace-title {
+.blog-title {
   font-size: 18px;
   font-weight: 700;
 }
 
-.trace-desc {
+.blog-desc {
   font-size: 13px;
   color: var(--muted);
 }
 
-.trace-row:hover .muted,
-.trace-row:hover .trace-desc {
+.blog-row:hover .muted,
+.blog-row:hover .blog-desc {
   color: var(--rule);
 }
 
@@ -928,7 +928,7 @@ a:hover {
   text-wrap: balance;
 }
 
-/* cache */
+/* library */
 
 .cool {
   display: grid;

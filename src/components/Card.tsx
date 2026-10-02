@@ -15,8 +15,8 @@ const TABS = [
   { href: '/about', label: 'about' },
   { href: '/now', label: 'now' },
   { href: '/running', label: 'runs' },
-  { href: '/dumps', label: 'traces' },
-  { href: '/cool', label: 'cache' },
+  { href: '/blog', label: 'blog' },
+  { href: '/library', label: 'library' },
 ];
 
 /**
@@ -67,8 +67,16 @@ function slideIn(el: HTMLElement, dir: number) {
   );
 }
 
-/** The card's heading: the intro page has its own, every other page says hi. */
-const titleFor = (pathname: string) => (pathname === INTRO_HREF ? 'Transit Control' : 'howdy!');
+/**
+ * The card's heading names the tab it is on; home, and anything off the nav,
+ * says hi. A post shares its index's heading, so opening one leaves it put.
+ */
+function titleFor(pathname: string): string {
+  if (pathname === INTRO_HREF) return 'Transit Control';
+  const tab = tabFor(pathname);
+  if (!tab || tab === '/') return 'howdy!';
+  return TABS.find((t) => t.href === tab)?.label ?? 'howdy!';
+}
 
 /** The fp and game pages: the card is the toolbar, the map is the page. */
 const onMap = (pathname: string) => pathname === FP_HREF || pathname === GAME_HREF;
@@ -87,7 +95,7 @@ function tabFor(pathname: string): string | null {
 /** home (and the intro page under it) is a small card in the corner; the list-heavy tabs take the width */
 function sizeFor(tab: string | null): 'sm' | 'md' | 'lg' {
   if (tab === '/') return 'sm';
-  if (tab === '/dumps' || tab === '/cool') return 'lg';
+  if (tab === '/blog' || tab === '/library') return 'lg';
   return 'md';
 }
 
@@ -105,7 +113,7 @@ export default function Card({ children }: { children: ReactNode }) {
   const bodyRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const footerRef = useRef<HTMLElement>(null);
-  // the title only rides along when the slide changes it, i.e. to or from play
+  // the title only rides along when the slide changes it, i.e. between tabs
   const titleSliding = useRef(false);
   const footerSliding = useRef(false);
   const pathnameRef = useRef(pathname);
@@ -123,7 +131,7 @@ export default function Card({ children }: { children: ReactNode }) {
   const enterDir = useRef(0);
   const navigateTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
-  const isPost = /^\/dumps\/[^/]+$/.test(pathname);
+  const isPost = /^\/blog\/[^/]+$/.test(pathname);
 
   const updateProgress = useCallback(() => {
     const body = bodyRef.current;

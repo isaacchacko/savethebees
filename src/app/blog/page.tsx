@@ -2,7 +2,7 @@ import { SlideLink } from "@/components/slide";
 import { getAllDumps } from "@/lib/dumps";
 
 export const metadata = {
-  title: "traces — isaacchacko.com",
+  title: "blog — isaacchacko.com",
   description: "Write-ups on how things work.",
 };
 
@@ -12,7 +12,7 @@ function monthYear(date: string): string {
   return match ? `${match[2]}/${match[1].slice(2)}` : "";
 }
 
-export default function TracesPage() {
+export default function BlogPage() {
   const dumps = getAllDumps();
 
   return (
@@ -21,17 +21,17 @@ export default function TracesPage() {
       {dumps.length === 0 ? (
         <p>nothing here yet.</p>
       ) : (
-        <div className="trace-list">
+        <div className="blog-list">
           {dumps.map((dump) => (
             <SlideLink
               key={dump.slug}
-              href={`/dumps/${dump.slug}`}
+              href={`/blog/${dump.slug}`}
               dir={1}
-              className="trace-row"
+              className="blog-row"
             >
-              <span className="trace-title">{dump.title}</span>
+              <span className="blog-title">{dump.title}</span>
               <span className="muted tabular">{monthYear(dump.date)}</span>
-              <span className="trace-desc">{dump.description}</span>
+              <span className="blog-desc">{dump.description}</span>
             </SlideLink>
           ))}
         </div>
