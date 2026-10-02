@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { GameView } from '@/components/useGame';
-import { STATION, TUNNEL, canPlace, type Board } from '@/lib/map/board';
+import type { Allowance } from '@/lib/map/game';
+import { PARK, STATION, TUNNEL, canPlace, isHouse, type Board } from '@/lib/map/board';
 import { neighbors } from '@/lib/map/hex';
 import { networks, type Breakdown } from '@/lib/map/score';
 import { tunnelPairs } from '@/lib/map/sim';
@@ -26,7 +27,12 @@ type Now = {
   struckBy: string;
   /** The tiles the tutorial's tsunami drowned. */
   washedOut: number[];
+  /** What the day still lets the player build. */
+  left: Allowance | null;
 };
+
+/** The tools the day rations, which a step can run out of. */
+type Rationed = keyof Allowance;
 
 type Step = {
   id: string;
@@ -37,7 +43,28 @@ type Step = {
   tiles?: (n: Now) => number[];
   /** Met by playing; a step without one waits for its button instead. */
   done?: (n: Now) => boolean;
+  /** The rationed tool the step still needs, so running out of it can be caught. */
+  needs?: Rationed | ((n: Now) => Rationed | null);
 };
+
+const NAMES: Record<Rationed, string> = { station: 'stations', park: 'parks', tunnel: 'tunnels' };
+
+/**
+ * Built where it can't help: a station no house needs (none beside it, or
+ * each beside it has another), a park by no station. A
+ * step that has run out of something rings these as the ones to erase.
+ */
+function strays(b: Board, tool: Rationed): number[] {
+  const out: number[] = [];
+  b.build.forEach((v, i) => {
+    const by = (test: (n: number) => boolean) => neighbors(b, i).some(test);
+    // a station is only needed by a house it alone serves
+    const needed = by((n) => isHouse(b.build[n]) && stationsBy(b, n).length === 1);
+    if (tool === 'station' && v === STATION && !needed) out.push(i);
+    if (tool === 'park' && v === PARK && !by((n) => b.build[n] === STATION)) out.push(i);
+  });
+  return out;
+}
 
 const stationsBy = (b: Board, home: number) => neighbors(b, home).filter((n) => b.build[n] === STATION);
 const spotsBy = (b: Board, home: number) => neighbors(b, home).filter((n) => canPlace(b, 'station', n));
@@ -66,6 +93,7 @@ const STEPS: Step[] = [
     text: 'People board at a station next to home. Press [s], then build one by this house.',
     touch: 'People board at a station next to home. Pick the station, then build one by this house.',
     hint: 'station',
+    needs: 'station',
     tiles: ({ board, island }) => spotsBy(board, island.homes.a),
     done: ({ board, island }) => served(board, island.homes.a),
   },
@@ -74,6 +102,7 @@ const STEPS: Step[] = [
     title: 'Another',
     text: 'And one by this house.',
     hint: 'station',
+    needs: 'station',
     tiles: ({ board, island }) => spotsBy(board, island.homes.b),
     done: ({ board, island }) => served(board, island.homes.b),
   },
@@ -98,6 +127,7 @@ const STEPS: Step[] = [
     text: 'Anyone who can reach a park scores for it. Press [p] and build one by a station.',
     touch: 'Anyone who can reach a park scores for it. Pick the park and build one by a station.',
     hint: 'park',
+    needs: 'park',
     tiles: ({ board }) => {
       const out = new Set<number>();
       board.build.forEach((v, i) => {
@@ -122,6 +152,7 @@ const STEPS: Step[] = [
     text: 'Now get this house on the network: [s] for a station, [r] for rail.',
     touch: 'Now get this house on the network.',
     hint: ({ board, island }) => (served(board, island.homes.c) ? 'rail' : 'station'),
+    needs: ({ board, island }) => (served(board, island.homes.c) ? null : 'station'),
     tiles: ({ board, island }) => {
       const c = island.homes.c;
       if (!served(board, c)) return spotsBy(board, c);
@@ -257,6 +288,12 @@ export function useTutorial(
   const full: Now | null =
     island && board ? { ...now, board, island, erased, undid: now.undos > undosAtStart, struckBy } : null;
   const met = !!full && !!step.done?.(full);
+  const read = <T>(v: T | ((n: Now) => T)) => (typeof v === 'function' ? (v as (n: Now) => T)(full!) : v);
+
+  // run out of what the step needs (a stray station, a park out of reach)
+  // and it turns into erasing one that isn't helping
+  const needs = full && !met && step.needs ? read(step.needs) : null;
+  const outOf = needs && full?.left && full.left[needs] <= 0 ? needs : null;
 
   useEffect(() => {
     if (!active || !met) return;
@@ -264,24 +301,28 @@ export function useTutorial(
     return () => clearTimeout(id);
   }, [active, met, index]);
 
-  const tiles = full && step.tiles && !met ? step.tiles(full) : null;
+  const tiles = outOf ? strays(full!.board, outOf) : full && step.tiles && !met ? step.tiles(full) : null;
   const tilesKey = tiles?.join() ?? '';
   // the same rings keep the same array, so the canvas isn't told twice
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const stableTiles = useMemo(() => tiles ?? [], [tilesKey]);
 
   if (!active || !full) return null;
-  const read = <T>(v: T | ((n: Now) => T)) => (typeof v === 'function' ? (v as (n: Now) => T)(full) : v);
-  const text = read(step.text);
+  const text = outOf
+    ? `No ${NAMES[outOf]} left. Press [e] and erase one that isn’t helping, then try again.`
+    : read(step.text);
+  const touch = outOf
+    ? `No ${NAMES[outOf]} left. Pick the eraser and clear one that isn’t helping, then try again.`
+    : (step.touch ?? text);
   return {
     index,
     count: STEPS.length,
     title: read(step.title),
     text,
-    touch: step.touch ?? text,
+    touch,
     met,
     manual: !step.done,
-    hint: step.hint && !met ? read(step.hint) : null,
+    hint: outOf ? 'erase' : step.hint && !met ? read(step.hint) : null,
     tiles: stableTiles,
     canStart: index >= START_STEP,
     next: () => setIndex((i) => Math.min(i + 1, LAST_STEP)),

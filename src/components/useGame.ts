@@ -3,7 +3,19 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Scene } from '@/components/MapCanvas';
 import { PARK, STATION, isHouse, type Board } from '@/lib/map/board';
-import { CATASTROPHE_AT, DAY_MS, TUTORIAL_DAY_MS, SPREAD, arrivals, isCatastropheDay, targetFor, type Stats } from '@/lib/map/game';
+import {
+  CATASTROPHE_AT,
+  DAY_MS,
+  SPREAD,
+  TARGET_SHARE,
+  TUTORIAL_DAY_MS,
+  TUTORIAL_SPREAD,
+  TUTORIAL_TARGET_SHARE,
+  arrivals,
+  isCatastropheDay,
+  targetFor,
+  type Stats,
+} from '@/lib/map/game';
 import { neighbors } from '@/lib/map/hex';
 import { score } from '@/lib/map/score';
 import { catastrophe, spawnHousing, tunnelPairs } from '@/lib/map/sim';
@@ -108,9 +120,9 @@ export function useGame(
   // it's only worked out again when someone arrives (or a new day begins)
   const homes = board ? board.build.map((v) => (isHouse(v) ? v : 0)).join('') : '';
   const target = useMemo(
-    () => (board ? targetFor(board, day) : 1),
+    () => (board ? targetFor(board, day, tutorial ? TUTORIAL_TARGET_SHARE : TARGET_SHARE) : 1),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [homes, day, board?.seed]
+    [homes, day, board?.seed, tutorial]
   );
 
   const restart = useCallback(() => {
@@ -150,6 +162,9 @@ export function useGame(
 
       if (now >= strikesAt.current) {
         strikesAt.current = Infinity;
+        // the tutorial's rebuild is guaranteed room only if no one moves
+        // onto the ground the rail was washed off
+        if (tutorial) nextArrival.current = Infinity;
         const hit = scripted?.(b) ?? catastrophe(b, Math.random);
         commit(hit);
         spawned();
@@ -161,7 +176,7 @@ export function useGame(
       }
 
       if (now >= nextArrival.current) {
-        const step = spawnHousing(b, Math.random, SPREAD);
+        const step = spawnHousing(b, Math.random, tutorial ? TUTORIAL_SPREAD : SPREAD);
         if (step) {
           commit(step);
           spawned();

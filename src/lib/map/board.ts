@@ -247,9 +247,17 @@ export function route(
    * Also cross existing rail, at a cost, on the understanding that a station
    * will be put on each crossing — the planner's way past a rail wall.
    */
-  crossings = false
+  crossings = false,
+  /**
+   * Also stop at a free tunnel mouth whose far end is already joined to `to`
+   * by rail, since the tunnel finishes the trip — so a player's drag to a
+   * station across water still works when only this side's line is missing.
+   * The path then ends at that mouth.
+   */
+  join = false
 ): number[] | null {
   if (from === to || b.build[from] !== STATION || !canEndAt(b, to)) return null;
+  const joined = join ? railFrom(b, to) : null;
   const n = tileCount(b);
   const crossable = (t: number) => crossings && b.build[t] === EMPTY && b.tiles[t] === LAND && bits(b.rail[t]) <= 2 && b.rail[t] !== 0;
   const passable = (t: number) =>
@@ -301,7 +309,8 @@ export function route(
     if (c > cost[s]) continue;
     const u = Math.floor(s / 7);
     const arrived = s % 7;
-    if (u === to) {
+    const joins = joined && b.build[u] === TUNNEL && u !== from && arrived !== JUMP && joined.has(b.partner[u]);
+    if (u === to || joins) {
       end = s;
       break;
     }
@@ -330,6 +339,24 @@ export function route(
   const path: number[] = [];
   for (let s = end; s >= 0; s = prev[s]) path.push(Math.floor(s / 7));
   return path.reverse();
+}
+
+/** Every tile rail and tunnels already join to tile t, t included. */
+function railFrom(b: Board, t: number): Set<number> {
+  const seen = new Set([t]);
+  const queue = [t];
+  for (let head = 0; head < queue.length; head++) {
+    const u = queue[head];
+    const next: number[] = [];
+    for (let d = 0; d < 6; d++) if (b.rail[u] & (1 << d)) next.push(neighborAt(b, u, d));
+    if (b.build[u] === TUNNEL && b.partner[u] >= 0) next.push(b.partner[u]);
+    for (const n of next) {
+      if (n < 0 || seen.has(n)) continue;
+      seen.add(n);
+      queue.push(n);
+    }
+  }
+  return seen;
 }
 
 /** Lays a route from `route`: rail between each pair of neighbours along it. */

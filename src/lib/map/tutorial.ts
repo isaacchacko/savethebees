@@ -3,8 +3,8 @@
 // and two homes far apart, and an islet across a strait with a third home
 // that only a tunnel can reach.
 
-import { EMPTY, STATION, TUNNEL, emptyBoard, paintTerrain, place, type Board } from './board.ts';
-import { colOf, neighbors, rowOf, tileCount, type Grid } from './hex.ts';
+import { EMPTY, STATION, TUNNEL, emptyBoard, erase, paintTerrain, place, type Board } from './board.ts';
+import { colOf, neighborAt, neighbors, rowOf, tileCount, type Grid } from './hex.ts';
 import { LAND, MOUNTAIN, WATER } from './terrain.ts';
 
 export const ISLAND_SEED = 7;
@@ -107,10 +107,13 @@ export function tutorialIsland(grid: Grid, orientation: Orientation = 'wide', at
 
 /**
  * The tutorial's catastrophe, scripted so it always teaches the same thing: a
- * tsunami rolls over the main island's south coast, drowning the open ground
- * and rail on its last two rows, plus the southernmost stretch of rail if
- * none was down there. It leaves every building, and a tile of ground beside
- * each station and tunnel mouth, so the network can always be rebuilt.
+ * tsunami rolls over the main island's south coast. On its last two rows it
+ * drowns the open ground and washes away the rail (the southernmost stretch
+ * of rail, if none was down there), along with the dead ends that leaves,
+ * back to a station or tunnel mouth. Buildings stand, and the ground under
+ * the rail and beside each station and tunnel mouth stays land — so every
+ * route it breaks can be laid again exactly where it was, by the same
+ * station-to-station drag that built it.
  */
 export function tsunami(b: Board, island: Island): { board: Board; origin: number; tiles: number[] } {
   const guarded = (i: number) => neighbors(b, i).some((n) => b.build[n] === STATION || b.build[n] === TUNNEL);
@@ -121,6 +124,37 @@ export function tsunami(b: Board, island: Island): { board: Board; origin: numbe
     if (rail.length) hit.push(rail[0]);
   }
   let board = b;
-  for (const i of hit) board = paintTerrain(board, i, WATER);
-  return { board, origin: island.waveFrom, tiles: hit };
+  for (const i of hit) board = b.rail[i] ? (erase(board, i) ?? board) : paintTerrain(board, i, WATER);
+  const pruned = deadEnds(board);
+  for (const i of pruned) board = erase(board, i) ?? board;
+  return { board, origin: island.waveFrom, tiles: [...hit, ...pruned] };
+}
+
+const ends = (m: number) => {
+  let c = 0;
+  for (; m; m &= m - 1) c++;
+  return c;
+};
+
+/**
+ * Rail that leads nowhere: on open ground with one end, and whatever that
+ * leaves with one end in turn, back to a station or a tunnel mouth.
+ */
+function deadEnds(b: Board): number[] {
+  const rail = b.rail.slice();
+  const out: number[] = [];
+  const open = (i: number) => b.build[i] === EMPTY && rail[i] !== 0 && ends(rail[i]) === 1;
+  const queue = Array.from(rail.keys()).filter(open);
+  while (queue.length) {
+    const i = queue.pop()!;
+    if (!open(i)) continue;
+    out.push(i);
+    const d = Math.log2(rail[i]);
+    const n = neighborAt(b, i, d);
+    rail[i] = 0;
+    if (n < 0) continue;
+    rail[n] &= ~(1 << ((d + 3) % 6));
+    if (open(n)) queue.push(n);
+  }
+  return out;
 }

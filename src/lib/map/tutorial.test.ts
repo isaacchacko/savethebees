@@ -55,12 +55,25 @@ test('the islet is only reachable by a tunnel between the two shores', () => {
     // beside a station or tunnel mouth
     const hit = tsunami(b, tutorialIsland(grid, o));
     assert.ok(hit.tiles.some((t) => b.rail[t]));
-    assert.ok(hit.tiles.every((t) => hit.board.tiles[t] === WATER));
+    assert.ok(hit.tiles.every((t) => hit.board.rail[t] === 0));
+    const flooded = hit.tiles.filter((t) => hit.board.tiles[t] === WATER);
+    assert.ok(flooded.length > 0);
     assert.deepEqual(hit.board.build, b.build);
     assert.ok(score(hit.board) < score(b));
+    // and it is rebuilt the way it was built: station to station
+    let fixed = hit.board;
+    for (const [s, t] of [[sa, sb], [sb, sc]]) {
+      const net = networks(fixed);
+      if (net[s] === net[t]) continue;
+      // as the player's drag routes: free to finish at a tunnel whose far side is still joined
+      const path = route(fixed, s, t, false, true);
+      assert.ok(path, 'a station-to-station drag rebuilds it');
+      fixed = layRoute(fixed, path);
+    }
+    assert.equal(score(fixed), 24);
     for (let i = 0; i < b.build.length; i++) {
       if (b.build[i] !== STATION && b.build[i] !== TUNNEL) continue;
-      assert.ok(neighbors(b, i).every((n) => !hit.tiles.includes(n)));
+      assert.ok(neighbors(b, i).every((n) => !flooded.includes(n)));
     }
   }
 });

@@ -20,8 +20,8 @@ export const TARGET_SHARE = 0.9;
  * same allowance. It moves as people arrive, and the day is judged on the
  * board it ends with.
  */
-export function targetFor(b: Board, day: number): number {
-  return Math.max(1, Math.round(TARGET_SHARE * maxScore(b, allowance(day))));
+export function targetFor(b: Board, day: number, share = TARGET_SHARE): number {
+  return Math.max(1, Math.round(share * maxScore(b, allowance(day))));
 }
 
 /** Every other day the land turns on the town (see sim.catastrophe). */
@@ -79,6 +79,14 @@ export function arrivals(day: number): number {
 
 /** How scattered they are: higher than the site's town, so they land in awkward places. */
 export const SPREAD = 0.3;
+
+/**
+ * The tutorial's day is there to be won: half the planner's best, with
+ * newcomers settling by the town (the site's spread) rather than off in
+ * awkward places, since its few stations are all spoken for.
+ */
+export const TUTORIAL_TARGET_SHARE = 0.5;
+export const TUTORIAL_SPREAD = 0.1;
 
 /** What the player has done, for the end screen. */
 export type Stats = {

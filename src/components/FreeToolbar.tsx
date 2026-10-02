@@ -83,8 +83,10 @@ export default function FreeToolbar() {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       if (e.key === 'Escape') {
         e.preventDefault();
-        if (selectingRef.current) leaveRef.current();
-        else setSelecting(true);
+        // the tutorial would be lost by leaving, so there it only toggles
+        if (!selectingRef.current) setSelecting(true);
+        else if (tutorialRef.current) setSelecting(false);
+        else leaveRef.current();
         return;
       }
       // the target is the window or document when nothing has focus, and
@@ -153,6 +155,8 @@ export default function FreeToolbar() {
   };
   const leaveRef = useRef(leave);
   leaveRef.current = leave;
+  const tutorialRef = useRef(tutorial);
+  tutorialRef.current = tutorial;
 
   const keepOpen = () => clearTimeout(hideTimer.current);
 

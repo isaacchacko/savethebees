@@ -296,6 +296,7 @@ export default function Stage({ children }: { children: ReactNode }) {
     pinned: play.pinned,
     undos: play.undos,
     washedOut,
+    left: mode === 'game' && board ? leftToBuild(board, game.day) : null,
   });
   // show me lights what the step points at, so it needs something to point at
   const spotlit = !!tutorial?.showing && (tutorial.tiles.length > 0 || !!tutorial.hint);

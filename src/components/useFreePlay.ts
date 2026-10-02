@@ -216,7 +216,7 @@ export function useFreePlay(
           setPreview(null);
           return;
         }
-        const path = route(b, p.from, i);
+        const path = route(b, p.from, i, false, true);
         setPreview(path ? { path, ok: true } : { path: hexLine(b, p.from, i), ok: false });
       } else if (p.kind === 'rail' && i !== p.last) {
         apply(link(b, p.last, i), { order: [p.last, i] });
