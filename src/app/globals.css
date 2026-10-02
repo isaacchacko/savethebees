@@ -12,6 +12,8 @@
   --code: #dfe9d2;
   --tile: #b9d69e;
   --card-ease: cubic-bezier(0.7, 0, 0.2, 1);
+  /* the one warm colour, the roofs' terracotta: counts and game alerts */
+  --accent: #b9654c;
   /* --card-ease run backwards in time, for animations that undo another */
   --card-ease-reverse: cubic-bezier(0.8, 0, 0.3, 1);
 }
@@ -287,13 +289,18 @@ a:hover {
   width: 100%;
   height: 100%;
   display: block;
+  touch-action: none;
+}
+
+.terrain[data-interactive="true"] {
+  cursor: crosshair;
 }
 
 /* on the fp and game pages, a dark vignette at every edge, just enough to
    sink the tiles the window cuts in half; above the map, below the card and
-   nav, and never in the way of a click. It fades in and out with the mode. */
-.stage::after {
-  content: "";
+   nav, and never in the way of a click. Card renders it, so it can come on
+   at the click into free play and go off once the mode has gone. */
+.vignette {
   position: absolute;
   inset: 0;
   z-index: 0;
@@ -309,16 +316,14 @@ a:hover {
   transition: opacity 420ms ease;
 }
 
-.stage[data-mode="free"]::after,
-.stage[data-mode="game"]::after {
+.vignette[data-on="true"] {
   opacity: 1;
 }
 
 /* idle and the game have the whole screen: the card slides off to the right,
    and visibility waits for the slide so nothing hidden can still take focus.
    free play keeps it, shrunk to the toolbar. */
-.stage[data-mode="idle"] .card,
-.stage[data-mode="game"] .card {
+.stage[data-mode="idle"] .card {
   transform: translateX(calc(100% + 120px));
   visibility: hidden;
   transition:
@@ -326,26 +331,172 @@ a:hover {
     visibility 0s linear 650ms;
 }
 
-/* the fp and game pages have no nav at all: it lifts and fades out, and
-   comes back the same way in reverse */
-.tabs {
+/* the nav and the game status stacked in one spot at the right of the top
+   bar; whichever is showing sets the width */
+.topbar-right {
+  display: grid;
+  justify-items: end;
+}
+
+.topbar-right > * {
+  grid-area: 1 / 1;
+}
+
+/* the map's readout in free play and the game: the nav's bar and size, bold
+   like the card title, fading in as the nav fades out and back */
+.status {
+  display: flex;
+  align-items: center;
+  padding: 4px 8px;
+  background: var(--paper);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.7;
+  pointer-events: auto;
   transition:
-    opacity 260ms ease,
-    transform 420ms var(--card-ease-reverse),
+    opacity 420ms ease,
     visibility 0s;
 }
 
-.stage:not([data-mode="site"]) .tabs {
+.status[data-hidden="true"] {
   opacity: 0;
-  transform: translateY(-10px);
   visibility: hidden;
   transition:
-    opacity 260ms ease,
-    transform 420ms var(--card-ease),
+    opacity 420ms ease,
     visibility 0s linear 420ms;
 }
 
-/* bottom left in a map mode: reroll the terrain, and what mode this is */
+/* where the points came from, folded away to the left of "Score" until the
+   status is hovered; the status is pinned right, so unfolding grows it left */
+.status-parts {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 0;
+  overflow: hidden;
+  opacity: 0;
+  white-space: nowrap;
+  transition:
+    max-width 380ms var(--card-ease),
+    opacity 200ms ease,
+    margin-right 380ms var(--card-ease);
+}
+
+.status:has(.status-score:hover, .status-parts:hover) .status-parts {
+  max-width: 320px;
+  margin-right: 10px;
+  opacity: 1;
+  transition:
+    max-width 380ms var(--card-ease),
+    opacity 200ms ease 120ms,
+    margin-right 380ms var(--card-ease);
+}
+
+.status-score {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-part {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* the game's day: a bar running down while it lasts, or the button to start
+   the next */
+.status-day {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-right: 14px;
+}
+
+.day-bar {
+  position: relative;
+  width: 90px;
+  height: 8px;
+  border: 1.5px solid var(--ink);
+  overflow: hidden;
+}
+
+.day-bar > span {
+  position: absolute;
+  inset: 0;
+  background: var(--ink);
+  transform-origin: left;
+  transition: transform 200ms linear;
+}
+
+.status-go {
+  border: 0;
+  padding: 0 8px;
+  background: var(--ink);
+  color: var(--paper);
+  font: inherit;
+  cursor: pointer;
+}
+
+.status-go:hover {
+  background: var(--accent);
+}
+
+.status-alert {
+  padding: 0 6px;
+  background: var(--accent);
+  color: #fff;
+}
+
+.status-target {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.status-target[data-met="true"] {
+  color: var(--ink);
+}
+
+/* odometer digits: each a one-digit window over a 0–9 strip */
+.roll {
+  display: inline-flex;
+  font-variant-numeric: tabular-nums;
+}
+
+.roll-digit {
+  display: inline-block;
+  height: 1.7em;
+  overflow: hidden;
+}
+
+.roll-strip {
+  display: flex;
+  flex-direction: column;
+  transition: transform 700ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.roll-strip > span {
+  height: 1.7em;
+  line-height: 1.7;
+}
+
+/* the fp and game pages have no nav: it fades out and back in on the same
+   switch, and at the same pace, as the vignette (Card sets both) */
+.tabs {
+  transition:
+    opacity 420ms ease,
+    visibility 0s;
+}
+
+.tabs[data-hidden="true"] {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 420ms ease,
+    visibility 0s linear 420ms;
+}
+
+/* bottom left on the idle and game pages: the way back to the site */
 .modebar {
   position: absolute;
   z-index: 2;
@@ -374,11 +525,6 @@ a:hover {
   color: var(--paper);
 }
 
-.mode-hint {
-  padding: 4px 10px;
-  background: var(--ink);
-  color: var(--paper);
-}
 
 /* "game" in the footer: a button dressed as the links beside it, held in
    their hover look while the intro page is up */
@@ -429,11 +575,18 @@ a:hover {
 
 /* ---------- free play ---------- */
 
-/* pinned bottom right like the home card, just tall enough for the glyphs */
+/* pinned bottom right, just tall enough for the glyphs, and kept below the
+   game status at the top; free play has no footer, so it can sit lower */
+.stage[data-mode="game"] .card {
+  --toolbar-height: 365px;
+}
+
 .card[data-size="tool"] {
-  top: max(96px, calc(100% - 68px - 510px));
+  /* tall enough for its glyphs: the game hands out fewer tools than free play */
+  top: max(80px, calc(100% - 24px - var(--toolbar-height, 590px)));
+  bottom: 24px;
   left: calc(100% - 44px - 52px);
-  padding: 14px 0;
+  padding: 6px 0;
 }
 
 .card[data-view="tool"] > :not(.toolbar) {
@@ -447,7 +600,7 @@ a:hover {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 3px;
 }
 
 .glyph {
@@ -471,7 +624,8 @@ a:hover {
   pointer-events: none;
   transition:
     top 380ms cubic-bezier(0.6, 0, 0.2, 1),
-    height 380ms cubic-bezier(0.6, 0, 0.2, 1);
+    height 380ms cubic-bezier(0.6, 0, 0.2, 1),
+    opacity 200ms ease;
 }
 
 .tool-action {
@@ -487,6 +641,31 @@ a:hover {
   color: var(--ink);
 }
 
+.tool-action:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.tool-action:disabled:hover {
+  color: var(--muted);
+}
+
+/* what the game has left of a tool, on its glyph's top right corner */
+.glyph-count {
+  position: absolute;
+  top: -5px;
+  right: -6px;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 9px;
+  background: var(--accent);
+  color: #fff;
+  font: 700 11px/17px var(--font-mono), monospace;
+  text-align: center;
+  pointer-events: none;
+}
+
 .toolbar-divider {
   width: 32px;
   height: 1px;
@@ -499,7 +678,7 @@ a:hover {
   position: absolute;
   z-index: 1;
   right: calc(44px + 52px + 28px);
-  bottom: 68px;
+  bottom: 24px;
   width: 340px;
   display: flex;
   flex-direction: column;
@@ -534,6 +713,11 @@ a:hover {
   font-size: 28px;
   line-height: 1.1;
   font-weight: 700;
+}
+
+/* the shortcut letter, bracketed in place: [h]ousing */
+.tile-key {
+  color: var(--muted);
 }
 
 .tile-info p {
@@ -947,7 +1131,79 @@ a:hover {
 
   /* phones get the map behind the card only */
   .modebar,
-  .game-link {
+  .game-link,
+  .status {
     display: none;
+  }
+}
+
+/* ---------- game over ---------- */
+
+/* the map dims behind a card with how it went */
+.game-over {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  background: rgba(18, 32, 10, 0.35);
+  animation: game-over-in 420ms ease both;
+}
+
+.game-over-card {
+  width: min(440px, calc(100vw - 48px));
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 36px 40px 30px;
+  background: var(--paper);
+  box-shadow: 12px 12px 0 var(--ink);
+  font-size: 15px;
+  line-height: 1.7;
+  animation: game-over-card-in 520ms cubic-bezier(0.2, 0.7, 0.2, 1) both 120ms;
+}
+
+.game-over-line {
+  margin: 0;
+}
+
+.game-over-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 24px;
+  margin: 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+}
+
+.game-over-stats div {
+  display: flex;
+  flex-direction: column;
+}
+
+.game-over-stats dt {
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.game-over-stats dd {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes game-over-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes game-over-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
   }
 }

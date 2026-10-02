@@ -3,11 +3,13 @@
 import { useEffect, useRef } from 'react';
 import {
   PLAIN,
+  drawEraser,
+  drawMagnifier,
   drawHouses,
   drawPark,
   drawStation,
   drawTile,
-  drawTrack,
+  drawRail,
   drawTunnel,
   hash,
 } from '@/lib/map/draw';
@@ -17,9 +19,9 @@ import type { ToolId } from '@/lib/map/tools';
 
 type SceneTile = {
   terrain: Terrain;
-  build?: 'park' | 'station' | 'tunnel' | 1 | 2 | 3;
-  /** Track exits, bit d for direction d (0 = east, clockwise). */
-  track?: number;
+  build?: 'park' | 'station' | 'tunnel' | 'eraser' | 'magnifier' | 1 | 2 | 3;
+  /** Rail exits, bit d for direction d (0 = east, clockwise). */
+  rail?: number;
 };
 
 const bit = (...dirs: number[]) => dirs.reduce((m, d) => m | (1 << d), 0);
@@ -34,31 +36,34 @@ const SW_NE = bit(2, 5);
  * and its six neighbours, east first, clockwise — enough context to show how
  * the tile is used.
  */
-const SCENES: Record<ToolId, SceneTile[]> = {
+const SCENES: Record<ToolId | 'select', SceneTile[]> = {
   house: [land({ build: 3 }), land(), land(), land(), land({ build: 2 }), land(), land({ build: 1 })],
   park: [land({ build: 'park' }), land({ build: 'park' }), land({ build: 'park' }), land(), land(), land(), land()],
   station: [
-    land({ build: 'station', track: EAST_WEST }),
-    land({ track: EAST_WEST }),
+    land({ build: 'station', rail: EAST_WEST }),
+    land({ rail: EAST_WEST }),
     land(),
     land(),
-    land({ track: EAST_WEST }),
+    land({ rail: EAST_WEST }),
     land(),
     land(),
   ],
   tunnel: [
-    land({ build: 'tunnel', track: bit(3) }),
+    land({ build: 'tunnel', rail: bit(3) }),
     water,
     water,
     land(),
-    land({ track: EAST_WEST }),
+    land({ rail: EAST_WEST }),
     land(),
     water,
   ],
-  track: [land({ track: SW_NE }), land(), land(), land({ track: SW_NE }), land(), land(), land({ track: SW_NE })],
+  // a bend, to show rail curving from tile to tile
+  rail: [land({ rail: bit(3, 5) }), land(), land(), land(), land({ rail: EAST_WEST }), land(), land({ rail: SW_NE })],
   land: [land(), land(), land(), land(), land(), land(), land()],
   water: [water, water, water, water, land(), land(), land()],
   mountain: [mountain, mountain, land(), land(), mountain, land(), land()],
+  select: [land({ build: 'magnifier' }), land({ build: 3 }), land({ build: 'station' }), land(), land({ build: 1 }), land(), land()],
+  erase: [land({ build: 'eraser' }), land({ build: 2 }), land(), land({ rail: EAST_WEST }), land(), land(), land()],
 };
 
 /** Offset of scene tile i from the middle, in units of r. */
@@ -90,9 +95,11 @@ function drawSceneTile(ctx: CanvasRenderingContext2D, tiles: SceneTile[], i: num
   const look = t.terrain === WATER ? { ...PLAIN, shore: shoreOf(tiles, i) } : PLAIN;
   if (t.build === 'park') drawPark(ctx, x, y, r, hash(i));
   else drawTile(ctx, t.terrain, i, x, y, r, look);
-  if (t.track) drawTrack(ctx, x, y, r, t.track);
+  if (t.rail) drawRail(ctx, x, y, r, t.rail);
   if (t.build === 'station') drawStation(ctx, x, y, r);
   else if (t.build === 'tunnel') drawTunnel(ctx, x, y, r);
+  else if (t.build === 'eraser') drawEraser(ctx, x, y, r);
+  else if (t.build === 'magnifier') drawMagnifier(ctx, x, y, r);
   else if (typeof t.build === 'number') drawHouses(ctx, x, y, r, t.build);
 }
 
@@ -100,7 +107,15 @@ function drawSceneTile(ctx: CanvasRenderingContext2D, tiles: SceneTile[], i: num
  * One tool drawn with the map's own renderer: just its tile for a toolbar
  * glyph, or with `scene` its seven-hex flower for the info card.
  */
-export default function TilePreview({ tool, r, scene = false }: { tool: ToolId; r: number; scene?: boolean }) {
+export default function TilePreview({
+  tool,
+  r,
+  scene = false,
+}: {
+  tool: ToolId | 'select';
+  r: number;
+  scene?: boolean;
+}) {
   const ref = useRef<HTMLCanvasElement>(null);
   const w = scene ? 3 * SQRT3 * r : SQRT3 * r;
   const h = scene ? 5 * r : 2 * r;

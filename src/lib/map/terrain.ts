@@ -1,4 +1,4 @@
-import { center, components, distanceFrom, neighbors, tileCount, type Grid } from './hex.ts';
+import { center, colOf, components, distanceFrom, neighbors, rowOf, tileCount, type Grid } from './hex.ts';
 import { fbm, quantile, ridged, rng, type Rng } from './noise.ts';
 
 export const LAND = 0;
@@ -10,7 +10,7 @@ export type Terrain = typeof LAND | typeof WATER | typeof MOUNTAIN;
 export type TerrainMap = Grid & { seed: number; tiles: Uint8Array };
 
 /** Below this share of buildable land in one piece, the map is rerolled. */
-export const MIN_LAND_SHARE = 0.5;
+export const MIN_LAND_SHARE = 0.42;
 
 const MAX_ATTEMPTS = 12;
 
@@ -30,10 +30,26 @@ export function generateTerrain(grid: Grid, seed: number): TerrainMap {
   return { ...grid, seed: attempt, tiles };
 }
 
-/** Share of all tiles in the largest connected piece of plain land. */
+/**
+ * How much of the map's edge is always ocean, whatever the seed: the outer
+ * columns on the east and west and rows on the north and south sit under the
+ * site's UI (nav, toolbar, status) or off screen, so nothing should spawn or
+ * matter there.
+ */
+export const BORDER = { cols: 2, rows: 3 };
+
+export function isBorder(grid: Grid, i: number): boolean {
+  const col = colOf(grid, i);
+  const row = rowOf(grid, i);
+  return col < BORDER.cols || col >= grid.cols - BORDER.cols || row < BORDER.rows || row >= grid.rows - BORDER.rows;
+}
+
+/** Share of the map inside the ocean border taken by its largest connected piece of plain land. */
 export function largestLandShare(grid: Grid, tiles: Uint8Array): number {
   const biggest = components(grid, (i) => tiles[i] === LAND)[0];
-  return (biggest?.length ?? 0) / tileCount(grid);
+  let inside = 0;
+  for (let i = 0; i < tileCount(grid); i++) if (!isBorder(grid, i)) inside++;
+  return (biggest?.length ?? 0) / Math.max(1, inside);
 }
 
 function build(grid: Grid, seed: number): Uint8Array {
@@ -42,18 +58,21 @@ function build(grid: Grid, seed: number): Uint8Array {
   const tiles = new Uint8Array(n);
   const elevation = coastElevation(grid, seed, random);
 
-  // a random share of the map is sea, so some maps are a peninsula and some
-  // are mostly land with a bay
-  const seaLevel = quantile(elevation, 0.16 + random() * 0.16);
-  for (let i = 0; i < n; i++) if (elevation[i] < seaLevel) tiles[i] = WATER;
+  // a random share of the map inside the border is sea, so some maps are a
+  // peninsula and some are mostly land with a bay; the border is sea anyway
+  const inside = Array.from(elevation).filter((_, i) => !isBorder(grid, i));
+  const seaLevel = quantile(inside, 0.22 + random() * 0.2);
+  for (let i = 0; i < n; i++) if (elevation[i] < seaLevel || isBorder(grid, i)) tiles[i] = WATER;
 
-  const riverCount = 1 + Math.floor(random() * 2);
+  const riverCount = 2 + Math.floor(random() * 2);
   for (let r = 0; r < riverCount; r++) carveRiver(grid, tiles, elevation, random);
 
-  const lakeCount = Math.floor(random() * 3);
+  const lakeCount = 1 + Math.floor(random() * 3);
   for (let l = 0; l < lakeCount; l++) fillLake(grid, tiles, random);
 
   raiseMountains(grid, tiles, seed, random);
+  // rivers and lakes can't reach the border, but make sure nothing else did
+  for (let i = 0; i < n; i++) if (isBorder(grid, i)) tiles[i] = WATER;
   return tiles;
 }
 
@@ -94,7 +113,7 @@ function carveRiver(grid: Grid, tiles: Uint8Array, elevation: Float32Array, rand
   let prev = -1;
   const visited = new Set([at]);
   const path = [at];
-  const maxLength = grid.cols + grid.rows;
+  const maxLength = Math.round((grid.cols + grid.rows) * 1.5);
 
   while (path.length < maxLength) {
     const options = neighbors(grid, at).filter((t) => !visited.has(t));
@@ -116,7 +135,14 @@ function carveRiver(grid: Grid, tiles: Uint8Array, elevation: Float32Array, rand
     path.push(at);
     if (tiles[at] === WATER || neighbors(grid, at).length < 6) break;
   }
-  for (const t of path) tiles[t] = WATER;
+  // in places the river spills a tile wider, so it reads as a real river
+  for (const t of path) {
+    tiles[t] = WATER;
+    if (random() < 0.3) {
+      const side = neighbors(grid, t);
+      tiles[side[Math.floor(random() * side.length)]] = WATER;
+    }
+  }
 }
 
 /**
@@ -133,7 +159,7 @@ function fillLake(grid: Grid, tiles: Uint8Array, random: Rng) {
   if (inland.length === 0) return;
 
   const lake = [inland[Math.floor(random() * inland.length)]];
-  const size = 3 + Math.floor(random() * 5);
+  const size = 4 + Math.floor(random() * 9);
   while (lake.length < size) {
     const edge = lake.flatMap((t) => neighbors(grid, t)).filter((t) => !lake.includes(t));
     if (edge.length === 0) break;
@@ -158,12 +184,12 @@ function raiseMountains(grid: Grid, tiles: Uint8Array, seed: number, random: Rng
     const { x, y } = center(grid, i);
     const u = x * cos + y * sin;
     const v = -x * sin + y * cos;
-    ridge[i] = ridged(seed + 7919, u / 16, v / 7, 3);
+    ridge[i] = ridged(seed + 7919, u / 22, v / 6, 3);
     if (tiles[i] === LAND && (toWater[i] < 0 || toWater[i] >= 2)) candidates.push(i);
   }
   if (candidates.length === 0) return;
 
-  const share = 0.07 + random() * 0.07;
+  const share = 0.12 + random() * 0.12;
   const landCount = tiles.reduce((sum, t) => sum + (t === LAND ? 1 : 0), 0);
   const threshold = quantile(
     candidates.map((i) => ridge[i]),

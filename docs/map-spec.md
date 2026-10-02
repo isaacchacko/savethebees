@@ -24,11 +24,11 @@ clock.
   then never changes; a later window of a different size scales the board
   to fit. That keeps a saved city identical whatever the window size.
 - Each tile has exactly one **terrain** type. Some tiles also hold one
-  **entity**. Track sits on top of a tile.
+  **entity**. Rail sits on top of a tile.
 
 ### Terrain
 
-| terrain  | buildable                        | track                 |
+| terrain  | buildable                        | rail                  |
 | -------- | -------------------------------- | --------------------- |
 | land     | yes                              | yes                   |
 | water    | no                               | only through a tunnel |
@@ -71,7 +71,7 @@ Each entity takes up one tile, except where noted.
 ### Station
 
 - Only on land.
-- Track can cross other track only at a station.
+- Rail can cross other rail only at a station.
 - Its size is **derived, never placed**: it comes from how many citizens need
   the station to travel. It is purely visual: small / medium / large.
   *(proposed)* The thresholds scale with the map's total population, e.g. the
@@ -83,26 +83,26 @@ Each entity takes up one tile, except where noted.
 - **Decided**: each end is a land tile next to water. The two ends can be
   anywhere on the map, at any distance, with no shape rule. In effect a
   tunnel is a link between two coasts.
-- Track that enters one end comes out of the other. A tunnel is the only way
-  for track to cross water.
-- **Decided**: mountains are impassable. No tunnel goes through them; track
+- Rail that enters one end comes out of the other. A tunnel is the only way
+  for rail to cross water.
+- **Decided**: mountains are impassable. No tunnel goes through them; rail
   has to go around.
 
-### Track
+### Rail
 
 - Joins tiles. It runs through tile centers to the edges, the way the current
   renderer draws lines.
 - Allowed on land tiles, stations and tunnel ends. *(proposed)* Not on housing
   or parks.
-- It cannot cross other track except at a station. The request said this for
+- It cannot cross other rail except at a station. The request said this for
   game mode; *(proposed)* free play uses the same rule so that a layout
   carries over between modes.
-- **Decided**: track is one shared network, with no lines and no colors.
-  Any two stations joined by track can reach each other.
+- **Decided**: rail is one shared network, with no lines and no colors.
+  Any two stations joined by rail can reach each other.
 - **Decided**, input: by default you drag from one station to another and the
   route is chosen automatically. It respects terrain, tunnels and the
   no-crossing rule, and prefers straight runs and 60° bends. Holding a
-  modifier key switches to painting track tile by tile.
+  modifier key switches to painting rail tile by tile.
 
 ## Travel
 
@@ -113,7 +113,7 @@ these hold:
 
 1. a station S1 is adjacent to H
 2. a station S2 is adjacent to D
-3. S1 and S2 are connected by track (through tunnels and through other
+3. S1 and S2 are connected by rail (through tunnels and through other
    stations)
 
 Destinations:
@@ -135,7 +135,7 @@ score = Σ over each citizen c
           + Σ over each park c can reach: parkBonus(park size) )
 ```
 
-Trains and dots moving along the track are decoration: they show the
+Trains and dots moving along the rail are decoration: they show the
 trips, but they do not affect the number.
 
 **Decided**: `parkBonus` comes in flat tiers, counted in units of one
@@ -147,45 +147,91 @@ reachable citizen:
 | medium    | 3–5   | 5     |
 | large     | 6+    | 10    |
 
+**Decided**: on top of its size bonus, a park is worth 1 more for every side
+it shares with a mountain tile, summed over all of its tiles. A park tile
+touching two mountains adds 2.
+
 **Decided**: a trip where S1 = S2 counts. Housing and a park that share an
-adjacent station can reach each other without riding any track, so one
+adjacent station can reach each other without riding any rail, so one
 station on its own already scores for its neighbours.
 
 ## Modes
 
 ### Free play (first)
 
-- Place or remove any entity, and draw or erase track, with no limits.
+- Place or remove any entity, and draw or erase rail, with no limits.
 - **Decided**, controls: a toolbar with a tool for each of housing, park,
-  station, tunnel, track and the terrain brushes. Left click (or drag)
+  station, tunnel, rail and the terrain brushes. Left click (or drag)
   places. **Right click erases anything** under the cursor, whatever tool is
   selected.
   - *(proposed)* the housing tool has small / medium / large variants
   - *(proposed)* a tunnel is placed with two clicks, one per end; the
     second click is only allowed on a valid end
-  - *(proposed)* right click on track erases the run between the nearest
+  - *(proposed)* right click on rail erases the run between the nearest
     stations or junctions, not just one tile
 - The terrain comes from a seed, and you can reroll it. **Decided**: there are
   also terrain brushes for water, land and mountain. Painting terrain under an
-  entity or track that it makes invalid removes that entity or track.
+  entity or rail that it makes invalid removes that entity or rail.
 - A live score readout.
 - *(proposed)* The city saves to localStorage, so it survives a reload.
 
 ### Idle (second)
 
-- What a visitor sees with no input: housing appears and grows, and the bot
-  places stations, track and parks to keep the score up.
-- Every change animates in. The current WFC "tile collapses into place"
-  animation is the reference for the feel.
-- It must stay cheap, since it runs behind every page of the site.
+- **Built** (`lib/map/sim.ts`, `useTownSim`): what a visitor sees with no
+  input. It runs behind every page of the site, and full screen from Watch on
+  the intro page.
+- Every map starts with a town already on it (`growTown`).
+- Every ~1.8s the town takes a step:
+  - someone moves in, as a new cottage or an existing building grown a stage
+  - or the planner catches up:
+    1. a station for any unserved house
+    2. rail joining separate networks, crossing existing rail with a station
+       at each crossing when that's much shorter
+    3. a tunnel across water, but only when rail can then actually use it
+    4. failing all that, reshaping one water or mountain tile to land
+    5. a park by a busy station
+- It eases off once the town fills its share of the map, and rests while the
+  tab is hidden.
 
 ### Game (third)
 
-- Like Mini Metro: housing slowly spawns and grows around the map.
-- The game runs in **days**. Each day you get an allowance of park, station
-  and tunnel tiles. Track is free but placed by hand.
-- To survive into the next day you have to reach a points-per-day target.
-  **OPEN Q8**: how the target grows, and what happens when you miss it.
+- **Built** (`lib/map/game.ts`, `useGame`), at `/play/game`. It reuses the fp
+  page's toolbar, limited to park, station, tunnel, rail, eraser and select.
+  Each budgeted tool shows how many are left as a white number in a
+  terracotta circle.
+- **Days** last 45s. A day starts from a breather, with the clock stopped,
+  where you build and rearrange; "Start day ▸" or Enter starts it.
+- **Arrivals:** during a day 4 + 2·day people arrive at odd intervals,
+  scattered (spread 0.3), so they turn up in awkward places.
+- **Allowance:** stations 3 + 2 a day, parks 1 a day, tunnels 1 plus one every
+  other day. What's left is worked out from the board, so erasing or undoing
+  refunds.
+- **Target:** 90% of what a greedy planner (`lib/map/optimize.ts`) can score
+  from bare land with the same people and allowance:
+  - stations placed to cover the most people
+  - everything joined by rail, with tunnels where needed
+  - parks placed where they score most
+
+  The target updates as people arrive, and the day is judged on the board it
+  ends with. Reach it and you get the next breather; miss it and it's game
+  over.
+- **Catastrophes:** every fifth day, 35% of the way through, a flood or a
+  landslide hits around the rail. It only remakes open ground, rail,
+  mountains and water. Houses, stations, parks, tunnels and the water under
+  tunnels are left alone, but any rail it lands on is gone. The breather
+  before warns that one is due.
+- **Game over:** a card with the final stats:
+  - days survived
+  - best score
+  - people, and the share of them served
+  - stations
+  - rail
+  - tunnels
+  - parks
+  - catastrophes
+
+  From it you can share the result (the share sheet, or a copied line), play
+  again or leave.
 
 ## Site integration
 
@@ -203,5 +249,5 @@ station on its own already scores for its neighbours.
   - one input controller per mode
 
   The rules module has no DOM in it, so it can be unit tested.
-- The current WFC tile set (straight, gentle, Y, …) becomes the way track
+- The current WFC tile set (straight, gentle, Y, …) becomes the way rail
   shapes are drawn, not the thing that generates the map.

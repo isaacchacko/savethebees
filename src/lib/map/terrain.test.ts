@@ -6,6 +6,7 @@ import { center, components, distanceFrom, neighborAt, neighbors, tileCount, typ
 import {
   LAND,
   MIN_LAND_SHARE,
+  isBorder,
   MOUNTAIN,
   WATER,
   generateTerrain,
@@ -99,4 +100,11 @@ test('mountains come in ranges of three or more, back from the shore', () => {
 test('every tile is one of the three terrains', () => {
   const { tiles } = generateTerrain(GRID, 7);
   for (const t of tiles) assert.ok(t === LAND || t === WATER || t === MOUNTAIN);
+});
+
+test('the border is always ocean, whatever the seed', () => {
+  for (const seed of SEEDS) {
+    const { tiles } = generateTerrain(GRID, seed);
+    for (let i = 0; i < tiles.length; i++) if (isBorder(GRID, i)) assert.equal(tiles[i], WATER, `seed ${seed} tile ${i}`);
+  }
 });

@@ -44,6 +44,46 @@ export function neighbors(g: Grid, i: number): number[] {
   return out;
 }
 
+/** Cube coordinates of tile i, where a straight line is easy to draw. */
+function cube(g: Grid, i: number): [number, number, number] {
+  const row = rowOf(g, i);
+  const q = colOf(g, i) - (row - (row & 1)) / 2;
+  return [q, row, -q - row];
+}
+
+/** Hex steps between two tiles, ignoring what's in the way. */
+export function hexDistance(g: Grid, a: number, b: number): number {
+  const A = cube(g, a);
+  const B = cube(g, b);
+  return Math.max(Math.abs(A[0] - B[0]), Math.abs(A[1] - B[1]), Math.abs(A[2] - B[2]));
+}
+
+/**
+ * The tiles a straight line from a to b passes through, both ends included,
+ * each one a neighbour of the last — the "as the crow flies" path, whatever
+ * is in the way.
+ */
+export function hexLine(g: Grid, a: number, b: number): number[] {
+  const A = cube(g, a);
+  const B = cube(g, b);
+  const n = Math.max(Math.abs(A[0] - B[0]), Math.abs(A[1] - B[1]), Math.abs(A[2] - B[2]));
+  const out: number[] = [];
+  for (let k = 0; k <= n; k++) {
+    // nudged off the exact midpoint so ties round the same way every time
+    const t = n === 0 ? 0 : k / n;
+    const f = A.map((v, j) => v + (B[j] - v) * t + 1e-6 * (j + 1));
+    let [q, r, s] = f.map(Math.round);
+    const [dq, dr, ds] = [Math.abs(q - f[0]), Math.abs(r - f[1]), Math.abs(s - f[2])];
+    if (dq > dr && dq > ds) q = -r - s;
+    else if (dr > ds) r = -q - s;
+    else s = -q - r;
+    const col = q + (r - (r & 1)) / 2;
+    const i = r * g.cols + col;
+    if (out[out.length - 1] !== i) out.push(i);
+  }
+  return out;
+}
+
 /** Hex steps from every tile to the nearest tile where `isSource` holds. */
 export function distanceFrom(g: Grid, isSource: (i: number) => boolean): Int32Array {
   const dist = new Int32Array(tileCount(g)).fill(-1);

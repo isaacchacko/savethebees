@@ -5,8 +5,9 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { MouseEvent, ReactNode } from 'react';
 import FreeToolbar from '@/components/FreeToolbar';
+import GameStatus from '@/components/GameStatus';
 import { SlideContext, SlideLink, type Slide } from '@/components/slide';
-import { FP_HREF, useMapMode } from '@/components/Stage';
+import { FP_HREF, GAME_HREF, useMapMode } from '@/components/Stage';
 import SfClock from '@/components/SfClock';
 
 const TABS = [
@@ -69,11 +70,14 @@ function slideIn(el: HTMLElement, dir: number) {
 /** The card's heading: the intro page has its own, every other page says hi. */
 const titleFor = (pathname: string) => (pathname === INTRO_HREF ? 'Transit Control' : 'howdy!');
 
+/** The fp and game pages: the card is the toolbar, the map is the page. */
+const onMap = (pathname: string) => pathname === FP_HREF || pathname === GAME_HREF;
+
 /** The tab a path lives under, or null for pages off the nav like /arch. */
 function tabFor(pathname: string): string | null {
   // the intro and fp pages both sit under home, so the card never takes some
   // other tab's size on the way between them
-  if (pathname === '/' || pathname === INTRO_HREF || pathname === FP_HREF) return '/';
+  if (pathname === '/' || pathname === INTRO_HREF || onMap(pathname)) return '/';
   return (
     ORDER.find((href) => href !== '/' && (pathname === href || pathname.startsWith(href + '/'))) ??
     null
@@ -107,10 +111,10 @@ export default function Card({ children }: { children: ReactNode }) {
   const pathnameRef = useRef(pathname);
   pathnameRef.current = pathname;
 
-  // what a slide moves: the page, or on the fp page the toolbar standing in
-  // for it — so free play wipes like a page sitting left of the others
+  // what a slide moves: the page, or on the fp and game pages the toolbar
+  // standing in for it — so they wipe like pages sitting left of the others
   const contentOf = (path: string) =>
-    path === FP_HREF
+    onMap(path)
       ? cardRef.current?.querySelector<HTMLElement>('.toolbar')
       : bodyRef.current;
   const linksRef = useRef<HTMLDivElement>(null);
@@ -143,7 +147,7 @@ export default function Card({ children }: { children: ReactNode }) {
       titleSliding.current = titleFor(href) !== titleFor(pathnameRef.current);
       if (titleSliding.current && titleRef.current) slideOut(titleRef.current, dir);
       // into or out of free play the whole card changes, footer included
-      footerSliding.current = (href === FP_HREF) !== (pathnameRef.current === FP_HREF);
+      footerSliding.current = onMap(href) !== onMap(pathnameRef.current);
       if (footerSliding.current && footerRef.current) slideOut(footerRef.current, dir);
       enterDir.current = dir;
       navigateTimer.current = setTimeout(() => router.push(href), NAVIGATE_AFTER_MS);
@@ -188,6 +192,11 @@ export default function Card({ children }: { children: ReactNode }) {
 
   useEffect(() => () => clearTimeout(navigateTimer.current), []);
 
+  // the map's own modes: on as soon as one is clicked (the game page sets its
+  // mode straight away; free play is a page, so it counts from the click),
+  // and off only once the mode has gone. The vignette and the nav follow it.
+  const mapOn = mode !== 'site' || onMap(dest);
+
   const go = (href: string) => {
     if (pathname === href) return;
     // same tab from deeper in (a post back to its index) slides back
@@ -202,6 +211,7 @@ export default function Card({ children }: { children: ReactNode }) {
 
   return (
     <SlideContext.Provider value={slide}>
+      <div className="vignette" data-on={mapOn ? 'true' : 'false'} />
       {/* size follows where the card is headed, set on click, so it resizes
           while the old contents wipe out; view follows where it actually is,
           so the toolbar and the page swap only once the url does. In free play
@@ -209,8 +219,8 @@ export default function Card({ children }: { children: ReactNode }) {
       <div
         ref={cardRef}
         className="card"
-        data-size={dest === FP_HREF ? 'tool' : sizeFor(tab)}
-        data-view={mode === 'free' ? 'tool' : 'page'}
+        data-size={onMap(dest) ? 'tool' : sizeFor(tab)}
+        data-view={mode === 'free' || mode === 'game' ? 'tool' : 'page'}
       >
         <h1 ref={titleRef} className="card-title">
           {titleFor(pathname)}
@@ -240,32 +250,36 @@ export default function Card({ children }: { children: ReactNode }) {
           </button>
           <SfClock />
         </footer>
-        {mode === 'free' ? <FreeToolbar /> : null}
+        {mode === 'free' || mode === 'game' ? <FreeToolbar /> : null}
       </div>
 
       <header className="topbar">
         <SlideLink href="/" dir={-1} className="brand">
           isaacchacko.com
         </SlideLink>
-        <nav className="tabs">
-          <div ref={linksRef} className="tab-links">
-            <div ref={indicatorRef} className="tab-indicator" />
-            <div className="page-links">
-              {TABS.map((t) => (
-                <Link
-                  key={t.href}
-                  href={t.href}
-                  data-tab={t.href}
-                  aria-current={t.href === tab ? 'page' : undefined}
-                  onClick={onTab(t.href)}
-                  className="tab"
-                >
-                  {t.label}
-                </Link>
-              ))}
+        {/* the nav and the status share one spot, swapping as a mode comes and goes */}
+        <div className="topbar-right">
+          <nav className="tabs" data-hidden={mapOn ? 'true' : 'false'}>
+            <div ref={linksRef} className="tab-links">
+              <div ref={indicatorRef} className="tab-indicator" />
+              <div className="page-links">
+                {TABS.map((t) => (
+                  <Link
+                    key={t.href}
+                    href={t.href}
+                    data-tab={t.href}
+                    aria-current={t.href === tab ? 'page' : undefined}
+                    onClick={onTab(t.href)}
+                    className="tab"
+                  >
+                    {t.label}
+                  </Link>
+                ))}
+              </div>
             </div>
-          </div>
-        </nav>
+          </nav>
+          <GameStatus hidden={!mapOn} />
+        </div>
       </header>
     </SlideContext.Provider>
   );

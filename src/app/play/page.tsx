@@ -15,7 +15,7 @@ export default function IntroPage() {
       </p>
       <p>
         you&rsquo;re the planner. each day you get a few stations, parks and
-        tunnels, and all the track you can draw. connect the town and score
+        tunnels, and all the rail you can draw. connect the town and score
         enough by sundown to make it to tomorrow.
       </p>
       <IntroActions />
