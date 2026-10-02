@@ -18,7 +18,7 @@ const SELECT: Omit<Tool, 'id' | 'group'> & { id: 'select' } = {
   id: 'select',
   key: 'esc',
   name: 'select',
-  place: 'click a tile to pin what it’s worth, then hover others to compare. esc goes in and out.',
+  place: 'click a tile to pin what it’s worth, then hover others to compare. esc goes in; esc again leaves the map.',
   score: 'a tile is worth how far the score would drop without it — so stations and rail show what they connect.',
 };
 
@@ -74,7 +74,8 @@ export default function FreeToolbar() {
 
   const tool = shown === 'select' ? SELECT : (TOOLS.find((t) => t.id === shown) ?? TOOLS[0]);
 
-  // each tool's letter picks it (see tools.ts), and esc toggles select mode;
+  // each tool's letter picks it (see tools.ts), and esc goes into select mode
+  // — and from there, like the X, off the map;
   // left alone with a modifier held, so ctrl/cmd + z and the browser's own
   // shortcuts still work
   useEffect(() => {
@@ -82,7 +83,8 @@ export default function FreeToolbar() {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       if (e.key === 'Escape') {
         e.preventDefault();
-        setSelecting(!selectingRef.current);
+        if (selectingRef.current) leaveRef.current();
+        else setSelecting(true);
         return;
       }
       // the target is the window or document when nothing has focus, and
@@ -149,6 +151,8 @@ export default function FreeToolbar() {
     setHovered(null);
     slide(INTRO_HREF, 1);
   };
+  const leaveRef = useRef(leave);
+  leaveRef.current = leave;
 
   const keepOpen = () => clearTimeout(hideTimer.current);
 

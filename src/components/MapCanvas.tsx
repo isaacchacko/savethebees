@@ -13,6 +13,7 @@ import {
   drawTile,
   drawRail,
   drawTunnel,
+  fitBoard,
   hash,
   hexPath,
 } from '@/lib/map/draw';
@@ -170,9 +171,7 @@ export default function MapCanvas({
       if (!board || !t) return false;
 
       // cover: the outer ring of tiles hangs off the edges
-      const s = Math.max(w / (SQRT3 * (board.cols - 1.5)), h / (1.5 * (board.rows - 2)));
-      const ox = (w - SQRT3 * (board.cols - 0.5) * s) / 2;
-      const oy = (h - 1.5 * (board.rows - 1) * s) / 2;
+      const { s, ox, oy } = fitBoard(board, w, h);
       layout.current = { s, ox, oy };
       const n = tileCount(board);
       const at = (i: number) => {

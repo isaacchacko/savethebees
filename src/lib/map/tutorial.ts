@@ -3,8 +3,8 @@
 // and two homes far apart, and an islet across a strait with a third home
 // that only a tunnel can reach.
 
-import { emptyBoard, place, type Board } from './board.ts';
-import { colOf, rowOf, tileCount, type Grid } from './hex.ts';
+import { EMPTY, STATION, TUNNEL, emptyBoard, paintTerrain, place, type Board } from './board.ts';
+import { colOf, neighbors, rowOf, tileCount, type Grid } from './hex.ts';
 import { LAND, MOUNTAIN, WATER } from './terrain.ts';
 
 export const ISLAND_SEED = 7;
@@ -52,6 +52,11 @@ export type Island = {
   homes: { a: number; b: number; c: number };
   /** A shore on each side of the strait, a tunnel's straight line apart. */
   shores: [number, number];
+  /** The main island's tiles, which the tutorial's tsunami washes over from the south. */
+  main: number[];
+  /** The first row of the main island the wave reaches, and the sea tile it rolls in from. */
+  waveRow: number;
+  waveFrom: number;
 };
 
 /**
@@ -73,11 +78,13 @@ export function tutorialIsland(grid: Grid, orientation: Orientation = 'wide', at
   };
 
   const tiles = new Uint8Array(tileCount(grid)).fill(WATER);
+  const main: number[] = [];
   for (let i = 0; i < tiles.length; i++) {
     const r = rowOf(grid, i);
     const q = colOf(grid, i) - (r - (r & 1)) / 2 - anchorQ;
     const dr = r - midRow;
     const onMain = MAIN.some(([mq, mr]) => dist(q, dr, mq, mr) <= 3);
+    if (onMain) main.push(i);
     if (onMain || dist(q, dr, islet[0], islet[1]) <= 1) tiles[i] = LAND;
   }
   for (const t of RIDGE) tiles[tileAt(t)] = MOUNTAIN;
@@ -88,5 +95,32 @@ export function tutorialIsland(grid: Grid, orientation: Orientation = 'wide', at
     board = place(board, 'house', home)!;
     board = place(board, 'house', home)!;
   }
-  return { board, homes, shores: [tileAt(shores[0]), tileAt(shores[1])] };
+  return {
+    board,
+    homes,
+    shores: [tileAt(shores[0]), tileAt(shores[1])],
+    main,
+    waveRow: midRow + 2,
+    waveFrom: tileAt([0, 5]),
+  };
+}
+
+/**
+ * The tutorial's catastrophe, scripted so it always teaches the same thing: a
+ * tsunami rolls over the main island's south coast, drowning the open ground
+ * and rail on its last two rows, plus the southernmost stretch of rail if
+ * none was down there. It leaves every building, and a tile of ground beside
+ * each station and tunnel mouth, so the network can always be rebuilt.
+ */
+export function tsunami(b: Board, island: Island): { board: Board; origin: number; tiles: number[] } {
+  const guarded = (i: number) => neighbors(b, i).some((n) => b.build[n] === STATION || b.build[n] === TUNNEL);
+  const open = island.main.filter((i) => b.tiles[i] === LAND && b.build[i] === EMPTY && !guarded(i));
+  const hit = open.filter((i) => rowOf(b, i) >= island.waveRow);
+  if (!hit.some((i) => b.rail[i])) {
+    const rail = open.filter((i) => b.rail[i]).sort((x, y) => rowOf(b, y) - rowOf(b, x));
+    if (rail.length) hit.push(rail[0]);
+  }
+  let board = b;
+  for (const i of hit) board = paintTerrain(board, i, WATER);
+  return { board, origin: island.waveFrom, tiles: hit };
 }

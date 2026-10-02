@@ -24,12 +24,15 @@ type Now = {
   undid: boolean;
   /** The last catastrophe's headline, kept after the status lets it go. */
   struckBy: string;
+  /** The tiles the tutorial's tsunami drowned. */
+  washedOut: number[];
 };
 
 type Step = {
   id: string;
   title: string | ((n: Now) => string);
   text: string | ((n: Now) => string);
+  touch?: string;
   hint?: Hint | ((n: Now) => Hint);
   tiles?: (n: Now) => number[];
   /** Met by playing; a step without one waits for its button instead. */
@@ -49,14 +52,19 @@ const builtCount = (b: Board) => b.build.reduce((n, v, i) => n + (v ? 1 : 0) + (
 
 /**
  * The tutorial, one thing at a time on the island (lib/map/tutorial): each
- * step names a thing, rings where it goes, and moves on once it has been
- * done. Then a short day with a catastrophe in it, and the result.
+ * step names a thing, says the key that picks it, rings where it goes, and
+ * moves on once it has been done — however the tool was picked. Then a short
+ * day with a scripted tsunami in it, and the result.
+ *
+ * Text marks keys as [key], drawn as key caps. `touch` is the same line for a
+ * device without a keyboard, where the toolbar is the only way to pick.
  */
 const STEPS: Step[] = [
   {
     id: 'station',
     title: 'Stations',
-    text: 'People board at a station next to home. Build one by this house.',
+    text: 'People board at a station next to home. Press [s], then build one by this house.',
+    touch: 'People board at a station next to home. Pick the station, then build one by this house.',
     hint: 'station',
     tiles: ({ board, island }) => spotsBy(board, island.homes.a),
     done: ({ board, island }) => served(board, island.homes.a),
@@ -72,7 +80,8 @@ const STEPS: Step[] = [
   {
     id: 'rail',
     title: 'Rail',
-    text: 'Drag from one station to the other.',
+    text: 'Press [r], then drag from one station to the other.',
+    touch: 'Pick rail, then drag from one station to the other.',
     hint: 'rail',
     tiles: ({ board, island }) => [...stationsBy(board, island.homes.a), ...stationsBy(board, island.homes.b)],
     done: ({ board, island }) => linked(board, island.homes.a, island.homes.b),
@@ -86,7 +95,8 @@ const STEPS: Step[] = [
   {
     id: 'park',
     title: 'Parks',
-    text: 'Anyone who can reach a park scores for it. Build one by a station.',
+    text: 'Anyone who can reach a park scores for it. Press [p] and build one by a station.',
+    touch: 'Anyone who can reach a park scores for it. Pick the park and build one by a station.',
     hint: 'park',
     tiles: ({ board }) => {
       const out = new Set<number>();
@@ -100,7 +110,8 @@ const STEPS: Step[] = [
   {
     id: 'tunnel',
     title: 'Tunnels',
-    text: 'Only a tunnel crosses water. Tap this shore, then that one.',
+    text: 'Only a tunnel crosses water. Press [t], then click this shore and that one.',
+    touch: 'Only a tunnel crosses water. Pick the tunnel, then tap this shore and that one.',
     hint: 'tunnel',
     tiles: ({ board, island }) => island.shores.filter((s) => canPlace(board, 'tunnel', s)),
     done: ({ board }) => tunnelPairs(board) > 0,
@@ -108,7 +119,8 @@ const STEPS: Step[] = [
   {
     id: 'across',
     title: 'Across',
-    text: 'Now get this house on the network.',
+    text: 'Now get this house on the network: [s] for a station, [r] for rail.',
+    touch: 'Now get this house on the network.',
     hint: ({ board, island }) => (served(board, island.homes.c) ? 'rail' : 'station'),
     tiles: ({ board, island }) => {
       const c = island.homes.c;
@@ -121,21 +133,32 @@ const STEPS: Step[] = [
   {
     id: 'inspect',
     title: 'Inspect',
-    text: 'Pick the magnifier, then any tile, to see what it’s worth.',
+    text: 'Press [esc], then click any tile to see what it’s worth.',
+    touch: 'Pick the magnifier, then tap any tile to see what it’s worth.',
     hint: 'select',
     done: ({ selecting, pinned }) => selecting && pinned >= 0,
   },
   {
+    id: 'erase',
+    title: 'Erase',
+    text: 'Press [e] for the eraser and erase anything. Right-click erases too.',
+    touch: 'Pick the eraser and erase anything.',
+    hint: 'erase',
+    done: ({ erased }) => erased,
+  },
+  {
     id: 'undo',
     title: 'Undo',
-    text: 'Erase anything, then undo it.',
-    hint: ({ erased }) => (erased ? 'undo' : 'erase'),
-    done: ({ erased, undid }) => erased && undid,
+    text: 'Press [ctrl/cmd+z] to bring it back.',
+    touch: 'Tap undo to bring it back.',
+    hint: 'undo',
+    done: ({ undid }) => undid,
   },
   {
     id: 'start',
     title: 'Day one',
-    text: 'Start the clock. People keep moving in while it runs.',
+    text: 'Press [enter] to start the clock. People keep moving in while it runs.',
+    touch: 'Start the clock. People keep moving in while it runs.',
     hint: 'start',
     done: ({ game }) => game.phase !== 'break',
   },
@@ -149,7 +172,8 @@ const STEPS: Step[] = [
   {
     id: 'strike',
     title: ({ struckBy }) => struckBy,
-    text: 'Every other day the land fights back. Rebuild what it broke.',
+    text: 'It washed out your rail. Every other day the land fights back: rebuild before sundown.',
+    tiles: ({ washedOut }) => washedOut,
     done: ({ game }) => game.phase === 'over',
   },
   {
@@ -177,6 +201,8 @@ export type TutorialView = {
   count: number;
   title: string;
   text: string;
+  /** The text for a device without a keyboard. */
+  touch: string;
   /** Met, and about to move on. */
   met: boolean;
   /** Waiting on its button rather than on play. */
@@ -186,6 +212,9 @@ export type TutorialView = {
   /** Whether the day may start yet: not until the steps before it are done. */
   canStart: boolean;
   next: () => void;
+  /** Show me: the page dimmed but for what the step points at. It stays on from step to step. */
+  showing: boolean;
+  setShowing: (on: boolean) => void;
 };
 
 export function useTutorial(
@@ -196,11 +225,15 @@ export function useTutorial(
   const [index, setIndex] = useState(0);
   const [erased, setErased] = useState(false);
   const [undosAtStart, setUndosAtStart] = useState(0);
-  const [struckBy, setStruckBy] = useState('Flood!');
+  const [struckBy, setStruckBy] = useState('Tsunami!');
+  const [showing, setShowing] = useState(false);
   const lastBoard = useRef(now.board);
 
   // every visit starts over, as does every fresh island
-  useEffect(() => setIndex(0), [active, island]);
+  useEffect(() => {
+    setIndex(0);
+    setShowing(false);
+  }, [active, island]);
 
   useEffect(() => {
     setErased(false);
@@ -239,16 +272,20 @@ export function useTutorial(
 
   if (!active || !full) return null;
   const read = <T>(v: T | ((n: Now) => T)) => (typeof v === 'function' ? (v as (n: Now) => T)(full) : v);
+  const text = read(step.text);
   return {
     index,
     count: STEPS.length,
     title: read(step.title),
-    text: read(step.text),
+    text,
+    touch: step.touch ?? text,
     met,
     manual: !step.done,
     hint: step.hint && !met ? read(step.hint) : null,
     tiles: stableTiles,
     canStart: index >= START_STEP,
     next: () => setIndex((i) => Math.min(i + 1, LAST_STEP)),
+    showing,
+    setShowing,
   };
 }

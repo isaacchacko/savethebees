@@ -2,11 +2,11 @@
 
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { canPairTunnel, isHouse, layRoute, place, placeTunnel, route } from './board.ts';
+import { STATION, TUNNEL, canPairTunnel, isHouse, layRoute, place, placeTunnel, route } from './board.ts';
 import { hexDistance, neighbors, type Grid } from './hex.ts';
 import { networks, score } from './score.ts';
 import { LAND, WATER } from './terrain.ts';
-import { tutorialIsland, type Orientation } from './tutorial.ts';
+import { tsunami, tutorialIsland, type Orientation } from './tutorial.ts';
 
 const GRIDS: [Grid, Orientation][] = [
   [{ cols: 25, rows: 20 }, 'wide'],
@@ -50,5 +50,17 @@ test('the islet is only reachable by a tunnel between the two shores', () => {
     const net = networks(b);
     assert.equal(net[sa], net[sc]);
     assert.equal(score(b), 24);
+
+    // the tsunami always washes out rail, but never a building or the ground
+    // beside a station or tunnel mouth
+    const hit = tsunami(b, tutorialIsland(grid, o));
+    assert.ok(hit.tiles.some((t) => b.rail[t]));
+    assert.ok(hit.tiles.every((t) => hit.board.tiles[t] === WATER));
+    assert.deepEqual(hit.board.build, b.build);
+    assert.ok(score(hit.board) < score(b));
+    for (let i = 0; i < b.build.length; i++) {
+      if (b.build[i] !== STATION && b.build[i] !== TUNNEL) continue;
+      assert.ok(neighbors(b, i).every((n) => !hit.tiles.includes(n)));
+    }
   }
 });

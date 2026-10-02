@@ -2,7 +2,23 @@
 // glyphs and the tile previews so all three always look the same. Sizes are
 // in units of r, the hex radius, so anything draws at any scale.
 
+import { SQRT3, center, type Grid } from './hex.ts';
 import { MOUNTAIN, WATER } from './terrain.ts';
+
+/**
+ * Where a board sits in a w × h box: hex radius s and the offset of tile 0's
+ * centre. It covers the box, the outer ring of tiles hanging off the edges.
+ */
+export function fitBoard(g: Grid, w: number, h: number) {
+  const s = Math.max(w / (SQRT3 * (g.cols - 1.5)), h / (1.5 * (g.rows - 2)));
+  return { s, ox: (w - SQRT3 * (g.cols - 0.5) * s) / 2, oy: (h - 1.5 * (g.rows - 1) * s) / 2 };
+}
+
+/** A tile's centre in px within the box fitBoard laid it out in. */
+export function tileAt(g: Grid, fit: ReturnType<typeof fitBoard>, i: number) {
+  const c = center(g, i);
+  return { x: fit.ox + c.x * fit.s, y: fit.oy + c.y * fit.s };
+}
 
 export const COLORS = {
   field: '#a3c585',

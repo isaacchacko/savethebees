@@ -25,9 +25,11 @@ const PARTS: { part: Exclude<keyof Breakdown, 'total'>; tool: ToolId; label: str
  * end and the score against the day's target; between them, a breather with
  * the button (or enter) that starts the next — and a warning before a
  * catastrophe day, and the news when one strikes.
+ *
+ * While watching, it is just "play?", the way to the intro page.
  */
 export default function GameStatus({ hidden }: { hidden: boolean }) {
-  const { score, game, tutorial } = useMapMode();
+  const { mode, score, game, tutorial, playFromWatch } = useMapMode();
   // the tutorial holds the day back until it gets to it
   const between = game?.phase === 'break' && (!tutorial || tutorial.canStart);
   const hint = tutorial?.hint;
@@ -42,6 +44,17 @@ export default function GameStatus({ hidden }: { hidden: boolean }) {
     addEventListener('keydown', onKey);
     return () => removeEventListener('keydown', onKey);
   }, [between, game]);
+
+  // watching has no score to keep, only an invitation
+  if (mode === 'idle') {
+    return (
+      <div className="status" data-hidden={hidden ? 'true' : 'false'}>
+        <button type="button" className="status-go" onClick={playFromWatch}>
+          play?
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="status" data-hidden={hidden ? 'true' : 'false'} aria-live="polite">

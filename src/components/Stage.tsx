@@ -5,6 +5,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import type { ReactNode } from 'react';
 import GameOver from '@/components/GameOver';
 import MapCanvas, { type Scene } from '@/components/MapCanvas';
+import Spotlight from '@/components/Spotlight';
 import TutorialCard from '@/components/TutorialCard';
 import { useFreePlay } from '@/components/useFreePlay';
 import { useGame, type GameView } from '@/components/useGame';
@@ -18,7 +19,7 @@ import { scoreBreakdown, type Breakdown } from '@/lib/map/score';
 import { SQRT3 } from '@/lib/map/hex';
 import { generateTerrain } from '@/lib/map/terrain';
 import type { ToolId } from '@/lib/map/tools';
-import { islandSpan, tutorialIsland, type Island } from '@/lib/map/tutorial';
+import { islandSpan, tsunami, tutorialIsland, type Island } from '@/lib/map/tutorial';
 
 /** The three ways to play with the map. "site" is none of them: the card is up. */
 export const MODES = ['idle', 'free', 'game'] as const;
@@ -51,6 +52,8 @@ const ModeContext = createContext<{
   tutorialDone: boolean | null;
   /** Runs the tutorial again on the next game. */
   replayTutorial: () => void;
+  /** From watching, straight to the intro page. */
+  playFromWatch: () => void;
 }>({
   mode: 'site',
   setMode: () => {},
@@ -67,6 +70,7 @@ const ModeContext = createContext<{
   tutorial: null,
   tutorialDone: null,
   replayTutorial: () => {},
+  playFromWatch: () => {},
 });
 
 /** The fp page has a url of its own, so a reload keeps you in free play. */
@@ -163,10 +167,10 @@ export default function Stage({ children }: { children: ReactNode }) {
     [pathname, router]
   );
 
-  // leaving idle lands on the intro page; from any other page the card waits
-  // off screen until the intro is there to slide back in with
+  // watching is left for the intro page by the status's "play?"; the card
+  // waits off screen until the intro is there to slide back in with
   const leavingWatch = useRef(false);
-  const leaveWatch = useCallback(() => {
+  const playFromWatch = useCallback(() => {
     if (pathname === INTRO_HREF) {
       setStateMode('site');
       return;
@@ -192,6 +196,16 @@ export default function Stage({ children }: { children: ReactNode }) {
   }, []);
   const inTutorial = mode === 'game' && tutorialDone === false;
   const [island, setIsland] = useState<Island | null>(null);
+  const [washedOut, setWashedOut] = useState<number[]>([]);
+  // the tutorial's catastrophe is always the same tsunami, on its island
+  const scriptedStrike = useCallback(
+    (b: Board) => {
+      const hit = tsunami(b, island!);
+      setWashedOut(hit.tiles);
+      return { board: hit.board, origin: hit.origin, kind: 'tsunami' as const };
+    },
+    [island]
+  );
   const [scene, setScene] = useState<Scene | null>(null);
   const [tool, setTool] = useState<ToolId>('house');
   const [selecting, setSelecting] = useState(false);
@@ -221,6 +235,7 @@ export default function Stage({ children }: { children: ReactNode }) {
       y: (covered.top + room / 2) / h,
     });
     setIsland(made);
+    setWashedOut([]);
     setScene({ board: made.board });
   }, []);
 
@@ -256,7 +271,7 @@ export default function Stage({ children }: { children: ReactNode }) {
   const play = useFreePlay(board, tool, setScene, playing, selecting, allow);
   // held back until it's known whether this game is the tutorial, so a first
   // visit doesn't flash a random map before the island
-  const game = useGame(board, setScene, mode === 'game' && tutorialDone !== null, freshGame, play.clearHistory, inTutorial);
+  const game = useGame(board, setScene, mode === 'game' && tutorialDone !== null, freshGame, play.clearHistory, inTutorial, inTutorial && island ? scriptedStrike : undefined);
   dayRef.current = game.day;
   useTownSim(board, setScene, mode === 'site' || mode === 'idle', newTerrain);
   // on the map with hands on: free play, or a game that isn't over
@@ -280,7 +295,10 @@ export default function Stage({ children }: { children: ReactNode }) {
     selecting,
     pinned: play.pinned,
     undos: play.undos,
+    washedOut,
   });
+  // show me lights what the step points at, so it needs something to point at
+  const spotlit = !!tutorial?.showing && (tutorial.tiles.length > 0 || !!tutorial.hint);
 
   return (
     <ModeContext.Provider
@@ -300,6 +318,7 @@ export default function Stage({ children }: { children: ReactNode }) {
         tutorial,
         tutorialDone,
         replayTutorial,
+        playFromWatch,
       }}
     >
       <div ref={stageRef} className="stage" data-mode={mode}>
@@ -317,14 +336,16 @@ export default function Stage({ children }: { children: ReactNode }) {
           onPress={mode === 'site' && pathname !== INTRO_HREF ? () => setMode('idle') : undefined}
         />
         {children}
+        {tutorial ? <Spotlight on={spotlit} board={board} tiles={tutorial.tiles} /> : null}
         {tutorial ? <TutorialCard step={tutorial} onFinish={finishTutorial} /> : null}
         {mode === 'game' && !inTutorial && game.phase === 'over' && game.stats ? (
           <GameOver stats={game.stats} reached={game.target} onAgain={freshGameAgain} />
         ) : null}
         {/* watching (idle) has no toolbar and no nav: a click anywhere on the
-            map is the way back, to the intro page */}
+            map is the way back to the page it was entered from; the
+            status's "play?" goes to the intro page instead */}
         {mode === 'idle' ? (
-          <button type="button" className="watch-exit" aria-label="back to the site" onClick={leaveWatch} />
+          <button type="button" className="watch-exit" aria-label="back to the site" onClick={() => setMode('site')} />
         ) : null}
       </div>
     </ModeContext.Provider>

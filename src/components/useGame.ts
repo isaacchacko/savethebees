@@ -32,6 +32,11 @@ export type GameView = {
   restart: () => void;
 };
 
+/** What can hit the town: the game's two, and the tutorial's tsunami. */
+export type Strike = 'flood' | 'landslide' | 'tsunami';
+
+const HEADLINES: Record<Strike, string> = { flood: 'Flood!', landslide: 'Landslide!', tsunami: 'Tsunami!' };
+
 function statsOf(b: Board, days: number, best: number, catastrophes: number): Stats {
   let people = 0;
   let served = 0;
@@ -71,8 +76,8 @@ function statsOf(b: Board, days: number, best: number, catastrophes: number): St
  * falling short ends it. `fresh` starts a new game when the page
  * is entered; `spawned` is told about each arrival so undo can forget it.
  *
- * The tutorial plays one shorter day with a catastrophe in it, and ends there
- * whatever the score.
+ * The tutorial plays one shorter day with a catastrophe in it — `scripted`,
+ * not random — and ends there whatever the score.
  */
 export function useGame(
   board: Board | null,
@@ -80,7 +85,9 @@ export function useGame(
   active: boolean,
   fresh: () => void,
   spawned: () => void,
-  tutorial = false
+  tutorial = false,
+  /** The tutorial's catastrophe, scripted; the game's are random. */
+  scripted?: (b: Board) => Scene & { kind: Strike }
 ) {
   const [phase, setPhase] = useState<Phase>('break');
   const [day, setDay] = useState(1);
@@ -143,11 +150,11 @@ export function useGame(
 
       if (now >= strikesAt.current) {
         strikesAt.current = Infinity;
-        const hit = catastrophe(b, Math.random);
+        const hit = scripted?.(b) ?? catastrophe(b, Math.random);
         commit(hit);
         spawned();
         setStruck((n) => n + 1);
-        setAlert(hit.kind === 'flood' ? 'Flood!' : 'Landslide!');
+        setAlert(HEADLINES[hit.kind]);
         clearTimeout(alertTimer.current);
         alertTimer.current = setTimeout(() => setAlert(null), 5000);
         return;
@@ -174,7 +181,7 @@ export function useGame(
       }
     }, 200);
     return () => clearInterval(id);
-  }, [active, phase, day, dayMs, tutorial, struck, commit, spawned]);
+  }, [active, phase, day, dayMs, tutorial, struck, commit, spawned, scripted]);
 
   const view: GameView = { phase, day, left, target, stats, alert, struck, startDay, restart };
   return view;

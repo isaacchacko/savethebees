@@ -501,11 +501,12 @@ a:hover {
     visibility 0s linear 420ms;
 }
 
-/* watching the town: the whole map is the way back to the site */
+/* watching the town: the whole map is the way back to the site, under the
+   top bar so its "play?" stays clickable */
 .watch-exit {
   position: absolute;
   inset: 0;
-  z-index: 2;
+  z-index: 1;
   border: 0;
   padding: 0;
   background: transparent;
@@ -1158,7 +1159,8 @@ a:hover {
    the site card's look, sliding up fresh for each step */
 .tutorial {
   position: absolute;
-  z-index: 2;
+  /* over the show-me shade, so the card itself is never dimmed */
+  z-index: 4;
   left: 56px;
   bottom: 48px;
   width: min(340px, calc(100vw - 112px));
@@ -1218,6 +1220,42 @@ a:hover {
 
 .tutorial-actions:empty {
   display: none;
+}
+
+/* keys named in a step, as key caps */
+.tutorial kbd {
+  display: inline-block;
+  min-width: 1.6em;
+  padding: 0 5px;
+  border: 1px solid var(--ink);
+  border-bottom-width: 2px;
+  background: var(--code);
+  font: 700 12px/1.5 var(--font-mono), monospace;
+  text-align: center;
+}
+
+.tutorial-show[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+/* show me: the page shaded but for holes over what the step points at; it
+   never takes a click, so the lit controls and tiles stay usable */
+.spotlight {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 320ms ease;
+}
+
+.spotlight[data-on="true"] {
+  opacity: 1;
+}
+
+.spotlight-shade {
+  fill: rgba(18, 32, 10, 0.62);
 }
 
 /* a quiet text button: skip, and the intro page's way back to the tutorial */
