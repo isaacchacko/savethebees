@@ -155,7 +155,7 @@ export default function Stage({ children }: { children: ReactNode }) {
   const play = useFreePlay(board, tool, setScene, playing, selecting, allow);
   const game = useGame(board, setScene, mode === 'game', freshGame, play.clearHistory);
   dayRef.current = game.day;
-  useTownSim(board, setScene, mode === 'site' || mode === 'idle');
+  useTownSim(board, setScene, mode === 'site' || mode === 'idle', newTerrain);
   // on the map with hands on: free play, or a game that isn't over
   const building = mode === 'free' || (mode === 'game' && game.phase !== 'over');
   const freshGameAgain = game.restart;

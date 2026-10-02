@@ -13,14 +13,28 @@ const STEP_MS = 1800;
 const STEPS_PER_CATASTROPHE = 50;
 
 /**
+ * Steps before the town starts over on a fresh map, about five minutes: the
+ * planner only ever adds, so left long enough it crowds the map until there's
+ * nothing sensible left for it to do.
+ */
+const STEPS_PER_TOWN = Math.round((5 * 60 * 1000) / STEP_MS);
+
+/**
  * The town that grows behind the site, and in idle mode: people keep moving
  * in, and the planner (lib/map/sim) keeps them served and connected —
  * stations, rail, tunnels, parks, and land reshaped where it has to be. Now
  * and then a flood or landslide tears through the rail, and the planner
- * builds it back. It eases off once the town fills its share of the map, and
- * rests while the tab is hidden.
+ * builds it back. It eases off once the town fills its share of the map,
+ * starts over on a new map every five minutes or so, and rests while the tab
+ * is hidden.
  */
-export function useTownSim(board: Board | null, commit: (scene: Scene) => void, active: boolean) {
+export function useTownSim(
+  board: Board | null,
+  commit: (scene: Scene) => void,
+  active: boolean,
+  /** Rolls a fresh map with a new town on it. */
+  restart: () => void
+) {
   const boardRef = useRef(board);
   boardRef.current = board;
 
@@ -31,6 +45,10 @@ export function useTownSim(board: Board | null, commit: (scene: Scene) => void, 
       const b = boardRef.current;
       if (!b || document.hidden) return;
       steps++;
+      if (steps % STEPS_PER_TOWN === 0) {
+        restart();
+        return;
+      }
       if (steps % STEPS_PER_CATASTROPHE === 0 && b.rail.some((r) => r !== 0)) {
         commit(catastrophe(b, Math.random));
         return;
@@ -44,5 +62,5 @@ export function useTownSim(board: Board | null, commit: (scene: Scene) => void, 
       if (step) commit(step);
     }, STEP_MS);
     return () => clearInterval(id);
-  }, [active, commit]);
+  }, [active, commit, restart]);
 }
