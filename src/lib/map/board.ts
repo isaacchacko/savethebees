@@ -44,6 +44,13 @@ const bits = (m: number) => {
   return c;
 };
 
+/** Pieces of rail on the board, one per pair of neighbouring tiles it joins. A tunnel's crossing is free. */
+export function railPieces(b: Board): number {
+  let ends = 0;
+  for (const m of b.rail) ends += bits(m);
+  return ends / 2;
+}
+
 export const touchesWater = (b: Board, i: number) => neighbors(b, i).some((n) => b.tiles[n] === WATER);
 
 function dirTo(b: Board, from: number, to: number): number {

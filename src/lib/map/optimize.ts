@@ -15,6 +15,7 @@ import {
   layRoute,
   place,
   placeTunnel,
+  railPieces,
   route,
   type Board,
 } from './board.ts';
@@ -54,42 +55,54 @@ function placeStations(b: Board, count: number): Board {
   return board;
 }
 
-/** Joins the stations into one network where it can: rail first, a tunnel when water's in the way. */
-function connect(b: Board, tunnels: number): Board {
+/**
+ * Joins stations' networks while the rail lasts, each time with the join
+ * that adds the most score per piece of rail: rail where it can go, a tunnel
+ * and the rail through it when water's in the way. What can't be afforded is
+ * left apart.
+ */
+function connect(b: Board, have: Allowance): Board {
   let board = b;
-  let tunnelsLeft = tunnels;
+  let tunnelsLeft = have.tunnel;
   for (let pass = 0; pass < 40; pass++) {
     const net = networks(board);
     const stations = [...board.build.keys()].filter((i) => board.build[i] === STATION);
-    const ids = [...new Set(stations.map((s) => net[s]))];
-    if (ids.length <= 1) break;
-    // the nearest pair of stations on different networks
+    // the nearest pairs of stations on different networks
     const pairs = stations
-      .flatMap((s) => stations.filter((t) => net[t] !== net[s]).map((t) => [s, t] as const))
+      .flatMap((s) => stations.filter((t) => net[t] > net[s]).map((t) => [s, t] as const))
       .sort((p, q) => hexDistance(board, p[0], p[1]) - hexDistance(board, q[0], q[1]));
-    let joined = false;
+    if (pairs.length === 0) break;
+
+    const options: { next: Board; tunnel: boolean }[] = [];
     for (const [s, t] of pairs.slice(0, 12)) {
       const path = route(board, s, t);
-      if (path) {
-        board = layRoute(board, path);
-        joined = true;
-        break;
-      }
+      if (path) options.push({ next: layRoute(board, path), tunnel: false });
     }
-    if (!joined && tunnelsLeft > 0) {
+    if (tunnelsLeft > 0) {
       for (const [s, t] of pairs.slice(0, 6)) {
         const pair = tunnelToward(board, s, t);
-        const next = pair ? placeTunnel(board, pair[0], pair[1]) : null;
-        // only a tunnel rail can actually use to get from s to t
-        if (next && route(next, s, t)) {
-          board = next;
-          tunnelsLeft--;
-          joined = true;
-          break;
-        }
+        const dug = pair ? placeTunnel(board, pair[0], pair[1]) : null;
+        const path = dug ? route(dug, s, t) : null;
+        if (dug && path) options.push({ next: layRoute(dug, path), tunnel: true });
       }
     }
-    if (!joined) break;
+
+    const base = score(board);
+    const railLeft = have.rail - railPieces(board);
+    let best: (typeof options)[number] | null = null;
+    let bestRate = 0;
+    for (const o of options) {
+      const cost = railPieces(o.next) - railPieces(board);
+      if (cost > railLeft) continue;
+      const rate = (score(o.next) - base) / Math.max(1, cost);
+      if (rate > bestRate) {
+        bestRate = rate;
+        best = o;
+      }
+    }
+    if (!best) break;
+    board = best.next;
+    if (best.tunnel) tunnelsLeft--;
   }
   return board;
 }
@@ -123,7 +136,7 @@ function placeParks(b: Board, count: number): Board {
 export function bestPlan(b: Board, have: Allowance): Board {
   let board = bareLand(b);
   board = placeStations(board, have.station);
-  board = connect(board, have.tunnel);
+  board = connect(board, have);
   board = placeParks(board, have.park);
   return board;
 }

@@ -47,7 +47,7 @@ type Step = {
   needs?: Rationed | ((n: Now) => Rationed | null);
 };
 
-const NAMES: Record<Rationed, string> = { station: 'stations', park: 'parks', tunnel: 'tunnels' };
+const NAMES: Record<Rationed, string> = { station: 'stations', park: 'parks', tunnel: 'tunnels', rail: 'rail' };
 
 /**
  * Built where it can't help: a station no house needs (none beside it, or

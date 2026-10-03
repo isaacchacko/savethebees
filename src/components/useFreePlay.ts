@@ -217,13 +217,13 @@ export function useFreePlay(
           return;
         }
         const path = route(b, p.from, i, false, true);
-        setPreview(path ? { path, ok: true } : { path: hexLine(b, p.from, i), ok: false });
+        setPreview(path ? { path, ok: allow(layRoute(b, path)) } : { path: hexLine(b, p.from, i), ok: false });
       } else if (p.kind === 'rail' && i !== p.last) {
         apply(link(b, p.last, i), { order: [p.last, i] });
         if (carriesRail(boardRef.current!, i)) press.current = { kind: 'rail', last: i };
       }
     },
-    [apply, pendingTunnel, preview, selecting, tool]
+    [allow, apply, pendingTunnel, preview, selecting, tool]
   );
 
   // whether placing the tool on a tile would stay within budget, so the ghost

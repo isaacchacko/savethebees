@@ -28,7 +28,7 @@ type Shown = ToolId | 'select';
 const GAME_TOOLS = new Set<ToolId>(['park', 'station', 'tunnel', 'rail', 'erase']);
 
 /** The tools the game rations, by the allowance field that counts them. */
-const BUDGETED = new Set<ToolId>(['station', 'park', 'tunnel']);
+const BUDGETED = new Set<ToolId>(['station', 'park', 'tunnel', 'rail']);
 
 /** Coyote time: how long the info card waits after the mouse leaves a glyph,
  * so it can be crossed over to without vanishing on the way. */

@@ -120,7 +120,7 @@ export function useGame(
   // it's only worked out again when someone arrives (or a new day begins)
   const homes = board ? board.build.map((v) => (isHouse(v) ? v : 0)).join('') : '';
   const target = useMemo(
-    () => (board ? targetFor(board, day, tutorial ? TUTORIAL_TARGET_SHARE : TARGET_SHARE) : 1),
+    () => (board ? targetFor(board, day, tutorial ? TUTORIAL_TARGET_SHARE : TARGET_SHARE, tutorial) : 1),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [homes, day, board?.seed, tutorial]
   );

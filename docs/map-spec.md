@@ -203,13 +203,16 @@ station on its own already scores for its neighbours.
   where you build and rearrange; "Start day ▸" or Enter starts it.
 - **Arrivals:** during a day 4 + 2·day people arrive at odd intervals,
   scattered (spread 0.3), so they turn up in awkward places.
-- **Allowance:** stations 3 + 2 a day, parks 1 a day, tunnels 1 plus one every
-  other day. What's left is worked out from the board, so erasing or undoing
-  refunds.
+- **Allowance:** cumulative totals on day d are stations 3 + 2·(d−1), parks
+  d, tunnels 1 + floor((d−1)/2), and rail 12 + 4·(d−1). Rail costs one per
+  neighboring tile pair joined; the tunnel jump itself is free. The tutorial
+  has 16 rail pieces so its tall island can be completed. What's left is
+  worked out from the board, so erasing or undoing refunds.
 - **Target:** 90% of what a greedy planner (`lib/map/optimize.ts`) can score
   from bare land with the same people and allowance:
   - stations placed to cover the most people
-  - everything joined by rail, with tunnels where needed
+  - joins chosen by score gained per rail piece, with tunnels where needed,
+    stopping when the budget runs out
   - parks placed where they score most
 
   The target updates as people arrive, and the day is judged on the board it

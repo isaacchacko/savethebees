@@ -267,7 +267,7 @@ export default function Stage({ children }: { children: ReactNode }) {
   // the game's budget, read through a ref because the day lives in useGame,
   // which needs this hook's history first
   const dayRef = useRef(1);
-  const allow = useCallback((next: Board) => mode !== 'game' || affordable(next, dayRef.current), [mode]);
+  const allow = useCallback((next: Board) => mode !== 'game' || affordable(next, dayRef.current, inTutorial), [mode, inTutorial]);
   const play = useFreePlay(board, tool, setScene, playing, selecting, allow);
   // held back until it's known whether this game is the tutorial, so a first
   // visit doesn't flash a random map before the island
@@ -296,7 +296,7 @@ export default function Stage({ children }: { children: ReactNode }) {
     pinned: play.pinned,
     undos: play.undos,
     washedOut,
-    left: mode === 'game' && board ? leftToBuild(board, game.day) : null,
+    left: mode === 'game' && board ? leftToBuild(board, game.day, inTutorial) : null,
   });
   // show me lights what the step points at, so it needs something to point at
   const spotlit = !!tutorial?.showing && (tutorial.tiles.length > 0 || !!tutorial.hint);
@@ -315,7 +315,7 @@ export default function Stage({ children }: { children: ReactNode }) {
         selecting,
         setSelecting,
         game: mode === 'game' ? game : null,
-        left: mode === 'game' && board ? leftToBuild(board, game.day) : null,
+        left: mode === 'game' && board ? leftToBuild(board, game.day, inTutorial) : null,
         tutorial,
         tutorialDone,
         replayTutorial,

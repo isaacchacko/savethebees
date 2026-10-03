@@ -3,6 +3,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { STATION, TUNNEL, canPairTunnel, isHouse, layRoute, place, placeTunnel, route } from './board.ts';
+import { affordable } from './game.ts';
 import { hexDistance, neighbors, type Grid } from './hex.ts';
 import { networks, score } from './score.ts';
 import { LAND, WATER } from './terrain.ts';
@@ -50,6 +51,7 @@ test('the islet is only reachable by a tunnel between the two shores', () => {
     const net = networks(b);
     assert.equal(net[sa], net[sc]);
     assert.equal(score(b), 24);
+    assert.ok(affordable(b, 1, true), 'the whole tutorial fits in its allowance');
 
     // the tsunami always washes out rail, but never a building or the ground
     // beside a station or tunnel mouth
