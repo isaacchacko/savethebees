@@ -17,6 +17,7 @@ import {
   type Stats,
 } from '@/lib/map/game';
 import { neighbors } from '@/lib/map/hex';
+import { advanceDayClock, dayClock, toggleDaySpeed } from '@/lib/map/day-clock';
 import { score } from '@/lib/map/score';
 import { catastrophe, spawnHousing, tunnelPairs } from '@/lib/map/sim';
 
@@ -40,6 +41,8 @@ export type GameView = {
   /** Catastrophes so far this game. */
   struck: number;
   startDay: () => void;
+  speed: 1 | 2;
+  toggleSpeed: () => void;
   /** A whole new game, on a new map. */
   restart: () => void;
 };
@@ -104,6 +107,8 @@ export function useGame(
   const [phase, setPhase] = useState<Phase>('break');
   const [day, setDay] = useState(1);
   const [left, setLeft] = useState(1);
+  const [speed, setSpeed] = useState<1 | 2>(1);
+  const clock = useRef(dayClock(0));
   const [stats, setStats] = useState<Stats | null>(null);
   const boardRef = useRef(board);
   boardRef.current = board;
@@ -126,6 +131,8 @@ export function useGame(
   );
 
   const restart = useCallback(() => {
+    clock.current = dayClock(performance.now());
+    setSpeed(1);
     fresh();
     setPhase('break');
     setDay(1);
@@ -144,7 +151,9 @@ export function useGame(
   const dayMs = tutorial ? TUTORIAL_DAY_MS : DAY_MS;
 
   const startDay = useCallback(() => {
-    const now = performance.now();
+    clock.current = dayClock(performance.now());
+    setSpeed(1);
+    const now = 0;
     endsAt.current = now + dayMs;
     nextArrival.current = now + 1500;
     strikesAt.current = tutorial || isCatastropheDay(day) ? now + dayMs * CATASTROPHE_AT : Infinity;
@@ -152,12 +161,19 @@ export function useGame(
     setPhase('day');
   }, [day, dayMs, tutorial]);
 
+  const toggleSpeed = useCallback(() => {
+    if (phase !== 'day') return;
+    clock.current = toggleDaySpeed(clock.current, performance.now());
+    setSpeed(clock.current.speed);
+  }, [phase]);
+
   useEffect(() => {
     if (!active || phase !== 'day') return;
     const id = setInterval(() => {
       const b = boardRef.current;
       if (!b) return;
-      const now = performance.now();
+      clock.current = advanceDayClock(clock.current, performance.now());
+      const now = clock.current.elapsed;
       best.current = Math.max(best.current, score(b));
 
       if (now >= strikesAt.current) {
@@ -198,6 +214,6 @@ export function useGame(
     return () => clearInterval(id);
   }, [active, phase, day, dayMs, tutorial, struck, commit, spawned, scripted]);
 
-  const view: GameView = { phase, day, left, target, stats, alert, struck, startDay, restart };
+  const view: GameView = { phase, day, left, target, stats, alert, struck, startDay, restart, speed, toggleSpeed };
   return view;
 }

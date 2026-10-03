@@ -61,6 +61,7 @@ Each entity takes up one tile, except where noted.
 
 ### Park
 
+- Shown to players as **greenery**, selected with **g**.
 - Only on land.
 - A bigger park gives a bigger citizen bonus.
 - **Decided**: park tiles that touch merge into one park, and its size is
@@ -200,7 +201,12 @@ station on its own already scores for its neighbours.
   Each budgeted tool shows how many are left as a white number in a
   terracotta circle.
 - **Days** last 45s. A day starts from a breather, with the clock stopped,
-  where you build and rearrange; "Start day ▸" or Enter starts it.
+  where you build and rearrange; "Start day ▸", Space or Enter starts it.
+  Space during a day toggles 1×/2× speed for the clock, arrivals and
+  catastrophes. Each new day starts at 1×. The status also has a speed button.
+- **Score warning:** in the final 10% of a running day, the vignette fades
+  from dark to red over 420ms while the score is below target. Meeting the
+  target or leaving the running day fades it back.
 - **Arrivals:** during a day 4 + 2·day people arrive at odd intervals,
   scattered (spread 0.3), so they turn up in awkward places.
 - **Allowance:** cumulative totals on day d are stations 3 + 2·(d−1), parks

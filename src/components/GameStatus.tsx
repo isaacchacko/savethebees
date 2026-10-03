@@ -11,7 +11,7 @@ import type { ToolId } from '@/lib/map/tools';
 // the three kinds of points, each shown with the tile that earns it
 const PARTS: { part: Exclude<keyof Breakdown, 'total'>; tool: ToolId; label: string }[] = [
   { part: 'housing', tool: 'house', label: 'from housing' },
-  { part: 'park', tool: 'park', label: 'from parks' },
+  { part: 'park', tool: 'park', label: 'from greenery' },
   { part: 'mountain', tool: 'mountain', label: 'from mountains' },
 ];
 
@@ -35,11 +35,16 @@ export default function GameStatus({ hidden }: { hidden: boolean }) {
   const hint = tutorial?.hint;
 
   useEffect(() => {
-    if (!between || !game) return;
+    if (!game || (game.phase !== 'day' && !between)) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key !== 'Enter' || e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.target instanceof HTMLElement && e.target.closest('input, textarea, select, button, a, [contenteditable]')) return;
+      const space = e.code === 'Space';
+      if (!space && !(e.key === 'Enter' && between)) return;
       e.preventDefault();
-      game.startDay();
+      if (e.repeat) return;
+      if (between) game.startDay();
+      else if (space) game.toggleSpeed();
     };
     addEventListener('keydown', onKey);
     return () => removeEventListener('keydown', onKey);
@@ -69,6 +74,8 @@ export default function GameStatus({ hidden }: { hidden: boolean }) {
               className="status-go"
               data-hint={hint === 'start' ? 'true' : undefined}
               onClick={game.startDay}
+              aria-keyshortcuts="Space Enter"
+              title="Start day (Space)"
             >
               Start day {game.day} ▸
             </button>
@@ -77,6 +84,13 @@ export default function GameStatus({ hidden }: { hidden: boolean }) {
               <span style={{ transform: `scaleX(${game.left})` }} />
             </span>
           )}
+          {game.phase === 'day' ? (
+            <button type="button" className="status-go" onClick={game.toggleSpeed}
+              aria-label={game.speed === 1 ? 'Switch to 2× speed' : 'Switch to normal speed'}
+              aria-pressed={game.speed === 2} aria-keyshortcuts="Space" title="Toggle speed (Space)">
+              {game.speed}×
+            </button>
+          ) : null}
         </span>
       ) : null}
       <span className="status-parts">

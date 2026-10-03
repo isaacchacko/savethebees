@@ -317,13 +317,34 @@ a:hover {
   pointer-events: none;
   --fade: 36px;
   --shade: rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  transition: opacity 420ms ease;
+}
+
+.vignette::before,
+.vignette::after {
+  content: '';
+  position: absolute;
+  inset: 0;
   background:
     linear-gradient(to right, var(--shade), transparent var(--fade)),
     linear-gradient(to left, var(--shade), transparent var(--fade)),
     linear-gradient(to bottom, var(--shade), transparent var(--fade)),
     linear-gradient(to top, var(--shade), transparent var(--fade));
-  opacity: 0;
   transition: opacity 420ms ease;
+}
+
+.vignette::after {
+  --shade: rgba(190, 45, 45, 0.5);
+  opacity: 0;
+}
+
+.vignette[data-warning="true"]::before {
+  opacity: 0;
+}
+
+.vignette[data-warning="true"]::after {
+  opacity: 1;
 }
 
 .vignette[data-on="true"] {

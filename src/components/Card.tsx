@@ -103,7 +103,8 @@ function sizeFor(tab: string | null): 'sm' | 'md' | 'lg' {
 export default function Card({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { mode } = useMapMode();
+  const { mode, game, score } = useMapMode();
+  const scoreWarning = mode === 'game' && game?.phase === 'day' && game.left <= 0.1 && score.total < game.target;
   // set on click rather than on arrival, so the indicator and the card's size
   // move while the old page is still sliding out
   const [tab, setTab] = useState(() => tabFor(pathname));
@@ -220,7 +221,7 @@ export default function Card({ children }: { children: ReactNode }) {
 
   return (
     <SlideContext.Provider value={slide}>
-      <div className="vignette" data-on={mapOn ? 'true' : 'false'} />
+      <div className="vignette" data-on={mapOn ? 'true' : 'false'} data-warning={scoreWarning ? 'true' : 'false'} />
       {/* size follows where the card is headed, set on click, so it resizes
           while the old contents wipe out; view follows where it actually is,
           so the toolbar and the page swap only once the url does. In free play

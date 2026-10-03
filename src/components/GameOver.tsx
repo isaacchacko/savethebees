@@ -31,7 +31,7 @@ export default function GameOver({
     ['stations', String(stats.stations)],
     ['rail', `${stats.rail} tiles`],
     ['tunnels', String(stats.tunnels)],
-    ['parks', String(stats.parks)],
+    ['greenery', String(stats.parks)],
     ['catastrophes', String(stats.catastrophes)],
   ];
 

@@ -37,12 +37,12 @@ export const TOOLS: Tool[] = [
   },
   {
     id: 'park',
-    key: 'p',
-    name: 'park',
+    key: 'g',
+    name: 'greenery',
     group: 'build',
-    place: 'put one on any empty land. parks that touch join into one bigger park.',
+    place: 'put greenery on any empty land. tiles that touch join into one bigger patch.',
     score:
-      'everyone who can reach a park scores for it: 2 for a small park (1–2 tiles), 5 for a medium one (3–5), 10 for a large one (6 or more), plus 1 for every side it shares with a mountain.',
+      'everyone who can reach greenery scores for it: 2 for a small patch (1–2 tiles), 5 for a medium one (3–5), 10 for a large one (6 or more), plus 1 for every side it shares with a mountain.',
   },
   {
     id: 'station',
@@ -69,7 +69,7 @@ export const TOOLS: Tool[] = [
     name: 'rail',
     group: 'build',
     place:
-      'drag from one station to another and the route is drawn for you; hold shift to paint it tile by tile. not on water, mountains, houses or parks.',
+      'drag from one station to another and the route is drawn for you; hold shift to paint it tile by tile. not on water, mountains, houses or greenery.',
     score:
       'stations joined by rail can reach each other, and so can everyone living next to them. one network is worth more than two.',
   },
@@ -79,7 +79,7 @@ export const TOOLS: Tool[] = [
     name: 'land',
     group: 'terrain',
     place: 'paint over any tile. whatever was there is cleared away.',
-    score: 'everything is built on land. more open land is more room for houses, parks and stations.',
+    score: 'everything is built on land. more open land is more room for houses, greenery and stations.',
   },
   {
     id: 'water',

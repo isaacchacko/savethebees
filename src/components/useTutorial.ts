@@ -47,7 +47,7 @@ type Step = {
   needs?: Rationed | ((n: Now) => Rationed | null);
 };
 
-const NAMES: Record<Rationed, string> = { station: 'stations', park: 'parks', tunnel: 'tunnels', rail: 'rail' };
+const NAMES: Record<Rationed, string> = { station: 'stations', park: 'greenery', tunnel: 'tunnels', rail: 'rail' };
 
 /**
  * Built where it can't help: a station no house needs (none beside it, or
@@ -123,9 +123,9 @@ const STEPS: Step[] = [
   },
   {
     id: 'park',
-    title: 'Parks',
-    text: 'Anyone who can reach a park scores for it. Press [p] and build one by a station.',
-    touch: 'Anyone who can reach a park scores for it. Pick the park and build one by a station.',
+    title: 'Greenery',
+    text: 'Anyone who can reach greenery scores for it. Press [g] and plant some by a station.',
+    touch: 'Anyone who can reach greenery scores for it. Pick greenery and plant some by a station.',
     hint: 'park',
     needs: 'park',
     tiles: ({ board }) => {
@@ -188,7 +188,7 @@ const STEPS: Step[] = [
   {
     id: 'start',
     title: 'Day one',
-    text: 'Press [enter] to start the clock. People keep moving in while it runs.',
+    text: 'Press [space] to start the clock. Press it again during the day to toggle 2× speed. People keep moving in while it runs.',
     touch: 'Start the clock. People keep moving in while it runs.',
     hint: 'start',
     done: ({ game }) => game.phase !== 'break',
