@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Markdown from '@/components/Markdown';
+import { useLibraryLists } from '@/components/PrivateLibrary';
 import type { CoolItem, CoolList } from '@/lib/cool';
 
 // long enough to move the mouse across the gap from a link into the drawer
@@ -21,7 +22,8 @@ function hostname(url: string): string {
  * the mouse leaves a link, and stays put while the mouse is over it. It keeps
  * showing the last entry while it fades out, so it never flashes empty.
  */
-export default function CoolLists({ lists }: { lists: CoolList[] }) {
+export default function CoolLists({ lists: publicLists }: { lists: CoolList[] }) {
+  const lists = useLibraryLists(publicLists);
   const [hovered, setHovered] = useState<CoolItem | null>(null);
   const [open, setOpen] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -55,7 +57,11 @@ export default function CoolLists({ lists }: { lists: CoolList[] }) {
               list.items.map((item) => {
                 const host = hostname(item.url);
                 return (
-                  <div key={item.id} className="cool-row">
+                  <div
+                    key={item.id}
+                    className="cool-row"
+                    data-private={item.private ? 'true' : undefined}
+                  >
                     <span className="bullet" />
                     <span
                       className="favicon"

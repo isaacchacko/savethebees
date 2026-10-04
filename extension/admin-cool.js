@@ -80,16 +80,33 @@ export function createCoolView({ root, say }) {
       }),
     };
 
+    // ticking private on an entry with a screenshot warns before the save
+    // deletes it: the image is public, so it cannot come along
+    const privateBox = el("input", { type: "checkbox", checked: Boolean(item?.private) });
+    const shotWarning = el("p", {
+      className: "warn",
+      textContent: item?.shot
+        ? "saving deletes this entry's screenshot — it is public, so it cannot stay"
+        : "",
+      hidden: true,
+    });
+    privateBox.onchange = () => {
+      shotWarning.hidden = !(privateBox.checked && !item?.private && item?.shot);
+    };
+
     const submit = () => {
-      const values = Object.fromEntries(
-        Object.entries(fields).map(([key, input]) => [key, input.value.trim()])
-      );
+      const values = {
+        ...Object.fromEntries(
+          Object.entries(fields).map(([key, input]) => [key, input.value.trim()])
+        ),
+        private: privateBox.checked,
+      };
       if (!values.title && !values.url) return say("needs a title or a url", "error");
 
       if (item) {
         commit(
           `library: update "${values.title}" in ${list.title}`,
-          (draft) => updateItem(draft, list.id, item.id, values),
+          (draft, files) => files.push(...updateItem(draft, list.id, item.id, values)),
           "updated"
         );
       } else {
@@ -105,6 +122,10 @@ export function createCoolView({ root, say }) {
     for (const [key, input] of Object.entries(fields)) {
       rows.push(el("label", { textContent: key }), input);
     }
+    rows.push(
+      el("label", { className: "check" }, [privateBox, el("span", { textContent: "private" })]),
+      shotWarning
+    );
     rows.push(
       el("div", { className: "form-actions" }, [
         el("button", { type: "button", textContent: "save", onclick: submit }),
@@ -190,6 +211,7 @@ export function createCoolView({ root, say }) {
       el("span", { className: "bullet" }),
       favicon,
       name,
+      item.private ? el("span", { className: "tag", textContent: "private" }) : null,
       el("button", {
         type: "button",
         textContent: "ed",

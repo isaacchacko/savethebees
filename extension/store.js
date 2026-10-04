@@ -10,8 +10,12 @@ const CONFIG_DEFAULTS = {
   repo: "savethebees",
   branch: "main",
   filePath: "content/cool.json",
+  privatePath: "content/cool-private.json",
   site: "https://isaacchacko.com",
   token: "",
+  // the library password: seals private entries before they reach the public
+  // repo, and is what the site asks for to show them
+  password: "",
 };
 
 const CACHE_KEY = "cool";
@@ -133,10 +137,156 @@ async function readCool(config, ref) {
   return Array.isArray(data.lists) ? data : { lists: [] };
 }
 
-export async function fetchCool() {
-  const config = await getConfig();
+// ─────────────────────────────  private entries  ────────────────────────────
+// The repo is public, so a private entry cannot sit in cool.json with a flag
+// on it. It is sealed with the library password (PBKDF2 → AES-GCM) into
+// cool-private.json instead, and only the ciphertext is ever committed. The
+// site's /api/library/private opens the same file with the password a visitor
+// types; src/lib/privateLibrary.ts is its half of this format.
+//
+// In memory the extension works on one merged `data`: private entries sit in
+// their lists with `private: true`, so every list helper below handles them
+// unchanged. They are split back out on the way to github.
+
+const PBKDF2_ITERATIONS = 310000;
+
+function bytesToBase64(bytes) {
+  let binary = "";
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return btoa(binary);
+}
+
+function base64ToBytes(base64) {
+  return Uint8Array.from(atob(base64), (char) => char.charCodeAt(0));
+}
+
+async function deriveKey(password, salt, iterations) {
+  const material = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(password),
+    "PBKDF2",
+    false,
+    ["deriveKey"]
+  );
+  return crypto.subtle.deriveKey(
+    { name: "PBKDF2", hash: "SHA-256", salt, iterations },
+    material,
+    { name: "AES-GCM", length: 256 },
+    false,
+    ["encrypt", "decrypt"]
+  );
+}
+
+export async function seal(plaintext, password) {
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const key = await deriveKey(password, salt, PBKDF2_ITERATIONS);
+  const data = await crypto.subtle.encrypt(
+    { name: "AES-GCM", iv },
+    key,
+    new TextEncoder().encode(plaintext)
+  );
+  return {
+    v: 1,
+    iterations: PBKDF2_ITERATIONS,
+    salt: bytesToBase64(salt),
+    iv: bytesToBase64(iv),
+    data: bytesToBase64(new Uint8Array(data)),
+  };
+}
+
+/** Throws when the password is wrong: GCM refuses to open what it did not seal. */
+export async function unseal(sealed, password) {
+  const key = await deriveKey(password, base64ToBytes(sealed.salt), sealed.iterations);
+  const plain = await crypto.subtle.decrypt(
+    { name: "AES-GCM", iv: base64ToBytes(sealed.iv) },
+    key,
+    base64ToBytes(sealed.data)
+  );
+  return new TextDecoder().decode(plain);
+}
+
+/** The sealed file at `ref`, or null when there is none yet. */
+async function readSealed(config, ref) {
+  const response = await github(
+    config,
+    `${repoPath(config, `/contents/${config.privatePath}`)}?ref=${ref}`
+  );
+  if (response.status === 404) return null;
+  if (!response.ok) throw new Error(await explain(response));
+  const body = await response.json();
+  try {
+    return JSON.parse(decodeBase64(body.content));
+  } catch {
+    throw new Error("cool-private.json on github is not valid JSON — fix it by hand");
+  }
+}
+
+/**
+ * Opens the private entries at `ref`. `plain` is the decrypted text, kept so a
+ * save that changed nothing private can leave the file alone rather than
+ * re-sealing it under a fresh iv on every commit. With no password set the
+ * entries stay sealed and out of sight, and saves leave the file untouched.
+ */
+async function readPrivate(config, ref) {
+  const sealed = await readSealed(config, ref);
+  if (!sealed || !config.password) return { items: [], plain: null };
+
+  let plain;
+  try {
+    plain = await unseal(sealed, config.password);
+  } catch {
+    throw new Error("the library password does not open the private entries — fix it in options");
+  }
+  const items = JSON.parse(plain).items;
+  return { items: Array.isArray(items) ? items : [], plain };
+}
+
+/**
+ * Puts each private entry back at the position it held in its list. One whose
+ * list is gone comes back as an orphan, carried through the next save rather
+ * than dropped — it can only happen when a list was deleted while locked.
+ */
+function mergePrivate(data, items) {
+  const orphans = [];
+  const sorted = [...items].sort((a, b) => a.index - b.index);
+  for (const { list: listId, index, item } of sorted) {
+    const list = data.lists.find((candidate) => candidate.id === listId);
+    if (!list) {
+      orphans.push({ list: listId, index, item });
+      continue;
+    }
+    list.items.splice(Math.min(index, list.items.length), 0, { ...item, private: true });
+  }
+  return orphans;
+}
+
+/** The inverse of mergePrivate: the public file, and what gets sealed. */
+function splitPrivate(data, orphans) {
+  const items = [];
+  const lists = data.lists.map((list) => ({
+    ...list,
+    items: list.items.filter((entry, index) => {
+      if (!entry.private) return true;
+      const { private: _, ...item } = entry;
+      items.push({ list: list.id, index, item });
+      return false;
+    }),
+  }));
+  return { publicData: { ...data, lists }, items: [...items, ...orphans] };
+}
+
+async function fetchMerged(config) {
   const head = await getHead(config);
   const data = await readCool(config, head);
+  const secret = await readPrivate(config, head);
+  const orphans = mergePrivate(data, secret.items);
+  return { data, head, secret, orphans };
+}
+
+export async function fetchCool() {
+  const config = await getConfig();
+  const { data, head } = await fetchMerged(config);
   await setCached(data, head);
   return { data, head };
 }
@@ -209,17 +359,28 @@ export async function mutate(message, apply) {
   // a write by a beat.
   for (let attempt = 0; attempt < 4; attempt++) {
     if (attempt) await new Promise((done) => setTimeout(done, 250 * attempt));
-    const { data, head } = await fetchCool();
+    const { data, head, secret, orphans } = await fetchMerged(config);
     const next = structuredClone(data);
     const files = [];
     apply(next, files);
 
-    const sha = await commitFiles(
-      config,
-      head,
-      [{ path: config.filePath, text: `${JSON.stringify(next, null, 2)}\n` }, ...files],
-      message
-    );
+    const { publicData, items } = splitPrivate(next, orphans);
+    const written = [
+      { path: config.filePath, text: `${JSON.stringify(publicData, null, 2)}\n` },
+    ];
+
+    // with no password nothing private was read into `next`, so the sealed
+    // file — if there is one — is left exactly as it is
+    if (!config.password && items.length) {
+      throw new Error("set the library password in options to save private entries");
+    }
+    const plain = JSON.stringify({ items });
+    if (config.password && plain !== (secret.plain ?? JSON.stringify({ items: [] }))) {
+      const sealed = await seal(plain, config.password);
+      written.push({ path: config.privatePath, text: `${JSON.stringify(sealed, null, 2)}\n` });
+    }
+
+    const sha = await commitFiles(config, head, [...written, ...files], message);
     if (sha) {
       await setCached(next, sha);
       return next;
@@ -227,6 +388,37 @@ export async function mutate(message, apply) {
   }
 
   throw new Error("cool.json changed while saving — try again");
+}
+
+/**
+ * Re-seals the private entries under a new password, in one commit. Returns
+ * false, committing nothing, when `oldPassword` does not open them — then
+ * there is nothing it could re-seal, and the new one simply replaces it.
+ */
+export async function rekeyPrivate(oldPassword, newPassword) {
+  const config = await getConfig();
+  for (let attempt = 0; attempt < 4; attempt++) {
+    if (attempt) await new Promise((done) => setTimeout(done, 250 * attempt));
+    const head = await getHead(config);
+    const sealed = await readSealed(config, head);
+    if (!sealed || !oldPassword) return false;
+
+    let plain;
+    try {
+      plain = await unseal(sealed, oldPassword);
+    } catch {
+      return false;
+    }
+    const resealed = await seal(plain, newPassword);
+    const sha = await commitFiles(
+      config,
+      head,
+      [{ path: config.privatePath, text: `${JSON.stringify(resealed, null, 2)}\n` }],
+      "library: change the private entries password"
+    );
+    if (sha) return true;
+  }
+  throw new Error("the repo changed while saving — try again");
 }
 
 // ─────────────────────── arbitrary files, for the admin view ───────────────
@@ -334,10 +526,15 @@ export function removeList(data, listId) {
   return list;
 }
 
-/** `shot` is {base64, width, height} from shot.js, or null for no screenshot. */
+/**
+ * `shot` is {base64, width, height} from shot.js, or null for no screenshot.
+ * A private entry never has one: public/cool-shots is public on the site and
+ * on github both, so the image would give away what the entry hides.
+ */
 export function addItem(data, listId, item, shot = null) {
   const id = crypto.randomUUID();
   const label = (item.label || "").trim();
+  if (item.private) shot = null;
   findList(data, listId).items.unshift({
     id,
     title: item.title.trim(),
@@ -348,16 +545,30 @@ export function addItem(data, listId, item, shot = null) {
     note: (item.note || "").trim(),
     added: new Date().toISOString().slice(0, 10),
     ...(shot ? { shot: shotUrl(id), shotW: shot.width, shotH: shot.height } : {}),
+    ...(item.private ? { private: true } : {}),
   });
   return id;
 }
 
+/**
+ * Returns the tree entries the update needs alongside it: making an entry
+ * private deletes its screenshot, for the reason addItem gives.
+ */
 export function updateItem(data, listId, itemId, patch) {
   const list = findList(data, listId);
   const item = list.items.find((candidate) => candidate.id === itemId);
   if (!item) throw new Error("that entry is gone");
   Object.assign(item, patch);
   if (!item.label) delete item.label;
+  if (!item.private) {
+    delete item.private;
+    return [];
+  }
+  const removals = shotRemovals([item]);
+  delete item.shot;
+  delete item.shotW;
+  delete item.shotH;
+  return removals;
 }
 
 /**

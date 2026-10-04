@@ -251,6 +251,34 @@ text. `**bold**`, `*italic*` and `` `code` `` work too. Raw HTML does not, and
 Block-level markdown (headings, lists) has nowhere to go on a single line —
 keep notes inline.
 
+## Private entries
+
+Tick **private** when adding or editing an entry and it disappears from the
+public page. Clicking the **library** heading on the site turns it into a
+password field; the right password shows the private entries in place, with a
+terracotta bullet. That only lasts until a reload.
+
+The repo is public, so a private entry cannot just be flagged in `cool.json`.
+It is encrypted (PBKDF2-SHA256 → AES-GCM) with the **library password** from
+options and committed to `content/cool-private.json`, which holds only
+ciphertext. The site's `/api/library/private` route opens that file with the
+password the visitor typed. The site keeps no copy of the password: either
+the typed one decrypts the file or it doesn't.
+
+- **Pick a long password.** Anyone can download the encrypted file and try
+  guesses offline, so rate limiting the route would not protect it.
+- **Change it in options**, not anywhere else. Saving a new one re-encrypts the
+  file under it in one commit, while the old one is still there to open it.
+- **No password set:** you can still edit public entries, the private file is
+  left as it is, and adding a private entry refuses. **Wrong password:**
+  nothing loads, so a save cannot quietly wipe the entries it failed to open.
+- **No screenshots.** `public/cool-shots` is public, so a private entry never
+  captures one, and making an entry private deletes its existing screenshot. The
+  edit form warns you as soon as you tick the box.
+- In the extension a private entry sits among the others, tagged `private`, and
+  every list helper treats it the same. It is pulled out on the way to github
+  and slotted back in by position when read.
+
 ## Screenshots
 
 Saving a page also grabs its visible viewport, shrinks it to 640px webp
@@ -293,7 +321,7 @@ really did commit underneath you. Try again.
 
 | file                  | what it does                                              |
 | --------------------- | --------------------------------------------------------- |
-| `store.js`            | GitHub client, the read-modify-write commit, list helpers |
+| `store.js`            | GitHub client, the read-modify-write commit, list helpers, private-entry encryption |
 | `background.js`       | context menus and their handler                            |
 | `popup.js`            | the add form and the manage view                           |
 | `admin.js`            | the editable stand-in for the site                         |

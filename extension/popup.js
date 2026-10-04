@@ -27,6 +27,7 @@ const labelInput = document.getElementById("entry-label");
 const urlInput = document.getElementById("url");
 const noteInput = document.getElementById("note");
 const listsRoot = document.getElementById("lists");
+const isPrivate = document.getElementById("is-private");
 const useShot = document.getElementById("use-shot");
 const shotLabel = document.getElementById("shot-label");
 const shotPreview = document.getElementById("shot-preview");
@@ -108,7 +109,19 @@ async function grabShot() {
   }
   shotLabel.textContent = `screenshot (${Math.round(shot.bytes / 1024)} kb)`;
   shotPreview.src = `data:image/webp;base64,${shot.base64}`;
-  shotPreview.hidden = false;
+  syncPrivate();
+}
+
+/** A private entry never gets a screenshot, so the checkbox goes with it. */
+function syncPrivate() {
+  const capturable = Boolean(shot);
+  useShot.disabled = isPrivate.checked || !capturable;
+  shotPreview.hidden = isPrivate.checked || !capturable;
+  if (capturable) {
+    shotLabel.textContent = isPrivate.checked
+      ? "screenshot (private entries never get one)"
+      : `screenshot (${Math.round(shot.bytes / 1024)} kb)`;
+  }
 }
 
 async function save() {
@@ -131,10 +144,11 @@ async function save() {
     label: labelInput.value.trim(),
     url,
     note: noteInput.value.trim(),
+    private: isPrivate.checked,
   };
   const target = makingList ? newListTitle : listById(listSelect.value).title;
 
-  const attach = useShot.checked ? shot : null;
+  const attach = useShot.checked && !isPrivate.checked ? shot : null;
   let savedTo = listSelect.value;
   const ok = await commit(
     `library: add "${entry.title}" to ${target}`,
@@ -170,6 +184,28 @@ function deleteButton(key, label, onConfirm) {
   });
 }
 
+/**
+ * The private checkbox for an existing entry. Ticking it on one that has a
+ * screenshot says, before anything is saved, that the screenshot will be
+ * deleted — the image is public, so it cannot come along.
+ */
+function privateCheck(item) {
+  const input = el("input", { type: "checkbox", checked: Boolean(item.private) });
+  const warning = el("p", {
+    className: "warn",
+    textContent: "saving deletes this entry's screenshot — it is public, so it cannot stay",
+    hidden: true,
+  });
+  input.onchange = () => {
+    warning.hidden = !(input.checked && !item.private && item.shot);
+  };
+  const toggle = el("div", {}, [
+    el("label", { className: "check" }, [input, el("span", { textContent: "private" })]),
+    warning,
+  ]);
+  return { toggle, input };
+}
+
 function itemEditor(list, item) {
   const title = el("input", { type: "text", value: item.title });
   const label = el("input", {
@@ -179,6 +215,7 @@ function itemEditor(list, item) {
   });
   const url = el("input", { type: "text", value: item.url });
   const note = el("input", { type: "text", value: item.note, placeholder: "note" });
+  const { toggle: privateToggle, input: privateBox } = privateCheck(item);
 
   return el("div", { className: "editor" }, [
     el("label", { textContent: "title" }),
@@ -189,19 +226,23 @@ function itemEditor(list, item) {
     url,
     el("label", { textContent: "note" }),
     note,
+    privateToggle,
     el("div", { className: "row" }, [
       el("button", {
         textContent: "save",
         onclick: () =>
           commit(
             `library: update "${title.value.trim()}" in ${list.title}`,
-            (draft) =>
-              updateItem(draft, list.id, item.id, {
-                title: title.value.trim(),
-                label: label.value.trim(),
-                url: url.value.trim(),
-                note: note.value.trim(),
-              }),
+            (draft, files) =>
+              files.push(
+                ...updateItem(draft, list.id, item.id, {
+                  title: title.value.trim(),
+                  label: label.value.trim(),
+                  url: url.value.trim(),
+                  note: note.value.trim(),
+                  private: privateBox.checked,
+                })
+              ),
             "updated"
           ),
       }),
@@ -278,6 +319,7 @@ function renderItem(list, item) {
   // shows the label when there is one, so the row reads like the site does
   const row = el("li", { title: item.url, draggable: true }, [
     el("span", { className: "name", textContent: item.label || item.title }),
+    item.private ? el("span", { className: "tag", textContent: "private" }) : null,
     el("button", {
       textContent: "ed",
       onclick: () => {
@@ -436,6 +478,7 @@ async function offerEditThisPage() {
 }
 document.getElementById("save").onclick = save;
 listSelect.onchange = syncNewListRow;
+isPrivate.onchange = syncPrivate;
 
 document.getElementById("add-list").onclick = () => {
   creatingList = true;

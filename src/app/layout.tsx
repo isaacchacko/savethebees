@@ -2,6 +2,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { JetBrains_Mono } from "next/font/google";
 import Card from "@/components/Card";
+import { PrivateLibraryProvider } from "@/components/PrivateLibrary";
 import Stage from "@/components/Stage";
 import "./globals.css";
 
@@ -28,7 +29,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={mono.variable}>
       <body>
         <Stage>
-          <Card>{children}</Card>
+          <PrivateLibraryProvider>
+            <Card>{children}</Card>
+          </PrivateLibraryProvider>
         </Stage>
         <Analytics />
         <SpeedInsights />

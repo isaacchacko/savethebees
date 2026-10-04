@@ -6,6 +6,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 import type { MouseEvent, ReactNode } from 'react';
 import FreeToolbar from '@/components/FreeToolbar';
 import GameStatus from '@/components/GameStatus';
+import { LibraryTitle } from '@/components/PrivateLibrary';
 import { SlideContext, SlideLink, type Slide } from '@/components/slide';
 import { FP_HREF, GAME_HREF, useMapMode } from '@/components/Stage';
 import SfClock from '@/components/SfClock';
@@ -233,7 +234,11 @@ export default function Card({ children }: { children: ReactNode }) {
         data-view={mode === 'free' || mode === 'game' ? 'tool' : 'page'}
       >
         <h1 ref={titleRef} className="card-title">
-          {titleFor(pathname)}
+          {tabFor(pathname) === '/library' ? (
+            <LibraryTitle>{titleFor(pathname)}</LibraryTitle>
+          ) : (
+            titleFor(pathname)
+          )}
         </h1>
         <div ref={bodyRef} className="card-body" onScroll={updateProgress}>
           {children}

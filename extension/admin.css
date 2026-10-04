@@ -814,3 +814,34 @@ body {
     display: none;
   }
 }
+
+/* marks a private entry, the same as the popup's manage list */
+.cool-row .tag {
+  font-size: 11px;
+  color: var(--muted);
+  border: 1px solid var(--rule);
+  padding: 0 4px;
+  flex: none;
+}
+
+.entry-form .check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.entry-form .check input {
+  width: auto;
+  margin: 0;
+}
+
+.warn {
+  margin: 0;
+  font-size: 12px;
+  color: var(--danger);
+}
+
+.warn[hidden] {
+  display: none;
+}

@@ -1446,3 +1446,51 @@ a:hover {
     transform: translateY(24px);
   }
 }
+
+/* the library title's secret password field: the heading's own type, so it
+   reads as the word turning into a blank rather than a form appearing */
+.vault-input {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  height: 1em;
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  /* a shadow rather than a border, so the field is exactly the word's height
+     and nothing under the heading moves when it swaps in */
+  box-shadow: 0 2px 0 var(--rule);
+  outline: none;
+}
+
+.vault-input::placeholder {
+  color: var(--muted);
+  opacity: 0.6;
+}
+
+.vault-input[data-state='checking'] {
+  opacity: 0.5;
+}
+
+.vault-input[data-state='wrong'] {
+  box-shadow: 0 2px 0 var(--accent);
+  animation: vault-shake 0.3s;
+}
+
+.vault-input[data-state='wrong']::placeholder {
+  color: var(--accent);
+}
+
+@keyframes vault-shake {
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+
+/* an entry only the password shows: its bullet in the warm accent */
+.cool-row[data-private] .bullet {
+  background: var(--accent);
+}

@@ -46,6 +46,17 @@
     <label for="token">token</label>
     <input id="token" type="password" placeholder="github_pat_…" />
 
+    <label for="password">library password</label>
+    <input id="password" type="password" placeholder="seals private entries" />
+    <p style="margin: 0.25rem 0 0">
+      Private entries are encrypted with this before they are committed, and
+      it is what you type on the site to see them. Make it long: the encrypted
+      file is in a public repo, so anyone can try guesses against it offline.
+      Changing it here re-encrypts the private entries under the new one in a
+      single commit. The site has no copy of it, so there is nothing else to
+      update.
+    </p>
+
     <div style="display: flex; gap: 0.5rem; margin-top: 1rem">
       <button type="button" id="save" class="primary" style="margin: 0">save</button>
       <button type="button" id="test" class="primary" style="margin: 0">test</button>

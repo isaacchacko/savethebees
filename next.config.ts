@@ -7,6 +7,11 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true
   },
+  // the route reads the sealed private entries at request time, by a path
+  // the bundler cannot see, so the file has to be shipped with it explicitly
+  outputFileTracingIncludes: {
+    '/api/library/private': ['./content/cool-private.json'],
+  },
   async redirects() {
     return [
       { source: '/tracking', destination: '/running', permanent: true },

@@ -122,7 +122,7 @@ globalThis.fetch = async (url, init = {}) => {
 
 const {
   fetchCool, mutate, setConfig, addList, addItem, updateItem, removeItem,
-  removeList, moveItem, shotPath, shotRemovals, readFile, saveFiles, listDir,
+  removeList, moveItem, shotPath, shotRemovals, readFile, saveFiles, listDir, unseal, rekeyPrivate,
 } = await import("data:text/javascript;base64," + Buffer.from(source).toString("base64"));
 
 await setConfig({ token: "t" });
@@ -209,6 +209,84 @@ alwaysConflict = true;
 await assert.rejects(mutate("doomed", (d) => addItem(d, "cool-webrings", { title: "no" })), /changed while saving/);
 await assert.rejects(saveFiles("doomed", [{ path: "a.md", text: "x" }]), /changed while saving/);
 alwaysConflict = false;
+
+// ── private entries ──────────────────────────────────────────────────────────
+const readSealed = () => JSON.parse(trees[commits[head].tree]["content/cool-private.json"].text);
+const openSealed = async (password) => JSON.parse(await unseal(readSealed(), password)).items;
+
+// locked (no password), adding a private entry refuses rather than leaking it
+await assert.rejects(
+  mutate("leak", (d) => addItem(d, "cool-webrings", { title: "secret", private: true })),
+  /set the library password/
+);
+
+await setConfig({ password: "hunter2" });
+await mutate("private", (d, files) => {
+  addItem(d, "cool-webrings", { title: "secret", url: "https://s.example", private: true }, shot);
+});
+assert.equal(
+  readJson().lists[0].items.some((i) => i.title === "secret"),
+  false,
+  "a private entry must never reach cool.json"
+);
+assert.equal(trees[commits[head].tree]["content/cool-private.json"].text.includes("secret"), false);
+const sealedItems = await openSealed("hunter2");
+assert.equal(sealedItems[0].item.title, "secret");
+assert.equal(sealedItems[0].list, "cool-webrings");
+assert.equal(sealedItems[0].index, 0);
+assert.equal("shot" in sealedItems[0].item, false, "a private entry never carries a screenshot");
+await assert.rejects(openSealed("wrong"), "a wrong password must not open it");
+
+// reading merges it back in its place, flagged
+const merged = (await fetchCool()).data.lists[0].items;
+assert.equal(merged[0].title, "secret");
+assert.equal(merged[0].private, true);
+
+// a save that touches nothing private leaves the sealed file byte for byte
+const sealedBefore = readSealed();
+await mutate("public only", (d) => addList(d, "another"));
+assert.deepEqual(readSealed(), sealedBefore);
+
+// making a public entry with a screenshot private deletes the screenshot
+let shotted;
+await mutate("shotted", (d, files) => {
+  shotted = addItem(d, "cool-webrings", { title: "had a shot" }, shot);
+  files.push({ path: shotPath(shotted), base64: shot.base64 });
+});
+assert.ok(paths().includes(shotPath(shotted)));
+await mutate("hide it", (d, files) =>
+  files.push(...updateItem(d, "cool-webrings", shotted, { private: true })));
+assert.equal(paths().includes(shotPath(shotted)), false, "the screenshot must go with it");
+const hidden = (await openSealed("hunter2")).find((e) => e.item.id === shotted).item;
+assert.equal("shot" in hidden, false);
+assert.equal(readJson().lists[0].items.some((i) => i.id === shotted), false);
+
+// and back to public drops the flag instead of writing private: false
+await mutate("show it", (d, files) =>
+  files.push(...updateItem(d, "cool-webrings", shotted, { private: false })));
+const shown = readJson().lists[0].items.find((i) => i.id === shotted);
+assert.equal("private" in shown, false);
+
+// locked again, public saves still work and the sealed file is untouched
+await setConfig({ password: "" });
+const lockedBefore = readSealed();
+assert.equal((await fetchCool()).data.lists[0].items.some((i) => i.title === "secret"), false);
+await mutate("locked public", (d) => addItem(d, "cool-webrings", { title: "public while locked" }));
+assert.deepEqual(readSealed(), lockedBefore);
+assert.equal((await openSealed("hunter2"))[0].item.title, "secret", "still there");
+
+// a wrong password is a loud error, not an empty private list that a save would wipe
+await setConfig({ password: "nope" });
+await assert.rejects(fetchCool(), /does not open the private entries/);
+await setConfig({ password: "hunter2" });
+
+// a new password re-seals under it; the old one stops working
+assert.equal(await rekeyPrivate("hunter2", "correct horse"), true);
+assert.equal((await openSealed("correct horse"))[0].item.title, "secret");
+await assert.rejects(openSealed("hunter2"));
+assert.equal(await rekeyPrivate("hunter2", "x"), false, "a stale old password re-seals nothing");
+await setConfig({ password: "correct horse" });
+assert.ok((await fetchCool()).data.lists[0].items.some((i) => i.title === "secret" && i.private));
 
 // a missing list is a clear error, not a crash
 assert.throws(() => addItem({ lists: [] }, "ghost", { title: "y" }), /no list "ghost"/);

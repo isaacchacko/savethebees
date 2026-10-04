@@ -368,3 +368,22 @@ button:focus-visible {
 #admin {
   margin-top: 0.6rem;
 }
+
+/* marks a private entry in the manage list */
+.tag {
+  font-size: 11px;
+  color: var(--muted);
+  border: 1px solid var(--rule);
+  padding: 0 0.3rem;
+  flex: none;
+}
+
+.warn {
+  margin: 0.25rem 0 0;
+  font-size: 12px;
+  color: var(--danger);
+}
+
+.warn[hidden] {
+  display: none;
+}

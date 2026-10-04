@@ -15,6 +15,8 @@ export type CoolItem = {
   shot: string;
   shotW: number;
   shotH: number;
+  /** Only ever set client side, once the password has opened the sealed file. */
+  private?: boolean;
 };
 
 export type CoolList = {
@@ -37,6 +39,9 @@ function toItem(raw: unknown): CoolItem | null {
   const { id, title, label, url, note, added, shot, shotW, shotH } =
     raw as Record<string, unknown>;
   if (!str(title) && !str(url)) return null;
+  // private entries are sealed into cool-private.json and never belong here;
+  // one that got in anyway is left off rather than published
+  if ((raw as Record<string, unknown>).private) return null;
   return {
     id: str(id) || str(url) || str(title),
     title: str(title) || str(url),
