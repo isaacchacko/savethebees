@@ -1,0 +1,212 @@
+%-------------------------
+% Resume in Latex
+% Based on Jake Gutierrez's Resume Template
+%-------------------------
+
+\documentclass[letterpaper,11pt]{article}
+
+\usepackage{latexsym}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage{marvosym}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage[english]{babel}
+\usepackage{tabularx}
+\input{glyphtounicode}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% Adjust margins
+\addtolength{\oddsidemargin}{-0.5in}
+\addtolength{\evensidemargin}{-0.5in}
+\addtolength{\textwidth}{1in}
+\addtolength{\topmargin}{-.5in}
+\addtolength{\textheight}{1.0in}
+
+\urlstyle{same}
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{0in}
+
+% Section formatting
+\titleformat{\section}{
+  \vspace{-4pt}\scshape\raggedright\large
+}{}{0em}{}[\color{black}\titlerule \vspace{-5pt}]
+
+% Ensure machine-readable, ATS-parsable PDF
+\pdfgentounicode=1
+
+% Resume commands
+\newcommand{\resumeItem}[1]{
+  \item\small{{#1 \vspace{-2pt}}}
+}
+
+\newcommand{\resumeSubheading}[4]{
+  \vspace{-2pt}\item
+  \begin{tabular*}{0.97\textwidth}[t]
+    {l@{\extracolsep{\fill}}r}
+    \textbf{#1} & #2 \\
+    \textit{\small#3} & \textit{\small #4} \\
+  \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeProjectHeading}[2]{
+  \item
+  \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
+    \small#1 & #2 \\
+  \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeSubItem}[1]{
+  \resumeItem{#1}\vspace{-4pt}
+}
+
+\renewcommand\labelitemii{
+  $\vcenter{\hbox{\tiny$\bullet$}}$
+}
+
+\newcommand{\resumeSubHeadingListStart}{
+  \begin{itemize}[leftmargin=0.15in, label={}]
+}
+
+\newcommand{\resumeSubHeadingListEnd}{
+  \end{itemize}
+}
+
+\newcommand{\resumeItemListStart}{
+  \begin{itemize}
+}
+
+\newcommand{\resumeItemListEnd}{
+  \end{itemize}\vspace{-5pt}
+}
+
+%-------------------------------------------
+%%%%%% RESUME STARTS HERE %%%%%%%%%%%%%%%%%%
+%-------------------------------------------
+
+\begin{document}
+
+%----------HEADING----------
+
+\begin{center}
+    \textbf{\Huge \scshape Isaac Chacko} \\ \vspace{1pt}
+    \small
+    \href{https://isaacchacko.com/}{isaacchacko.com} $|$
+    \href{mailto:isaac.chacko05@gmail.com}{isaac.chacko05@gmail.com} $|$
+    \href{https://linkedin.com/in/isaacchacko}{linkedin.com/in/isaacchacko} $|$
+    \href{https://github.com/isaacchacko}{github.com/isaacchacko}
+\end{center}
+
+%-----------EDUCATION-----------
+
+\section{Education}
+\resumeSubHeadingListStart
+
+    \resumeSubheading
+      {Texas A\&M University, Engineering Honors}
+      {College Station, TX}
+      {B.S. Computer Science, Applied Mathematics}
+      {May 2028}
+      \resumeItemListStart
+        \resumeItem{Relevant Coursework: Data Structures \& Algorithms, Computer Organization, Real Analysis.}
+        \resumeItem{Awards: National Merit Winner, Texas A\&M President's Endowed Scholar, Dean's Honor Roll.}
+      \resumeItemListEnd
+
+\resumeSubHeadingListEnd
+
+%-----------EXPERIENCE-----------
+
+\section{Experience}
+\resumeSubHeadingListStart
+
+    \resumeSubheading
+      {Dryft $|$ Neo, General Catalyst}
+      {May 2026 -- Present}
+      {Founding Engineer}
+      {San Francisco, CA}
+      \resumeItemListStart
+        \resumeItem{Developed agents with Python and PydanticAI to reason over live ERP data, coordinate supplier follow-ups, and generate SAP updates for approval.}
+        \resumeItem{Owned end-to-end data pipelines for billion-dollar manufacturers using Dagster and PostgreSQL for SAP ingestion, incremental sync, and reconciliation.}
+        \resumeItem{Built autonomous QA workflows with Temporal to investigate data and business-logic regressions; instrumented agent execution with PostHog.}
+      \resumeItemListEnd
+
+    \resumeSubheading
+      {SISO Engineering}
+      {May 2025 -- August 2025}
+      {Backend Engineer}
+      {Houston, TX}
+      \resumeItemListStart
+        \resumeItem{Cut query runtimes by 73\% across 300 million rows and improved real-time streaming scalability across 40+ international edge devices.}
+        \resumeItem{Protected 1.7 million streaming records through preventative data validation.}
+        \resumeItem{Built Terraform infrastructure to provision Grafana workspaces and Azure database resources.}
+      \resumeItemListEnd
+
+    \resumeSubheading
+      {Texas A\&M Department of Computer Science}
+      {August 2025 -- Present}
+      {Undergraduate Teaching Assistant}
+      {College Station, TX}
+      \resumeItemListStart
+        \resumeItem{Developed critical plagiarism-detection software as part of the plagiarism subteam, verifying 600+ student submissions using C++ fingerprinting algorithms and AI detection software.}
+      \resumeItemListEnd
+
+    \resumeSubheading
+      {tidalhacks}
+      {October 2025 -- Present}
+      {Logistics Director}
+      {College Station, TX}
+      \resumeItemListStart
+        \resumeItem{Spearheaded one of Texas A\&M's largest student-run hackathons, overseeing end-to-end logistics and securing sponsorships and venue support for 300+ hackers, sponsors, and mentors.}
+        \resumeItem{Designed and deployed the tidalhacks 2025 live site and custom judging platform, enabling real-time scheduling, announcements, and project evaluation across dozens of concurrent submissions.}
+        \resumeItem{Coordinated sponsor-led workshops, technical talks, and mentorship blocks while directing judges and volunteers with clear run-of-show instructions for a 24-hour event.}
+      \resumeItemListEnd
+
+\resumeSubHeadingListEnd
+
+%-----------PROJECTS-----------
+
+\section{Projects}
+\resumeSubHeadingListStart
+
+    \resumeProjectHeading
+      {\textbf{Kernel Optimization} $|$ \emph{Python, FastAPI, PostgreSQL, Modal}}
+      {September 2026}
+      \resumeItemListStart
+        \resumeItem{Co-developed an H100 benchmarking platform for LLM inference optimization, with automated submissions and throughput rankings gated on output correctness.}
+        \resumeItem{Expanded dispatch to support 50 GPU workers and removed queue deadlocks that stalled concurrent job claims.}
+        \resumeItem{Added static submission checks before GPU allocation to avoid spending compute on invalid jobs.}
+      \resumeItemListEnd
+
+    \resumeProjectHeading
+      {\textbf{Fold Forge AI} $|$ \emph{TypeScript, Tailwind CSS, Google Gemini, MCP Servers}}
+      {November 2025}
+      \resumeItemListStart
+        \resumeItem{Placed top 5 at HackUTD 2025; built a 10-second drug discovery analysis workflow using tool-calling agents for molecular structures and protein--ligand interactions.}
+        \resumeItem{Ranked 3 million research papers to surface 20 relevant studies in a single pass.}
+      \resumeItemListEnd
+
+\resumeSubHeadingListEnd
+
+%-----------TECHNICAL SKILLS-----------
+
+\section{Technical Skills}
+\begin{itemize}[leftmargin=0.15in, label={}]
+    \small{\item{
+        \textbf{Web Development}{: React, Next.js, Vite, Django, Express, Sockets, Tailwind CSS, Chakra UI, TanStack Query} \\
+        \textbf{Backend \& Data}{: FastAPI, PydanticAI, Temporal, Dagster, PostgreSQL, Redis, SQLAlchemy, Polars, SAP OData} \\
+        \textbf{Cloud \& Infrastructure}{: Azure Container Apps, Modal, Terraform, Docker, Arch Linux, Blacksmith} \\
+        \textbf{Observability \& Analytics}{: PostHog, Grafana, KQL, ADX, Power BI}
+    }}
+\end{itemize}
+
+%-------------------------------------------
+\end{document}
