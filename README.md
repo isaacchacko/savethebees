@@ -4,7 +4,7 @@
 
 ![A screenshot of the projects on my website](https://raw.githubusercontent.com/isaacchacko/savethebees/main/public/summer-2025-projects.png "My personal projects! Circa Summer 2025")
 
-Howdy! Have fun playing around with an interactive boid simulation, learn about my music tastes, and discover my other projects at [isaacchacko.co](https://isaacchacko.co)!
+Howdy! Have fun playing around with an interactive boid simulation, learn about my music tastes, and discover my other projects at [isaacchacko.com](https://isaacchacko.com)!
 
 I made this website with **Next.js**, **Typescript**, **TailwindCSS**, **Redis Cloud Databases**, and **Vercel**.
 
