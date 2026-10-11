@@ -22,6 +22,8 @@ const nextConfig: NextConfig = {
       { source: '/dumps', destination: '/blog', permanent: true },
       { source: '/dumps/:slug', destination: '/blog/:slug', permanent: true },
       { source: '/cool', destination: '/library', permanent: true },
+      { source: '/graph', destination: 'https://graph.isaacchacko.com', permanent: false },
+      { source: '/graph/:path*', destination: 'https://graph.isaacchacko.com/:path*', permanent: false },
     ];
   },
 };
