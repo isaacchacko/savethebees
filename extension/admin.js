@@ -298,7 +298,7 @@ async function newDump(files) {
       say("creating…");
       const today = new Date().toISOString().slice(0, 10);
       // no `# title` in the body: the site takes a post's title from the front
-      // matter and drops the body's h1, so one here would only go unread
+      // matter and drops the body's leading h1, so one here would only go unread
       const body = buildFrontMatter({ title: text, date: today, description: "" }) + "start here.\n";
 
       try {

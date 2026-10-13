@@ -47,6 +47,16 @@ function listItem(node, text) {
   });
 }
 
+/**
+ * The site drops a page's leading `# title` and shows every later `#` as a
+ * section heading, so only an h1 with nothing but blank lines above it is the
+ * title.
+ */
+function lineClass(name, node, state) {
+  const isTitle = name === "md-h1" && state.doc.sliceString(0, node.from).trim() === "";
+  return isTitle ? "md-h1 md-title" : name;
+}
+
 function lineClasses(view) {
   const { state } = view;
   const classes = new Map();
@@ -59,7 +69,7 @@ function lineClasses(view) {
       const last = node.name === "FencedCode" ? state.doc.lineAt(node.to).number : first;
       for (let line = first; line <= last; line++) {
         const { from, text } = state.doc.line(line);
-        classes.set(from, name === "md-li" ? listItem(node, text) : Decoration.line({ class: name }));
+        classes.set(from, name === "md-li" ? listItem(node, text) : Decoration.line({ class: lineClass(name, node, state) }));
       }
     },
   });

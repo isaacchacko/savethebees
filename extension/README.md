@@ -81,10 +81,14 @@ over the map — components, not prose, with nothing to type over.
 
 ### The page's `# title` is not on the site
 
-The site drops a page's h1: the card's heading already names the tab, and a post takes
+The site drops a page's leading h1: the card's heading already names the tab, and a post takes
 its title from the front matter. The line is still in the file, so the editor
 keeps it editable, but faded and labelled *not shown on the
 site* so nobody polishes a line no visitor will read.
+
+Any later `#` is a section heading, and the site shows it a step smaller than
+the title. The editor shows it the same way. A body that *starts* with a
+section `#` loses it, since the first line is where the title goes.
 
 ### Private dumps
 

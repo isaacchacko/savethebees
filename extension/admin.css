@@ -307,19 +307,31 @@ body {
   color: inherit;
 }
 
-/* The site drops the page's `# title` — the card, or a post's front matter,
-   already names it. It is still in the file, so it stays editable here, but
-   faded and labelled so nobody polishes a line no visitor will read. */
+/* any later `#` is a section of the body, a step down from the post's title,
+   as the site shows it */
 #doc .md-h1 {
-  color: var(--muted);
-  opacity: 0.6;
+  padding-top: 12px;
+  font-size: 22px;
+  line-height: 1.25;
+  color: var(--ink);
 }
 
 #doc .md-h1 .cm-header-1 {
   font-weight: 700;
 }
 
-#doc .md-h1::after {
+/* The site drops the page's leading `# title`: the card, or a post's front
+   matter, already names it. It is still in the file, so it stays editable here,
+   but faded and labelled so nobody polishes a line no visitor will read. */
+#doc .md-title {
+  padding-top: 0;
+  font-size: inherit;
+  line-height: inherit;
+  color: var(--muted);
+  opacity: 0.6;
+}
+
+#doc .md-title::after {
   content: "not shown on the site";
   font-size: 11px;
   letter-spacing: 0.08em;
