@@ -83,7 +83,7 @@ over the map — components, not prose, with nothing to type over.
 
 The site drops a page's h1: the card's heading already names the tab, and a post takes
 its title from the front matter. The line is still in the file, so the editor
-keeps it editable, but faded, struck through and labelled *not shown on the
+keeps it editable, but faded and labelled *not shown on the
 site* so nobody polishes a line no visitor will read.
 
 ### Private dumps
@@ -175,50 +175,35 @@ edit the slug yourself.
 front matter both — back to what was last loaded or saved. It touches nothing
 in the repo.
 
-### Bullets and section labels are drawn, not typed
+### The editor is the markdown file, rendered in place
 
-The bullet is a small ink square drawn by CSS `::before` and a `## heading` is
-a small-caps label with a rule above it, the same as on the site, so there is
-no marker character to select or backspace over. That makes a
-bullet a one-way door unless the editor does something about it:
+The editor is [CodeMirror 6](https://codemirror.net/) with
+[codemirror-live-markdown](https://github.com/blueberrycongee/codemirror-live-markdown)'s
+Obsidian-style live preview. What you type into is the file's own text: the
+markdown syntax (`## `, `- `, `**`, `[text](url)`) shows on the line the cursor
+is on and is hidden everywhere else, where the line renders the way the site
+draws it — a bullet as an ink square, a `## heading` as a small-caps label with
+a rule above it.
 
-- **backspace at the very start of a line** turns a bullet or heading back into
-  plain text. A bullet in the middle of a list leaves the items either side in
-  lists of their own.
-- **type `- ` or `## ` at the start of a line** to make one. A line turned into
-  a bullet next to an existing list joins that list rather than starting a
-  second one touching it.
-- **enter on an empty bullet** leaves the list, and **enter at the end of a
-  heading** starts a paragraph rather than another heading.
+Because the text *is* the file, saving writes exactly what is in the editor.
+There is no serialiser in between to drop or re-escape anything, so every file
+opens for editing and an untouched file saves back byte for byte. Enter on a
+bullet continues the list, and cmd-Z undoes.
 
-The two directions are exact inverses: adding a bullet and removing it again
-returns the document to the structure it started with.
+#### Rebuilding the editor bundle
 
-### Why editing the rendered page is safe
-
-Saving rewrites the whole file from the DOM, so anything the serialiser cannot
-read would be dropped silently. Three things stop that:
-
-- **Both halves know the same constructs.** `markdown.js` renders and
-  serialises headings, paragraphs, unordered lists, fenced code, and inline
-  links, bold, italic and code — nothing else.
-- **A file that cannot round-trip is never opened for editing.** On load the
-  editor renders the markdown, serialises it straight back, and compares. If it
-  does not match byte for byte the page goes read-only and says so, rather than
-  letting you type into something it would mangle.
-- **Paste is forced to plain text**, so rich markup never enters the document.
-
-`markdown.test.html` asserts both properties — that render-then-serialise is
-the identity for every file in `content/`, and that serialising twice after a
-real contenteditable edit does not drift. Run it from the repo root:
+Chrome extensions cannot load code from a CDN and this one has no build step of
+its own, so `editor.src.js` and its CodeMirror dependencies are bundled into
+`editor.js`, which is committed. After changing either:
 
 ```sh
-python3 -m http.server 8000
-open http://localhost:8000/extension/markdown.test.html
+npm run build:editor
 ```
 
-Headings keep their real level in the editor (`#` stays `<h1>`) even though the
-site drops the `h1` altogether, so the trip back never loses it.
+`scripts/build-editor.mjs` also cuts the copy of highlight.js that
+codemirror-live-markdown inlines for its code-block plugin (~1.5mb, unused here).
+If a new version of the library changes its layout, the build fails and says so
+rather than shipping the highlighter.
 
 ## It wears what the site wears
 
@@ -328,8 +313,9 @@ really did commit underneath you. Try again.
 | `admin.js`            | the editable stand-in for the site                         |
 | `admin-cool.js`       | the library page's lists, entries and drawer, editable       |
 | `site-paths.js`       | which admin page edits which url on the site               |
-| `markdown.js`         | markdown in, DOM out, and back again                       |
+| `editor.src.js`       | the post editor: CodeMirror with live preview              |
+| `editor.js`           | `editor.src.js` bundled — built by `npm run build:editor`  |
+| `markdown.js`         | markdown to html for notes, and front matter helpers       |
 | `shot.js`             | screenshot capture and shrinking                           |
 | `options.js`          | repo + token settings                                      |
 | `store.test.mjs`      | `npm test` — the commit logic, against a fake github       |
-| `markdown.test.html`  | the round trip, in a browser because it needs a DOM        |

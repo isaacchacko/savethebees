@@ -1,27 +1,11 @@
-// Markdown in, DOM out, and back again. The admin view edits the rendered page
-// directly, so the way back matters as much as the way there: whatever the
-// serializer emits is what gets committed. Both halves handle exactly the same
-// constructs — headings, paragraphs, unordered lists, and inline links, bold,
-// italic and code — and markdown.test asserts that render then serialize is the
-// identity for every page in content/.
-//
-// Headings keep their real level here (h1 stays h1) even though the site
-// drops a page's h1 altogether. Leaving it out would lose it on the trip back;
-// admin.css shows it faded and labelled as not on the site instead.
+// Markdown to HTML for the library's notes, plus the front matter helpers the
+// post editor uses. The editor itself edits markdown text directly (editor.js),
+// so nothing here has to turn a DOM back into markdown.
 
 const ESCAPE_HTML = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" };
 
 function escapeHtml(text) {
   return text.replace(/[&<>"]/g, (c) => ESCAPE_HTML[c]);
-}
-
-/** Only the characters that would otherwise be read as markup. */
-function escapeMarkdown(text) {
-  return text.replace(/([\\`*[\]])/g, "\\$1");
-}
-
-function unescapeMarkdown(text) {
-  return text.replace(/\\([\\`*[\]])/g, "$1");
 }
 
 // ──────────────────────────────── md → html ────────────────────────────────
@@ -141,104 +125,12 @@ export function toHtml(markdown) {
     .join("");
 }
 
-// ──────────────────────────────── html → md ────────────────────────────────
-
-function inlineToMarkdown(node) {
-  let out = "";
-
-  for (const child of node.childNodes) {
-    if (child.nodeType === Node.TEXT_NODE) {
-      // contenteditable leaves nbsp behind wherever it kept a space visible
-      out += escapeMarkdown(child.textContent.replace(/ /g, " "));
-      continue;
-    }
-    if (child.nodeType !== Node.ELEMENT_NODE) continue;
-
-    const tag = child.tagName.toLowerCase();
-    if (tag === "br") out += " ";
-    else if (tag === "a") out += `[${inlineToMarkdown(child)}](${child.getAttribute("href") || ""})`;
-    else if (tag === "strong" || tag === "b") out += `**${inlineToMarkdown(child)}**`;
-    else if (tag === "em" || tag === "i") out += `*${inlineToMarkdown(child)}*`;
-    else if (tag === "code") out += `\`${child.textContent}\``;
-    else out += inlineToMarkdown(child);
-  }
-
-  return out;
-}
-
-/** A <pre>'s visible text, with whatever contenteditable used for line breaks. */
-function preToText(node) {
-  let out = "";
-  const walk = (parent) => {
-    for (const child of parent.childNodes) {
-      if (child.nodeType === Node.TEXT_NODE) out += child.textContent;
-      else if (child.nodeType !== Node.ELEMENT_NODE) continue;
-      else {
-        const tag = child.tagName.toLowerCase();
-        if (tag === "br") out += "\n";
-        else if (tag === "div" || tag === "p") {
-          if (out && !out.endsWith("\n")) out += "\n";
-          walk(child);
-        } else walk(child);
-      }
-    }
-  };
-  walk(node);
-  return out.replace(/\n+$/, "");
-}
-
-/** The DOM the editor is holding, back to the markdown we will commit. */
-export function toMarkdown(root) {
-  const blocks = [];
-
-  for (const node of root.children) {
-    const tag = node.tagName.toLowerCase();
-    const heading = /^h([1-6])$/.exec(tag);
-
-    if (tag === "pre") {
-      blocks.push("```" + (node.dataset.lang || "") + "\n" + preToText(node) + "\n```");
-      continue;
-    }
-
-    if (heading) {
-      const text = inlineToMarkdown(node).trim();
-      if (text) blocks.push("#".repeat(Number(heading[1])) + " " + text);
-    } else if (tag === "ul") {
-      const items = [...node.children]
-        .map((li) => inlineToMarkdown(li).trim())
-        .filter(Boolean)
-        .map((text) => `- ${text}`);
-      if (items.length) blocks.push(items.join("\n"));
-    } else {
-      const text = inlineToMarkdown(node).replace(/\s+/g, " ").trim();
-      if (text) blocks.push(text);
-    }
-  }
-
-  return blocks.join("\n\n") + "\n";
-}
-
 // ─────────────────────────── front matter passthrough ───────────────────────
 
 /** Learnings carry yaml front matter the editor must not touch. */
 export function splitFrontMatter(markdown) {
   const match = /^(---\n[\s\S]*?\n---\n)([\s\S]*)$/.exec(markdown);
   return match ? { front: match[1], body: match[2] } : { front: "", body: markdown };
-}
-
-/**
- * Whether this markdown survives a trip through the editor untouched. The
- * admin view calls this before turning editing on: anything it cannot
- * reproduce exactly — a construct the renderer does not know — would be
- * silently dropped on save, so it refuses to open the file instead.
- */
-export function roundTrips(markdown, makeHost) {
-  const host = makeHost();
-  host.innerHTML = toHtml(markdown);
-  const back = toMarkdown(host);
-  host.remove();
-  const norm = (text) => text.replace(/\r\n/g, "\n").trim();
-  return { ok: norm(back) === norm(markdown), got: back };
 }
 
 // ────────────────────────────── front matter ──────────────────────────────
@@ -290,4 +182,3 @@ export function slugify(title) {
   );
 }
 
-export { escapeMarkdown, unescapeMarkdown };

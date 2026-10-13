@@ -239,27 +239,105 @@ body {
   gap: 16px;
 }
 
-#doc > * {
-  margin: 0;
-  text-wrap: pretty;
+/* The editor is CodeMirror with live preview: the file's text is what you
+   type into, and markdown syntax only shows on the line the cursor is on.
+   These rules dress its lines up the way the site draws the same markdown.
+   The heading, bullet and fence classes are line classes from editor.src.js. */
+
+#doc .cm-editor {
+  background: none;
+  outline: 1px dashed var(--rule);
+  outline-offset: 10px;
+  margin: 10px;
 }
 
-#doc ul {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+#doc .cm-editor.cm-focused {
+  outline: 1px dashed var(--ink);
+}
+
+#doc .cm-scroller,
+#doc .cm-content {
+  font-family: var(--mono);
+  line-height: 1.7;
+}
+
+#doc .cm-content {
   padding: 0;
-  list-style: none;
+  caret-color: var(--ink);
 }
 
-/* the bullet is drawn, not typed: there is no character to select or delete,
-   so backspace at the start of the line is what removes it */
-#doc li {
+#doc .cm-line {
+  padding: 0;
+  line-height: 1.7;
+}
+
+#doc .cm-activeLine {
+  background: none;
+}
+
+#doc .cm-focused .cm-activeLine {
+  background: var(--editing);
+}
+
+#doc .cm-selectionBackground,
+#doc .cm-focused .cm-selectionBackground {
+  background: var(--tile) !important;
+}
+
+/* section headings: a dated entry on /now, a section of a post */
+#doc .md-h2,
+#doc .md-h3 {
+  padding-top: 14px;
+  margin-top: 4px;
+  border-top: 1px solid var(--rule);
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+}
+
+#doc .md-h2 {
+  text-transform: uppercase;
+}
+
+#doc :is(.cm-header-1, .cm-header-2, .cm-header-3) {
+  font-size: inherit;
+  font-weight: 400;
+  line-height: inherit;
+  color: inherit;
+}
+
+/* The site drops the page's `# title` — the card, or a post's front matter,
+   already names it. It is still in the file, so it stays editable here, but
+   faded and labelled so nobody polishes a line no visitor will read. */
+#doc .md-h1 {
+  color: var(--muted);
+  opacity: 0.6;
+}
+
+#doc .md-h1 .cm-header-1 {
+  font-weight: 700;
+}
+
+#doc .md-h1::after {
+  content: "not shown on the site";
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-left: 0.75rem;
+}
+
+/* the bullet is drawn while the "-" is hidden; on the cursor's line the
+   "-" itself shows, so the drawn one steps aside. The space after the hidden
+   "-" is still there, so the first line is pulled back by its width, and
+   wrapped lines line up with the text */
+#doc .md-li {
   position: relative;
   padding-left: 18px;
+  text-indent: -1ch;
 }
 
-#doc li::before {
+#doc .md-li::before {
   content: "";
   position: absolute;
   left: 0;
@@ -269,112 +347,49 @@ body {
   background: var(--ink);
 }
 
-/* section headings: a dated entry on /now, a section of a post */
-#doc h2,
-#doc h3 {
-  padding-top: 14px;
-  border-top: 1px solid var(--rule);
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 1.7;
-  color: var(--muted);
-  letter-spacing: 0.08em;
-  font-variant-numeric: tabular-nums;
+#doc .md-li.cm-activeLine {
+  padding-left: 0;
+  text-indent: 0;
 }
 
-#doc h2 {
-  margin-top: 10px;
-  text-transform: uppercase;
+#doc .md-li.cm-activeLine::before {
+  display: none;
 }
 
-#doc h3 + ul {
-  margin-top: -10px;
-}
-
-/* The site drops the page's `# title` — the card, or a post's front matter,
-   already names it. It is still in the file, so it stays editable here, but
-   faded and labelled so nobody polishes a line no visitor will read. */
-#doc h1 {
-  font-size: 15px;
-  font-weight: 700;
-  line-height: 1.7;
-  color: var(--muted);
-  opacity: 0.6;
-  text-decoration: line-through dotted;
-}
-
-#doc h1::after {
-  content: "  not shown on the site";
-  font-size: 11px;
-  font-weight: 400;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  text-decoration: none;
-  display: inline-block;
-  margin-left: 0.75rem;
-  user-select: none;
-}
-
-#doc a {
+#doc .cm-link-widget,
+#doc .cm-link {
   color: var(--ink);
-  text-decoration-style: dotted;
+  text-decoration: underline dotted;
   text-underline-offset: 3px;
 }
 
-#doc code {
+#doc .cm-link-source {
+  color: var(--muted);
+}
+
+#doc .cm-code {
   font: inherit;
   font-size: 13px;
   background: var(--code);
+  border-radius: 0;
   padding: 1px 5px;
 }
 
-#doc pre {
+#doc .md-fence {
   background: var(--ink);
   color: var(--paper);
-  padding: 16px 18px;
-  font: 13px/1.7 var(--mono);
-  overflow-x: auto;
+  padding: 0 18px;
+  font-size: 13px;
 }
 
-#doc pre code {
-  background: none;
-  padding: 0;
-  color: inherit;
-}
-
-/* about: "**i like**" reads as a label sitting right on top of its list */
-#doc.labelled p:has(> strong:only-child) {
-  margin-bottom: -10px;
-  font-size: 12px;
-  color: var(--muted);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-#doc.labelled p:has(> strong:only-child) strong {
-  font-weight: 400;
+#doc .cm-focused .md-fence.cm-activeLine {
+  background: color-mix(in srgb, var(--ink) 88%, var(--paper));
 }
 
 /* a post is capped like the site's .post */
 #doc.post,
 .meta {
   max-width: 720px;
-}
-
-/* editing affordance: the page you are typing into gets a quiet frame */
-#doc[contenteditable="true"] {
-  outline: 1px dashed var(--rule);
-  outline-offset: 10px;
-  margin: 10px;
-}
-
-#doc[contenteditable="true"]:focus-within {
-  outline-color: var(--ink);
-}
-
-#doc :is(p, li, h1, h2, h3):focus {
-  background: var(--editing);
-  outline: none;
 }
 
 /* ─────────────────── a dump: its header, as the post shows it ───────────── */

@@ -5,15 +5,8 @@
 // overwrite.
 
 import { getConfig, listDir, readFile, saveFiles } from "./store.js";
-import {
-  buildFrontMatter,
-  parseFrontMatter,
-  roundTrips,
-  slugify,
-  splitFrontMatter,
-  toHtml,
-  toMarkdown,
-} from "./markdown.js";
+import { buildFrontMatter, parseFrontMatter, slugify, splitFrontMatter } from "./markdown.js";
+import { createEditor } from "./editor.js";
 import { createCoolView } from "./admin-cool.js";
 import { editorFor } from "./site-paths.js";
 
@@ -35,6 +28,14 @@ const nav = document.getElementById("nav");
 const card = document.getElementById("card");
 const cardTitle = card.querySelector(".card-title");
 const doc = document.getElementById("doc");
+const editor = createEditor({
+  parent: doc,
+  onChange: () => {
+    if (current) setDirty(true);
+    refreshPostHeader();
+  },
+  onSave: () => save(),
+});
 const picker = document.getElementById("picker");
 const hint = document.getElementById("hint");
 const legend = document.getElementById("legend");
@@ -99,7 +100,7 @@ function shortDate(date) {
 /** The date and read time above a post, kept current as you type. */
 function refreshPostHeader() {
   if (!current?.isDump) return;
-  const words = doc.textContent.split(/\s+/).filter(Boolean).length;
+  const words = editor.text().split(/\s+/).filter(Boolean).length;
   const minutes = Math.max(1, Math.round(words / WORDS_PER_MINUTE));
   const date = shortDate(metaFields.date.value.trim());
   postStats.textContent = `${date ? `${date} · ` : ""}${minutes} min`;
@@ -128,34 +129,15 @@ function el(tag, props = {}, children = []) {
 
 async function openPath(path) {
   say("loading…");
-  doc.contentEditable = "false";
+  doc.hidden = true;
   legend.hidden = true;
   meta.hidden = true;
   try {
     const { text } = await readFile(path);
-    const { front, body } = splitFrontMatter(text);
+    const { front, body: rawBody } = splitFrontMatter(text);
+    // buildFrontMatter writes the blank line after the front matter itself
+    const body = rawBody.replace(/^\n+/, "");
     const isDump = path.startsWith(`${DUMPS_DIR}/`);
-
-    // Refuse to edit anything this editor cannot reproduce byte for byte.
-    // Saving is a full rewrite of the file, so a construct the renderer does
-    // not understand would be dropped silently — better to not open it.
-    const probe = roundTrips(body, () => {
-      const host = document.createElement("div");
-      host.style.display = "none";
-      document.body.append(host);
-      return host;
-    });
-    if (!probe.ok) {
-      current = null;
-      doc.innerHTML = toHtml(body);
-      doc.contentEditable = "false";
-      legend.hidden = true;
-      meta.hidden = true;
-      hint.textContent =
-        "read-only: this file uses markdown the editor cannot write back exactly, so editing it here would lose something. edit it in the repo instead.";
-      say("not editable", "error");
-      return;
-    }
 
     const fields = parseFrontMatter(front);
     current = { path, fields, markdown: body, isDump };
@@ -170,8 +152,8 @@ async function openPath(path) {
       refreshLive();
     }
 
-    doc.innerHTML = toHtml(body);
-    doc.contentEditable = "true";
+    editor.load(body);
+    doc.hidden = false;
     doc.classList.toggle("post", isDump);
     legend.hidden = false;
     refreshPostHeader();
@@ -179,15 +161,14 @@ async function openPath(path) {
     composed.lastSaved = null;
     say("");
   } catch (error) {
-    doc.innerHTML = "";
+    doc.hidden = true;
     say(error.message, "error");
   }
 }
 
 async function showDumps() {
   picker.hidden = false;
-  doc.innerHTML = "";
-  doc.contentEditable = "false";
+  doc.hidden = true;
   legend.hidden = true;
   meta.hidden = true;
   current = null;
@@ -346,7 +327,6 @@ function selectPage(page) {
   cardTitle.textContent = page.id === "home" ? "howdy!" : page.label;
   // home and library have nothing held back to save: library commits every action
   saveButton.hidden = revertButton.hidden = page.id === "home" || page.id === "library";
-  doc.classList.toggle("labelled", page.id === "about");
   doc.classList.remove("post");
   setLive(page.id === "home" ? "/" : `/${page.id}`);
   picker.hidden = true;
@@ -356,8 +336,7 @@ function selectPage(page) {
   current = null;
 
   if (page.id === "home") {
-    doc.contentEditable = "false";
-    doc.innerHTML = "";
+    doc.hidden = true;
     legend.hidden = true;
     meta.hidden = true;
     hint.textContent =
@@ -368,8 +347,7 @@ function selectPage(page) {
   if (page.id === "blog") return showDumps();
   if (page.id === "library") {
     coolRoot.hidden = false;
-    doc.contentEditable = "false";
-    doc.innerHTML = "";
+    doc.hidden = true;
     legend.hidden = true;
     meta.hidden = true;
     hint.textContent =
@@ -385,11 +363,6 @@ function confirmDiscard() {
 }
 
 // ──────────────────────────────── editing ────────────────────────────────
-
-doc.addEventListener("input", () => {
-  if (current) setDirty(true);
-  refreshPostHeader();
-});
 
 privateBox.addEventListener("change", () => {
   if (current) setDirty(true);
@@ -441,245 +414,9 @@ slugField.addEventListener("blur", () => {
   showSlug();
 });
 
-// Rich paste would smuggle in markup the serializer does not handle, and
-// whatever it cannot read would be silently dropped on save.
-doc.addEventListener("paste", (event) => {
-  event.preventDefault();
-  const text = event.clipboardData.getData("text/plain");
-  document.execCommand("insertText", false, text);
-});
-
-// ───────────────────────── block structure by keyboard ─────────────────────
-// The ─ and ## in front of a line are CSS, not text, so there is nothing there
-// to backspace over. Without these handlers a bullet is a one-way door: you
-// could never turn one back into a plain line. Backspace at the very start of
-// a block unwraps it, and typing "- " or "## " wraps it again, which is how
-// every other editor behaves.
-
-function blockAt() {
-  const selection = getSelection();
-  if (!selection.rangeCount) return null;
-
-  let node = selection.getRangeAt(0).startContainer;
-  if (node.nodeType === Node.TEXT_NODE) node = node.parentElement;
-
-  while (node && node !== doc) {
-    if (node.tagName === "LI" || node.parentElement === doc) return node;
-    node = node.parentElement;
-  }
-  return null;
-}
-
-function caretAtStartOf(block) {
-  const selection = getSelection();
-  if (!selection.isCollapsed || !selection.rangeCount) return false;
-
-  const caret = selection.getRangeAt(0);
-  const before = document.createRange();
-  before.selectNodeContents(block);
-  before.setEnd(caret.startContainer, caret.startOffset);
-  return before.toString().length === 0;
-}
-
-function putCaret(node, atStart = true) {
-  const range = document.createRange();
-  range.selectNodeContents(node);
-  range.collapse(atStart);
-  const selection = getSelection();
-  selection.removeAllRanges();
-  selection.addRange(range);
-}
-
-function paragraphFrom(node) {
-  const p = document.createElement("p");
-  p.innerHTML = node.innerHTML || "<br>";
-  return p;
-}
-
-/** Pulls one item out of its list, keeping the items either side in lists. */
-function unwrapListItem(li) {
-  const list = li.parentElement;
-  const p = paragraphFrom(li);
-  const after = [...list.children].slice([...list.children].indexOf(li) + 1);
-
-  li.remove();
-  list.after(p);
-
-  if (after.length) {
-    const tail = document.createElement("ul");
-    tail.append(...after);
-    p.after(tail);
-  }
-  if (!list.children.length) list.remove();
-
-  return p;
-}
-
-function unwrapBlock(block) {
-  if (block.tagName === "LI") return unwrapListItem(block);
-  const p = paragraphFrom(block);
-  block.replaceWith(p);
-  return p;
-}
-
-/** A paragraph becomes a list item, joining whichever lists it now touches. */
-function makeListItem(block) {
-  const li = document.createElement("li");
-  li.innerHTML = block.innerHTML || "<br>";
-
-  const previous = block.previousElementSibling;
-  let list;
-
-  if (previous && previous.tagName === "UL") {
-    previous.append(li);
-    block.remove();
-    list = previous;
-  } else {
-    list = document.createElement("ul");
-    list.append(li);
-    block.replaceWith(list);
-  }
-
-  // a line turned into a bullet right above an existing list belongs to it,
-  // rather than starting a second list touching the first
-  const next = list.nextElementSibling;
-  if (next && next.tagName === "UL") {
-    list.append(...next.children);
-    next.remove();
-  }
-
-  return li;
-}
-
-function makeHeading(block, level) {
-  const heading = document.createElement(`h${level}`);
-  heading.innerHTML = block.innerHTML || "<br>";
-  block.replaceWith(heading);
-  return heading;
-}
-
-/** "- " and "## " at the start of a line, the way markdown would read them. */
-const SHORTCUTS = [
-  { pattern: /^(#{1,3})\s$/, apply: (block, m) => makeHeading(block, m[1].length) },
-  { pattern: /^[-*]\s$/, apply: (block) => makeListItem(block) },
-];
-
-doc.addEventListener("beforeinput", (event) => {
-  if (event.inputType !== "insertText" || event.data !== " ") return;
-
-  const block = blockAt();
-  if (!block || block.tagName === "LI" || /^H[1-6]$/.test(block.tagName)) return;
-  if (block.closest("pre")) return;
-
-  const selection = getSelection();
-  if (!selection.isCollapsed) return;
-
-  const caret = selection.getRangeAt(0);
-  const lead = document.createRange();
-  lead.selectNodeContents(block);
-  lead.setEnd(caret.startContainer, caret.startOffset);
-  const typed = lead.toString() + " ";
-
-  for (const { pattern, apply } of SHORTCUTS) {
-    const match = pattern.exec(typed);
-    if (!match) continue;
-
-    event.preventDefault();
-    lead.deleteContents(); // drop the "- " or "## " the shortcut consumed
-    putCaret(apply(block, match));
-    setDirty(true);
-    return;
-  }
-});
-
-// Typed text is only ever text — the serializer escapes its brackets — so
-// "[label](url)" would be committed literally. Closing the paren turns it into
-// a real link instead, the same way "- " turns a line into a bullet.
-const TYPED_LINK = /\[([^\]]+)\]\(([^)\s]+)$/;
-
-doc.addEventListener("beforeinput", (event) => {
-  if (event.inputType !== "insertText" || event.data !== ")") return;
-
-  const selection = getSelection();
-  if (!selection.isCollapsed || !selection.rangeCount) return;
-
-  const caret = selection.getRangeAt(0);
-  const node = caret.startContainer;
-  if (node.nodeType !== Node.TEXT_NODE) return;
-  if (node.parentElement.closest("pre, code, a")) return;
-
-  const match = TYPED_LINK.exec(node.textContent.slice(0, caret.startOffset));
-  if (!match) return;
-
-  event.preventDefault();
-  const typed = document.createRange();
-  typed.setStart(node, caret.startOffset - match[0].length);
-  typed.setEnd(node, caret.startOffset);
-  typed.deleteContents();
-
-  const link = document.createElement("a");
-  link.href = match[2];
-  link.textContent = match[1];
-  typed.insertNode(link);
-
-  const after = document.createRange();
-  after.setStartAfter(link);
-  selection.removeAllRanges();
-  selection.addRange(after);
-  setDirty(true);
-});
-
-doc.addEventListener("keydown", (event) => {
-  if ((event.metaKey || event.ctrlKey) && event.key === "s") {
-    event.preventDefault();
-    save();
-    return;
-  }
-
-  const block = blockAt();
-  if (!block || block.closest("pre")) return;
-
-  // backspace at the very start unwraps, since the marker itself cannot be
-  // deleted — it is drawn by css, not typed
-  if (event.key === "Backspace" && caretAtStartOf(block)) {
-    if (block.tagName === "LI" || /^H[1-6]$/.test(block.tagName)) {
-      event.preventDefault();
-      putCaret(unwrapBlock(block));
-      setDirty(true);
-      return;
-    }
-  }
-
-  if (event.key === "Enter" && !event.shiftKey) {
-    // enter on an empty bullet leaves the list, rather than adding another
-    if (block.tagName === "LI" && !block.textContent.trim()) {
-      event.preventDefault();
-      putCaret(unwrapBlock(block));
-      setDirty(true);
-      return;
-    }
-    // and enter at the end of a heading starts a paragraph, not another heading
-    if (/^H[1-6]$/.test(block.tagName)) {
-      const selection = getSelection();
-      const atEnd =
-        selection.isCollapsed &&
-        selection.getRangeAt(0).endOffset === (selection.getRangeAt(0).endContainer.length ?? 0) &&
-        block.contains(selection.getRangeAt(0).endContainer);
-      if (atEnd) {
-        event.preventDefault();
-        const p = document.createElement("p");
-        p.innerHTML = "<br>";
-        block.after(p);
-        putCaret(p);
-        setDirty(true);
-      }
-    }
-  }
-});
-
 /** What the file would look like if saved right now. */
 function composed() {
-  const body = toMarkdown(doc);
+  const body = editor.text().replace(/\n*$/, "\n");
   if (!current.isDump) return { text: body, path: current.path };
 
   const fields = Object.fromEntries(
@@ -718,7 +455,7 @@ async function save() {
   try {
     await saveFiles(renamed ? `admin: rename ${current.path.split("/").pop()} to ${name}` : `admin: edit ${name}`, files);
     current.path = next.path;
-    current.markdown = toMarkdown(doc);
+    current.markdown = editor.text();
     if (next.fields) current.fields = next.fields;
     composed.lastSaved = next.text;
     setDirty(false);
@@ -735,7 +472,7 @@ async function save() {
 function revert() {
   if (!current || !dirty) return;
 
-  doc.innerHTML = toHtml(current.markdown);
+  editor.load(current.markdown);
   if (current.isDump) {
     for (const [key, input] of Object.entries(metaFields)) input.value = current.fields[key] || "";
     slugField.value = current.path.split("/").pop().replace(/\.md$/, "");

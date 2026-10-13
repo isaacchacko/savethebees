@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "node extension/store.test.mjs && node --test src/lib/map/*.test.ts"
+    "test": "node extension/store.test.mjs && node --test src/lib/map/*.test.ts",
+    "build:editor": "node scripts/build-editor.mjs"
   },
   "dependencies": {
     "@microfleet/ioredis-lock": "^6.0.1",
@@ -23,12 +24,20 @@
     "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
+    "@codemirror/commands": "^6.11.1",
+    "@codemirror/lang-markdown": "^6.5.2",
+    "@codemirror/language": "^6.13.1",
+    "@codemirror/state": "^6.7.6",
+    "@codemirror/view": "^6.43.14",
     "@eslint/eslintrc": "^3",
+    "@lezer/markdown": "^1.8.0",
     "@tailwindcss/postcss": "^4.0.12",
     "@types/node": "^20",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19",
     "autoprefixer": "^10.4.20",
+    "codemirror-live-markdown": "^0.5.1-alpha.1",
+    "esbuild": "^0.25.12",
     "eslint": "^9",
     "eslint-config-next": "15.2.0",
     "postcss": "^8.5.3",
