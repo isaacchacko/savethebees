@@ -190,6 +190,20 @@ There is no serialiser in between to drop or re-escape anything, so every file
 opens for editing and an untouched file saves back byte for byte. Enter on a
 bullet continues the list, and cmd-Z undoes.
 
+#### Pasting images
+
+Paste an image (png, jpeg, gif or webp) into the editor and it inserts
+`![](/images/<page>-<id>.webp)` at the cursor. The file goes to
+`public/images/` in the same commit as the next save, so a post and its images
+land together; an image whose markdown you deleted before saving is left out.
+It is shrunk on the way in: webp, at most 1440px wide (twice the post column),
+unless the original is already smaller. A gif is kept as is, so it keeps
+animating.
+
+Until vercel redeploys, the site does not have the image yet, so the preview
+comes from the pasted bytes for the rest of the session, and after that from
+the site or, failing that, straight from github.
+
 #### Rebuilding the editor bundle
 
 Chrome extensions cannot load code from a CDN and this one has no build step of

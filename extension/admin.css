@@ -363,6 +363,12 @@ body {
   text-underline-offset: 3px;
 }
 
+#doc .md-img {
+  display: block;
+  max-width: 100%;
+  margin: 6px 0;
+}
+
 #doc .cm-link-source {
   color: var(--muted);
 }

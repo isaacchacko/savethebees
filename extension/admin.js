@@ -8,6 +8,7 @@ import { getConfig, listDir, readFile, saveFiles } from "./store.js";
 import { buildFrontMatter, parseFrontMatter, slugify, splitFrontMatter } from "./markdown.js";
 import { createEditor } from "./editor.js";
 import { createCoolView } from "./admin-cool.js";
+import { preparePasted } from "./shot.js";
 import { editorFor } from "./site-paths.js";
 
 // labels and card sizes as the site's Card.tsx has them: home is the small
@@ -35,6 +36,8 @@ const editor = createEditor({
     refreshPostHeader();
   },
   onSave: () => save(),
+  onPasteImage: (file) => pasteImage(file),
+  resolveImage: (src) => imageUrls(src),
 });
 const picker = document.getElementById("picker");
 const hint = document.getElementById("hint");
@@ -66,6 +69,7 @@ let dirty = false;
 let arming = null; // the delete button waiting for a second click
 
 let siteUrl = "";
+let rawUrl = ""; // the repo's public/ on raw.githubusercontent, at the branch head
 
 /**
  * Where the thing being edited lives on the real site. A write-up points at
@@ -152,6 +156,7 @@ async function openPath(path) {
       refreshLive();
     }
 
+    pendingImages.clear();
     editor.load(body);
     doc.hidden = false;
     doc.classList.toggle("post", isDump);
@@ -414,6 +419,43 @@ slugField.addEventListener("blur", () => {
   showSlug();
 });
 
+// ───────────────────────────── pasted images ─────────────────────────────
+// A pasted image goes to public/images and rides along in the next save's
+// commit, so a post and the images it shows land together. Until the site
+// redeploys it is not there to load, so its preview comes from the pasted
+// bytes for the rest of this session.
+
+const IMAGES_DIR = "public/images";
+const pendingImages = new Map(); // repo path -> base64, waiting for a save
+const pastedPreviews = new Map(); // site path -> object url
+
+async function pasteImage(file) {
+  if (!current) return null;
+  say("adding image…");
+  try {
+    const image = await preparePasted(file);
+    const page = current.path.split("/").pop().replace(/\.md$/, "");
+    const name = `${page}-${Date.now().toString(36)}.${image.extension}`;
+    pendingImages.set(`${IMAGES_DIR}/${name}`, image.base64);
+    pastedPreviews.set(`/images/${name}`, URL.createObjectURL(image.blob));
+    say(`image added (${Math.round(image.blob.size / 1024)} kb) — it is committed with the next save`, "ok");
+    return `![](/images/${name})`;
+  } catch (error) {
+    say(`could not read that image: ${error.message}`, "error");
+    return null;
+  }
+}
+
+/**
+ * Where to load an image's preview from, in order. A committed one is on the
+ * site once vercel has rebuilt, and on github straight away.
+ */
+function imageUrls(src) {
+  if (pastedPreviews.has(src)) return [pastedPreviews.get(src)];
+  if (!src.startsWith("/")) return [src];
+  return [siteUrl + src, rawUrl + src];
+}
+
 /** What the file would look like if saved right now. */
 function composed() {
   const body = editor.text().replace(/\n*$/, "\n");
@@ -450,6 +492,10 @@ async function save() {
   // the write-up is never briefly absent or briefly duplicated
   const files = [{ path: next.path, text: next.text }];
   if (renamed) files.push({ path: current.path, remove: true });
+  // a pasted image whose markdown has since been deleted is left behind
+  for (const [path, base64] of pendingImages) {
+    if (next.text.includes(path.slice("public".length))) files.push({ path, base64 });
+  }
 
   const name = next.path.split("/").pop();
   try {
@@ -458,6 +504,7 @@ async function save() {
     current.markdown = editor.text();
     if (next.fields) current.fields = next.fields;
     composed.lastSaved = next.text;
+    pendingImages.clear();
     setDirty(false);
     if (current.isDump) refreshLive();
     say(renamed ? `saved as ${name} — the old url is gone` : "saved — vercel will rebuild in a minute or so", "ok");
@@ -472,6 +519,7 @@ async function save() {
 function revert() {
   if (!current || !dirty) return;
 
+  pendingImages.clear();
   editor.load(current.markdown);
   if (current.isDump) {
     for (const [key, input] of Object.entries(metaFields)) input.value = current.fields[key] || "";
@@ -528,6 +576,8 @@ async function openRequested() {
 }
 
 (async () => {
-  siteUrl = (await getConfig()).site.replace(/\/$/, "");
+  const config = await getConfig();
+  siteUrl = config.site.replace(/\/$/, "");
+  rawUrl = `https://raw.githubusercontent.com/${config.owner}/${config.repo}/${config.branch}/public`;
   await openRequested();
 })();

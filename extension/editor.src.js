@@ -5,7 +5,7 @@
 // file and everything it imports into editor.js, which is committed.
 
 import { EditorState, RangeSetBuilder } from "@codemirror/state";
-import { EditorView, ViewPlugin, Decoration, highlightActiveLine, keymap } from "@codemirror/view";
+import { EditorView, ViewPlugin, Decoration, WidgetType, highlightActiveLine, keymap } from "@codemirror/view";
 import { syntaxTree } from "@codemirror/language";
 import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
 import { markdownLanguage, markdownKeymap } from "@codemirror/lang-markdown";
@@ -17,6 +17,7 @@ import {
   markdownStylePlugin,
   mouseSelectingField,
   setMouseSelecting,
+  shouldShowSource,
 } from "codemirror-live-markdown";
 
 // The live preview library only marks heading text, not which line a heading,
@@ -63,11 +64,82 @@ const lineClassPlugin = ViewPlugin.fromClass(
   { decorations: (plugin) => plugin.decorations }
 );
 
+// The library has an image preview, but it can only prefix a src with a fixed
+// base path. A pasted image is not on the site until it is committed and
+// deployed, so where to load one from is the caller's call: `resolveImage`
+// gives the urls to try, in order.
+class ImageWidget extends WidgetType {
+  constructor(src, alt, resolveImage) {
+    super();
+    this.src = src;
+    this.alt = alt;
+    this.resolveImage = resolveImage;
+  }
+
+  eq(other) {
+    return other.src === this.src && other.alt === this.alt;
+  }
+
+  toDOM() {
+    const img = document.createElement("img");
+    img.className = "md-img";
+    img.alt = this.alt;
+    const candidates = this.resolveImage(this.src);
+    img.onerror = () => {
+      if (candidates.length) img.src = candidates.shift();
+    };
+    img.src = candidates.shift();
+    return img;
+  }
+
+  ignoreEvent() {
+    return false;
+  }
+}
+
+const IMAGE = /^!\[([^\]]*)\]\(([^)\s]+)\)$/;
+
+function imageDecorations(view, resolveImage) {
+  const { state } = view;
+  const builder = new RangeSetBuilder();
+  syntaxTree(state).iterate({
+    enter(node) {
+      if (node.name !== "Image") return;
+      if (shouldShowSource(state, node.from, node.to)) return; // false mid-drag
+      const match = IMAGE.exec(state.doc.sliceString(node.from, node.to));
+      if (!match) return;
+      const widget = new ImageWidget(match[2], match[1], resolveImage);
+      builder.add(node.from, node.to, Decoration.replace({ widget }));
+    },
+  });
+  return builder.finish();
+}
+
+function imagePlugin(resolveImage) {
+  return ViewPlugin.fromClass(
+    class {
+      constructor(view) {
+        this.decorations = imageDecorations(view, resolveImage);
+      }
+      update(update) {
+        const moved = update.docChanged || update.selectionSet || update.viewportChanged;
+        const dragged = update.transactions.some((tr) => tr.effects.length);
+        if (moved || dragged) this.decorations = imageDecorations(update.view, resolveImage);
+      }
+    },
+    { decorations: (plugin) => plugin.decorations }
+  );
+}
+
+const PASTABLE = ["image/png", "image/jpeg", "image/gif", "image/webp"];
+
 /**
  * Mount an editor in `parent`. `onChange` fires on every edit with the new
- * text; `onSave` on mod-s.
+ * text; `onSave` on mod-s. `onPasteImage` gets a pasted image file and
+ * resolves to the markdown to insert for it; `resolveImage` maps an image's
+ * src to the urls to load its preview from.
  */
-export function createEditor({ parent, onChange, onSave }) {
+export function createEditor({ parent, onChange, onSave, onPasteImage, resolveImage }) {
   const extensions = [
     history(),
     keymap.of([
@@ -84,6 +156,18 @@ export function createEditor({ parent, onChange, onSave }) {
     livePreviewPlugin,
     markdownStylePlugin,
     linkPlugin({ openInNewTab: true }),
+    imagePlugin(resolveImage),
+    EditorView.domEventHandlers({
+      paste(event, view) {
+        const file = [...event.clipboardData.files].find((f) => PASTABLE.includes(f.type));
+        if (!file) return false;
+        event.preventDefault();
+        onPasteImage(file).then((markdown) => {
+          if (markdown) view.dispatch(view.state.replaceSelection(markdown));
+        });
+        return true;
+      },
+    }),
     lineClassPlugin,
     editorTheme,
     EditorView.updateListener.of((update) => {

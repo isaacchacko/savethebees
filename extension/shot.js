@@ -1,8 +1,11 @@
-// Screenshots of the page being saved, shrunk to something a git repo can
-// carry: the visible viewport, 640px wide, webp.
+// Images shrunk to something a git repo can carry: screenshots of the page
+// being saved (the visible viewport, 640px wide), and images pasted into a
+// post (twice the post's 720px column, so they stay sharp on a retina screen).
 
 const MAX_WIDTH = 640;
 const QUALITY = 0.72;
+const PASTED_MAX_WIDTH = 1440;
+const PASTED_QUALITY = 0.85;
 
 function dataUrlToBlob(dataUrl) {
   const [meta, base64] = dataUrl.split(",");
@@ -22,9 +25,9 @@ async function blobToBase64(blob) {
   return btoa(binary);
 }
 
-async function shrink(dataUrl) {
-  const bitmap = await createImageBitmap(dataUrlToBlob(dataUrl));
-  const scale = Math.min(1, MAX_WIDTH / bitmap.width);
+async function toWebp(source, maxWidth, quality) {
+  const bitmap = await createImageBitmap(source);
+  const scale = Math.min(1, maxWidth / bitmap.width);
   const width = Math.round(bitmap.width * scale);
   const height = Math.round(bitmap.height * scale);
 
@@ -32,8 +35,27 @@ async function shrink(dataUrl) {
   canvas.getContext("2d").drawImage(bitmap, 0, 0, width, height);
   bitmap.close();
 
-  const blob = await canvas.convertToBlob({ type: "image/webp", quality: QUALITY });
+  const blob = await canvas.convertToBlob({ type: "image/webp", quality });
+  return { blob, width, height };
+}
+
+async function shrink(dataUrl) {
+  const { blob, width, height } = await toWebp(dataUrlToBlob(dataUrl), MAX_WIDTH, QUALITY);
   return { base64: await blobToBase64(blob), width, height, bytes: blob.size };
+}
+
+/**
+ * A pasted image, ready to commit: webp unless the original is already
+ * smaller (a small flat png often is). A gif is kept as is, since redrawing it
+ * on a canvas would keep only its first frame.
+ */
+export async function preparePasted(file) {
+  const original = { blob: file, extension: file.type.split("/")[1].replace("jpeg", "jpg") };
+  if (file.type === "image/gif") return { ...original, base64: await blobToBase64(file) };
+
+  const { blob } = await toWebp(file, PASTED_MAX_WIDTH, PASTED_QUALITY);
+  if (blob.size >= file.size) return { ...original, base64: await blobToBase64(file) };
+  return { blob, extension: "webp", base64: await blobToBase64(blob) };
 }
 
 /**
