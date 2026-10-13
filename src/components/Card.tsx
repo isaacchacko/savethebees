@@ -146,6 +146,8 @@ export default function Card({ children }: { children: ReactNode }) {
 
   const slide = useCallback<Slide>(
     (href, dir) => {
+      // pushing the page it is already on never arrives, so it would never slide back in
+      if (href === pathnameRef.current) return;
       setTab(tabFor(href));
       setDest(href);
       clearTimeout(navigateTimer.current);
@@ -209,7 +211,6 @@ export default function Card({ children }: { children: ReactNode }) {
   const mapOn = mode !== 'site' || onMap(dest);
 
   const go = (href: string) => {
-    if (pathname === href) return;
     // same tab from deeper in (a post back to its index) slides back
     slide(href, rank(href) > rank(pathname) ? 1 : -1);
   };
