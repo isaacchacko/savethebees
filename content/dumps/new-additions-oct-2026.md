@@ -6,12 +6,13 @@ description: graphing how jobless i am
 
 two new things to the isaacchacko subdomains
 
+# graph
 link: [graph.isaacchacko.com](https://graph.isaacchacko.com)
 ![](/images/new-additions-oct-2026-mv6yffwq.webp)
 its just a clean roomed version of obsidian's graph view with an added editor. made it because i like graphs and i could plausibly use it in future cs classes idk. shadcn is a big carry
 
 
-
+# jobless
 link: [jobless.isaacchacko.com](https://jobless.isaacchacko.com)
 ![](/images/new-additions-oct-2026-mv6ygwz6.webp)
 a website to sankey graph track my summer 2027 application cycle! 
