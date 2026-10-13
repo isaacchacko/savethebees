@@ -9,7 +9,7 @@ export default function Home() {
         <a href="https://aggier.ing" target="_blank" rel="noopener noreferrer">
           a&amp;m
         </a>{" "}
-        + fullstack engineer at{" "}
+        + founding eng at{" "}
         <a href="https://dryft.ai" target="_blank" rel="noopener noreferrer">
           dryft
         </a>{" "}
