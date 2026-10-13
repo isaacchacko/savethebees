@@ -101,8 +101,8 @@ the fix was the vocab lesson: steps are cheap, jobs aren't. the gates collapsed 
 a pass record is tiny, it just has to live somewhere the next run can find it.
 
 - attempt 1: the gha cache, keyed `supersonic-ci-<lane>-<hash>`. lookup only, nothing gets downloaded
-- problem: the cache is branch-scoped. a pr can read its own branch's cache and main's, but main can never read a pr's. so the push to main after a merge reruns everything the pr just passed, on the exact same files
-- problem 2: our runners are blacksmith, which quietly redirects the actions cache on its machines to its own cache. records were written on blacksmith, but the gates ran on github-hosted runners and looked in github's cache. in the first ~day, 1,897 of 1,900 gate decisions were "run", and 736 of those had a matching pass sitting in the other cache. github's cache held 2,373 supersonic keys and 0 passes
+  - problem 1: the cache is branch-scoped. a pr can read its own branch's cache and main's, but main can never read a pr's. so the push to main after a merge reruns everything the pr just passed, on the exact same files
+  - problem 2: our runners are blacksmith, which quietly redirects the actions cache on its machines to its own cache. records were written on blacksmith, but the gates ran on github-hosted runners and looked in github's cache. in the first ~day, 1,897 of 1,900 gate decisions were "run", and 736 of those had a matching pass sitting in the other cache. github's cache held 2,373 supersonic keys and 0 passes
 - attempt 2: artifacts. with `shared: true`, `record` also uploads a one-line artifact named after the hash, and `check` falls back to asking the artifacts api for an unexpired artifact with that name. artifacts are repo-wide instead of branch-scoped, and blacksmith doesn't reroute them
 
 # pr + main = lots of dedupe
