@@ -23,7 +23,8 @@ Make a [fine-grained personal access token](https://github.com/settings/personal
 - Expiry: whatever you are willing to re-do
 
 Open the extension's options (the `opts` button in the popup), paste the token,
-hit **save**, then **test** — it should report how many lists it can see.
+hit **save**, then **test** — it reads the lists and writes a no-op blob, so a
+token that can read but not write fails here rather than on your first save.
 
 The token sits in `chrome.storage.local`, so anyone with your Chrome profile can
 read it. That is why it is scoped to one repo and one permission: the worst case

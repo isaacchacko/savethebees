@@ -82,6 +82,9 @@ async function explain(response) {
   const body = await response.json().catch(() => null);
   const detail = body?.message || response.statusText;
   if (response.status === 401) return "github rejected the token (401)";
+  if (response.status === 403 && /not accessible by personal access token/i.test(detail)) {
+    return "token can't write here — give it this repo and Contents: Read and write (403)";
+  }
   if (response.status === 403) return `github refused: ${detail} (403)`;
   if (response.status === 404) {
     return "repo or branch not found — check the options, and that the token can see this repo (404)";
@@ -289,6 +292,20 @@ export async function fetchCool() {
   const { data, head } = await fetchMerged(config);
   await setCached(data, head);
   return { data, head };
+}
+
+/**
+ * A public repo answers reads for any valid token, so a successful read says
+ * nothing about whether saves will work. Writing the empty blob does: it needs
+ * Contents write, and git already has that object, so nothing is added.
+ */
+export async function checkWrite() {
+  const config = await getConfig();
+  const blob = await send(config, repoPath(config, "/git/blobs"), "POST", {
+    content: "",
+    encoding: "utf-8",
+  });
+  if (blob.failed) throw new Error(await explain(blob.failed));
 }
 
 /**

@@ -1,4 +1,4 @@
-import { fetchCool, getConfig, rekeyPrivate, setConfig } from "./store.js";
+import { checkWrite, fetchCool, getConfig, rekeyPrivate, setConfig } from "./store.js";
 
 const FIELDS = ["owner", "repo", "branch", "filePath", "site", "token", "password"];
 const status = document.getElementById("status");
@@ -54,6 +54,7 @@ document.getElementById("test").onclick = async () => {
   say("checking…");
   try {
     const { data } = await fetchCool();
+    await checkWrite();
     const entries = data.lists.flatMap((list) => list.items);
     const hidden = entries.filter((item) => item.private).length;
     say(`ok — ${data.lists.length} lists, ${entries.length} entries (${hidden} private)`, "ok");
