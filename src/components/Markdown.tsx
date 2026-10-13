@@ -6,8 +6,8 @@ import remarkGfm from "remark-gfm";
  * line of its own — a note on a list entry, say, where a block would break it
  * onto the next row.
  *
- * `skipTitle` drops the `# heading`, for pages where the card already shows a
- * title of its own.
+ * `skipTitle` drops the leading `# heading`, for pages where the card already
+ * shows a title of its own. Any later `#` is a section heading of the body.
  */
 export default function Markdown({
   content,
@@ -23,7 +23,7 @@ export default function Markdown({
       remarkPlugins={[remarkGfm]}
       components={{
         ...(inline ? { p: ({ children }) => <>{children}</> } : {}),
-        h1: ({ children }) => (skipTitle ? null : <h2>{children}</h2>),
+        h1: ({ children }) => <h2 className="heading">{children}</h2>,
         a: ({ href, children }) => {
           const external = href?.startsWith("http");
           return (
@@ -39,7 +39,7 @@ export default function Markdown({
         },
       }}
     >
-      {content}
+      {skipTitle ? content.replace(/^\s*# .*(\r?\n|$)/, "") : content}
     </ReactMarkdown>
   );
 }

@@ -785,6 +785,20 @@ a:hover {
   text-transform: uppercase;
 }
 
+/* a `#` in a post body: a section title, a step down from the post's own */
+.card-body .heading {
+  margin-top: 12px;
+  padding: 0;
+  border: 0;
+  font-size: 22px;
+  line-height: 1.25;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: normal;
+  text-transform: none;
+  text-wrap: balance;
+}
+
 /* a heading sits right on its list, not a full gap above it */
 .card-body h3 + ul {
   margin-top: -10px;

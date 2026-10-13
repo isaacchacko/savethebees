@@ -15,7 +15,7 @@ i couldn't find a good pre-built solution for what we were struggling with, so i
 
 skip the vocab lesson if you'd like.
 
-**enrichment: vocab lesson for github actions**
+# enrichment: vocab lesson for github actions
 ![example diagram of vocab hierarchy](/images/ci-cannot-be-that-hard-for-monorepos-mv6ziu0k.webp)
 - workflows: the list of items you see on the Actions tab in github. a workflow is just a static definition of CI, while the rest of the vocab below is related to the process of actually running CI
 - run: one execution of a workflow
@@ -23,7 +23,7 @@ skip the vocab lesson if you'd like.
 - step: work done sequentially within a job. cheaper than jobs because while each job uses its own VM, steps of a job run within the same VM
 - actions: pre-defined steps defined by other people on github. you can source pre-defined actions by `owner/repo/path@ref` (what i do for supersonic-ci!)
 
-**what makes a run unnecessary**
+# what makes a run unnecessary
 
 say there's commit A (touching fe/be) and commit B (be only).
 
@@ -32,7 +32,7 @@ say there's commit A (touching fe/be) and commit B (be only).
 
 in reality, default gha behavior is not built for this, wasting lots of runner minutes (you're billed by jobs' elapsed time in minutes).
 
-**staquo sucks**
+# staquo sucks
 
 there's of course many solutions out there to mitigate the loss. 
 
@@ -53,7 +53,7 @@ there's of course many solutions out there to mitigate the loss.
 
 every one of these answers "did this pr touch X?". what i actually want to know is "did X already pass?"
 
-**my solution**
+# my solution
 
 [supersonic-ci](https://github.com/Dryft-AI/supersonic-ci): skip a lane when the exact files it depends on already passed, no matter which commit, branch, or pr they passed on.
 
@@ -85,7 +85,7 @@ push B   touches be only, cancels A
 
 and case 2 is free: B touches be only, so fe hashes the same as A's green fe, and fe skips.
 
-**my first try was too expensive**
+# my first try was too expensive
 
 my first version gave every lane its own gate job, and the gates could do more: wait for an identical job already running instead of starting a new one, and kill a job once a newer push made it stale. it benchmarked well. then it shipped and the bill went up.
 
@@ -96,7 +96,7 @@ my first version gave every lane its own gate job, and the gates could do more: 
 
 the fix was the vocab lesson: steps are cheap, jobs aren't. the gates collapsed into one `check` step inside a job every run already starts (~1s), and waiting got cut.
 
-**caching and artifacting was needed**
+# caching and artifacting was needed
 
 a pass record is tiny, it just has to live somewhere the next run can find it.
 
@@ -105,7 +105,7 @@ a pass record is tiny, it just has to live somewhere the next run can find it.
 - problem 2: our runners are blacksmith, which quietly redirects the actions cache on its machines to its own cache. records were written on blacksmith, but the gates ran on github-hosted runners and looked in github's cache. in the first ~day, 1,897 of 1,900 gate decisions were "run", and 736 of those had a matching pass sitting in the other cache. github's cache held 2,373 supersonic keys and 0 passes
 - attempt 2: artifacts. with `shared: true`, `record` also uploads a one-line artifact named after the hash, and `check` falls back to asking the artifacts api for an unexpired artifact with that name. artifacts are repo-wide instead of branch-scoped, and blacksmith doesn't reroute them
 
-**pr + main = lots of dedupe**
+# pr + main = lots of dedupe
 
 we run CI on every pr push, then again when the pr merges to main. if the pr was up to date with main, the merge produces the same files lane for lane, so main's run is mostly a rerun of work the pr just did.
 
@@ -115,7 +115,7 @@ with shared artifacts, main skips it:
 - ~4 runner minutes saved per merge, on average
 - median time to green on main went from 3.9 to 1.0 min
 
-**preliminary savings**
+# preliminary savings
 
 oct 1 to oct 13, 2,932 CI runs. "saved" means a lane the path filter would have run, but supersonic skipped, valued at that lane's median runtime.
 
@@ -134,7 +134,7 @@ oct 1 to oct 13, 2,932 CI runs. "saved" means a lane the path filter would have 
 
 the pr number is mostly teammates making lanes faster, not supersonic. a pr run only finishes sooner if every lane on its critical path skips, which is rare since the pr is usually the thing that changed those lanes.
 
-**caveats & closing**
+# caveats & closing
 
 in hindsight, our solution had to be handrolled because we partially made the problem harder on ourselves. 
 
