@@ -107,7 +107,18 @@
       "id": "friends-websites",
       "title": "friends' websites",
       "description": "",
-      "items": []
+      "items": [
+        {
+          "id": "274ad224-30f6-492b-a2d8-4cd083334388",
+          "title": "Boping Li",
+          "url": "https://bopingli.github.io/",
+          "note": "",
+          "added": "2026-10-13",
+          "shot": "/cool-shots/274ad224-30f6-492b-a2d8-4cd083334388.webp",
+          "shotW": 640,
+          "shotH": 396
+        }
+      ]
     }
   ]
 }
