@@ -459,7 +459,8 @@ export async function readFile(path) {
 }
 
 /** Lists the markdown files in a directory, newest name first. */
-export async function listDir(path) {
+/** The files in a directory, by name; only markdown unless `suffix` says otherwise. */
+export async function listDir(path, suffix = ".md") {
   const config = await getConfig();
   const head = await getHead(config);
   const response = await github(
@@ -470,7 +471,7 @@ export async function listDir(path) {
   if (!response.ok) throw new Error(await explain(response));
   const body = await response.json();
   return (Array.isArray(body) ? body : [])
-    .filter((entry) => entry.type === "file" && entry.name.endsWith(".md"))
+    .filter((entry) => entry.type === "file" && entry.name.endsWith(suffix))
     .map((entry) => entry.name);
 }
 

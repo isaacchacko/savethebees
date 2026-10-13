@@ -261,12 +261,16 @@ function renderDumps(files) {
 async function deleteDump(name, files) {
   arming = null;
   say(`deleting ${name}…`);
+  const path = `${DUMPS_DIR}/${name}`;
   try {
+    const { text } = await readFile(path);
+    const images = await unusedImages([...imageRefs(text)], [path]);
     await saveFiles(`admin: delete ${name}`, [
-      { path: `${DUMPS_DIR}/${name}`, remove: true },
+      { path, remove: true },
+      ...images.map((src) => ({ path: `public${src}`, remove: true })),
     ]);
     renderDumps(files.filter((file) => file.name !== name));
-    say(`deleted ${name}`, "ok");
+    say(`deleted ${name}${images.length ? ` and ${plural(images.length, "image")}` : ""}`, "ok");
   } catch (error) {
     renderDumps(files);
     say(error.message, "error");
@@ -446,6 +450,33 @@ async function pasteImage(file) {
   }
 }
 
+const IMAGE_REF = /!\[[^\]]*\]\((\/images\/[^)\s]+)\)/g;
+
+/** The pasted images a page shows, as their site paths. */
+function imageRefs(markdown) {
+  return new Set([...markdown.matchAll(IMAGE_REF)].map((match) => match[1]));
+}
+
+const plural = (count, noun) => `${count} ${noun}${count === 1 ? "" : "s"}`;
+
+/**
+ * Of `srcs`, the images to delete from the repo: the ones that exist there and
+ * that no page outside `skip` still shows. An image pasted into one post can
+ * be copied into another, so this reads every page rather than trusting the
+ * filename — it only runs when a save or delete actually drops an image.
+ */
+async function unusedImages(srcs, skip) {
+  if (!srcs.length) return [];
+  const [dumps, committed] = await Promise.all([listDir(DUMPS_DIR), listDir(IMAGES_DIR, "")]);
+  const pages = [
+    ...PAGES.filter((page) => page.path).map((page) => page.path),
+    ...dumps.map((name) => `${DUMPS_DIR}/${name}`),
+  ].filter((path) => !skip.includes(path));
+  const texts = await Promise.all(pages.map(async (path) => (await readFile(path)).text));
+  const shown = new Set(texts.flatMap((text) => [...imageRefs(text)]));
+  return srcs.filter((src) => !shown.has(src) && committed.includes(src.slice("/images/".length)));
+}
+
 /**
  * Where to load an image's preview from, in order. A committed one is on the
  * site once vercel has rebuilt, and on github straight away.
@@ -499,6 +530,10 @@ async function save() {
 
   const name = next.path.split("/").pop();
   try {
+    const dropped = [...imageRefs(current.markdown)].filter((src) => !imageRefs(next.text).has(src));
+    const unused = await unusedImages(dropped, [current.path, next.path]);
+    for (const src of unused) files.push({ path: `public${src}`, remove: true });
+
     await saveFiles(renamed ? `admin: rename ${current.path.split("/").pop()} to ${name}` : `admin: edit ${name}`, files);
     current.path = next.path;
     current.markdown = editor.text();
@@ -507,7 +542,8 @@ async function save() {
     pendingImages.clear();
     setDirty(false);
     if (current.isDump) refreshLive();
-    say(renamed ? `saved as ${name} — the old url is gone` : "saved — vercel will rebuild in a minute or so", "ok");
+    const removed = unused.length ? ` · removed ${plural(unused.length, "unused image")}` : "";
+    say((renamed ? `saved as ${name} — the old url is gone` : "saved — vercel will rebuild in a minute or so") + removed, "ok");
   } catch (error) {
     saveButton.disabled = false;
     revertButton.disabled = false;

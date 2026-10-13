@@ -199,6 +199,10 @@ Paste an image (png, jpeg, gif or webp) into the editor and it inserts
 `![](/images/<page>-<id>.webp)` at the cursor. The file goes to
 `public/images/` in the same commit as the next save, so a post and its images
 land together; an image whose markdown you deleted before saving is left out.
+It works the other way too: a save that drops an image's markdown deletes the
+file from `public/images/` in the same commit, and so does deleting a post —
+unless another page still shows that image, which the save checks by reading
+every page (only when an image was actually dropped).
 It is shrunk on the way in: webp, at most 1440px wide (twice the post column),
 unless the original is already smaller. A gif is kept as is, so it keeps
 animating.
