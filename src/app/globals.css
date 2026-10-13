@@ -44,9 +44,11 @@ body {
   color: var(--paper);
 }
 
+/* Tailwind's reset leaves links with no line at all, so set it, not just the
+   style: the dotted underline the extension's editor draws */
 a {
   color: var(--ink);
-  text-decoration-style: dotted;
+  text-decoration: underline dotted;
   text-underline-offset: 3px;
 }
 
