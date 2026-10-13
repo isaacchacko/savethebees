@@ -102,6 +102,12 @@
           "shotH": 396
         }
       ]
+    },
+    {
+      "id": "friends-websites",
+      "title": "friends' websites",
+      "description": "",
+      "items": []
     }
   ]
 }
