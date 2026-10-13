@@ -320,9 +320,9 @@ body {
   font-weight: 700;
 }
 
-/* The site drops the page's leading `# title`: the card, or a post's front
-   matter, already names it. It is still in the file, so it stays editable here,
-   but faded and labelled so nobody polishes a line no visitor will read. */
+/* the site drops the page's leading `# title`: the card, or a post's front
+   matter, already names it. It is still in the file, so it stays editable
+   here, faded */
 #doc .md-title {
   padding-top: 0;
   font-size: inherit;
@@ -331,12 +331,10 @@ body {
   opacity: 0.6;
 }
 
-#doc .md-title::after {
-  content: "not shown on the site";
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  margin-left: 0.75rem;
+/* the hidden "#" leaves the space after it, which the site does not render, so
+   a heading is pulled back by one space; on the cursor's line the "# " shows */
+#doc :is(.md-h1, .md-h2, .md-h3):not(.cm-activeLine) {
+  text-indent: -1ch;
 }
 
 /* the bullet is drawn while the "-" is hidden; on the cursor's line the

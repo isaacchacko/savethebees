@@ -30,20 +30,6 @@
             <button type="button" id="back" class="chip-link">← blog</button>
             <span class="muted tabular" id="post-stats"></span>
           </div>
-          <div class="post-head">
-            <input id="meta-title" class="post-title" type="text" placeholder="title" aria-label="title" />
-            <input
-              id="meta-description"
-              class="post-desc"
-              type="text"
-              placeholder="description — the blog index shows this under the title"
-              aria-label="description"
-            />
-            <p class="meta-warn" id="desc-warn" hidden>
-              no description: the blog index shows an empty line under this one.
-            </p>
-          </div>
-
           <details class="front-matter">
             <summary>front matter</summary>
             <div class="front-matter-fields">
@@ -67,6 +53,20 @@
               </p>
             </div>
           </details>
+
+          <div class="post-head">
+            <input id="meta-title" class="post-title" type="text" placeholder="title" aria-label="title" />
+            <input
+              id="meta-description"
+              class="post-desc"
+              type="text"
+              placeholder="description — the blog index shows this under the title"
+              aria-label="description"
+            />
+            <p class="meta-warn" id="desc-warn" hidden>
+              no description: the blog index shows an empty line under this one.
+            </p>
+          </div>
         </div>
 
         <div id="picker" class="picker" hidden></div>
