@@ -188,7 +188,10 @@ a rule above it.
 Because the text *is* the file, saving writes exactly what is in the editor.
 There is no serialiser in between to drop or re-escape anything, so every file
 opens for editing and an untouched file saves back byte for byte. Enter on a
-bullet continues the list, and cmd-Z undoes.
+bullet continues the list, and enter on an empty one leaves it with a blank
+line after, so the next line is a paragraph rather than more of the last
+bullet. Tab and shift-tab nest and un-nest a bullet; a sub-item gets a hollow
+bullet, here and on the site. cmd-Z undoes.
 
 #### Pasting images
 

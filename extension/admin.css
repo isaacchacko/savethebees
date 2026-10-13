@@ -329,22 +329,29 @@ body {
 
 /* the bullet is drawn while the "-" is hidden; on the cursor's line the
    "-" itself shows, so the drawn one steps aside. The space after the hidden
-   "-" is still there, so the first line is pulled back by its width, and
-   wrapped lines line up with the text */
+   "-" is still there, and so is a sub-item's indent (--indent, set per line),
+   so the first line is pulled back by both, and wrapped lines line up with
+   the text */
 #doc .md-li {
   position: relative;
-  padding-left: 18px;
-  text-indent: -1ch;
+  padding-left: calc(18px + var(--indent, 0ch));
+  text-indent: calc(-1ch - var(--indent, 0ch));
 }
 
 #doc .md-li::before {
   content: "";
   position: absolute;
-  left: 0;
+  left: var(--indent, 0ch);
   top: 10px;
   width: 6px;
   height: 6px;
   background: var(--ink);
+}
+
+/* a sub-item's bullet is hollow, as on the site */
+#doc .md-li-nested::before {
+  background: none;
+  box-shadow: inset 0 0 0 1px var(--ink);
 }
 
 #doc .md-li.cm-activeLine {

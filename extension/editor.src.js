@@ -7,7 +7,7 @@
 import { EditorState, RangeSetBuilder } from "@codemirror/state";
 import { EditorView, ViewPlugin, Decoration, WidgetType, highlightActiveLine, keymap } from "@codemirror/view";
 import { syntaxTree } from "@codemirror/language";
-import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
+import { defaultKeymap, history, historyKeymap, indentWithTab } from "@codemirror/commands";
 import { markdownLanguage, markdownKeymap } from "@codemirror/lang-markdown";
 import {
   collapseOnSelectionFacet,
@@ -31,6 +31,22 @@ const LINE_CLASSES = {
   FencedCode: "md-fence",
 };
 
+/**
+ * A sub-item's indent is typed spaces, so the drawn bullet has to move over by
+ * the same amount to sit in front of its text rather than at the margin.
+ */
+function listItem(node, text) {
+  let nested = false;
+  for (let parent = node.node.parent; parent; parent = parent.parent) {
+    if (parent.name === "ListItem") nested = true;
+  }
+  const indent = /^\s*/.exec(text)[0].length;
+  return Decoration.line({
+    class: nested ? "md-li md-li-nested" : "md-li",
+    attributes: { style: `--indent: ${indent}ch` },
+  });
+}
+
 function lineClasses(view) {
   const { state } = view;
   const classes = new Map();
@@ -41,13 +57,16 @@ function lineClasses(view) {
       const first = state.doc.lineAt(node.from).number;
       // a list item's wrapped continuation lines are not new bullets
       const last = node.name === "FencedCode" ? state.doc.lineAt(node.to).number : first;
-      for (let line = first; line <= last; line++) classes.set(state.doc.line(line).from, name);
+      for (let line = first; line <= last; line++) {
+        const { from, text } = state.doc.line(line);
+        classes.set(from, name === "md-li" ? listItem(node, text) : Decoration.line({ class: name }));
+      }
     },
   });
 
   const builder = new RangeSetBuilder();
-  for (const [from, name] of [...classes].sort((a, b) => a[0] - b[0])) {
-    builder.add(from, from, Decoration.line({ class: name }));
+  for (const [from, decoration] of [...classes].sort((a, b) => a[0] - b[0])) {
+    builder.add(from, from, decoration);
   }
   return builder.finish();
 }
@@ -131,6 +150,25 @@ function imagePlugin(resolveImage) {
   );
 }
 
+/**
+ * Enter on an empty top-level bullet leaves the list. CodeMirror's own version
+ * only clears the "- ", so whatever you type next sits on the very next line —
+ * which markdown reads as more of the last bullet, not a new paragraph. This
+ * leaves the blank line in between. An empty sub-item is left to CodeMirror,
+ * which moves it out a level.
+ */
+function leaveList(view) {
+  const { state } = view;
+  const { empty, head } = state.selection.main;
+  const line = state.doc.lineAt(head);
+  if (!empty || head !== line.to || !/^[-*+]\s*$/.test(line.text)) return false;
+  view.dispatch({
+    changes: { from: line.from, to: line.to, insert: "\n" },
+    selection: { anchor: line.from + 1 },
+  });
+  return true;
+}
+
 const PASTABLE = ["image/png", "image/jpeg", "image/gif", "image/webp"];
 
 /**
@@ -144,7 +182,9 @@ export function createEditor({ parent, onChange, onSave, onPasteImage, resolveIm
     history(),
     keymap.of([
       { key: "Mod-s", preventDefault: true, run: () => (onSave(), true) },
+      { key: "Enter", run: leaveList },
       ...markdownKeymap,
+      indentWithTab, // tab / shift-tab nest and un-nest a bullet
       ...historyKeymap,
       ...defaultKeymap,
     ]),
