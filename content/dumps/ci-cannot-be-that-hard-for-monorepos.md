@@ -36,7 +36,8 @@ in reality, default gha behavior is not built for this. actions refire on every 
 
 there's of course many solutions out there to mitigate the loss. 
 
-- gha native `paths-ignore`: skips the whole workflow
+- gha native `paths-ignore`: if a pr doesn't touch a certain filepath, you can skip the workflow. problem: "touching" a filepath is calculated as pr HEAD - base, and you can't skip the workflow if your CI is all in one workflow
+- `dorny/paths-filter`: 
 - 
 
 **gha makes things hard**
