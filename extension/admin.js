@@ -592,6 +592,43 @@ doc.addEventListener("beforeinput", (event) => {
   }
 });
 
+// Typed text is only ever text — the serializer escapes its brackets — so
+// "[label](url)" would be committed literally. Closing the paren turns it into
+// a real link instead, the same way "- " turns a line into a bullet.
+const TYPED_LINK = /\[([^\]]+)\]\(([^)\s]+)$/;
+
+doc.addEventListener("beforeinput", (event) => {
+  if (event.inputType !== "insertText" || event.data !== ")") return;
+
+  const selection = getSelection();
+  if (!selection.isCollapsed || !selection.rangeCount) return;
+
+  const caret = selection.getRangeAt(0);
+  const node = caret.startContainer;
+  if (node.nodeType !== Node.TEXT_NODE) return;
+  if (node.parentElement.closest("pre, code, a")) return;
+
+  const match = TYPED_LINK.exec(node.textContent.slice(0, caret.startOffset));
+  if (!match) return;
+
+  event.preventDefault();
+  const typed = document.createRange();
+  typed.setStart(node, caret.startOffset - match[0].length);
+  typed.setEnd(node, caret.startOffset);
+  typed.deleteContents();
+
+  const link = document.createElement("a");
+  link.href = match[2];
+  link.textContent = match[1];
+  typed.insertNode(link);
+
+  const after = document.createRange();
+  after.setStartAfter(link);
+  selection.removeAllRanges();
+  selection.addRange(after);
+  setDirty(true);
+});
+
 doc.addEventListener("keydown", (event) => {
   if ((event.metaKey || event.ctrlKey) && event.key === "s") {
     event.preventDefault();
