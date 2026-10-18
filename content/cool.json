@@ -35,6 +35,16 @@
       "description": "",
       "items": [
         {
+          "id": "3f3ea84a-4858-4414-8311-40686c5260e9",
+          "title": "Max von Storch",
+          "url": "https://max.vonstorch.com/",
+          "note": "",
+          "added": "2026-10-18",
+          "shot": "/cool-shots/3f3ea84a-4858-4414-8311-40686c5260e9.webp",
+          "shotW": 640,
+          "shotH": 396
+        },
+        {
           "id": "e1a289df-d3c9-44ad-9d75-e0be17590da6",
           "title": "Lucas Jin",
           "url": "https://www.lucasjin.ca/",
