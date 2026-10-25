@@ -17,8 +17,8 @@ i love to yap! reach me at isaac.chacko05@gmail.com <island name="copy" value="i
 
 ## subdomains
 
-- [graph.isaacchacko.com](https://graph.isaacchacko.com): pretty graphs, quickly
-- [jobless.isaacchacko.com](https://jobless.isaacchacko.com): am i jobless or jobful?
-- [basalt.isaacchacko.com](https://basalt.isaacchacko.com): markdown in, a website that reads like a good math textbook out
+- [graph](https://graph.isaacchacko.com): pretty graphs, quickly
+- [jobless](https://jobless.isaacchacko.com): am i jobless or jobful?
+- [basalt](https://basalt.isaacchacko.com): better quartz
 
 <p class="signoff">- isaac</p>
