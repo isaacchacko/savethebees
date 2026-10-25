@@ -240,6 +240,11 @@ article .note-list li > a {
   display: none;
 }
 
+// the site's mark, "ic" (components/Mark.astro), in the ink
+.garden-mark path {
+  fill: var(--dark);
+}
+
 // the theme toggle shows emoji too, to match the surf's 🌊: ☀️ by day, 🌙 by
 // night (Basalt's own glyphs are hidden, its button and script are kept)
 .darkmode {
