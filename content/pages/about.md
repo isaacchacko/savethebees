@@ -9,3 +9,5 @@ in cs, solving a problem you can't solve means reducing it to a problem you can 
 to me, striving for the perfect abstraction is striving for elegant design, where succeeding is evidence that you understood the whole problem, from the minutiae to the big picture. experience in trying and failing to achieve elegant design is taste.
 
 ai writes a lot of my code now, and eventually it'll be able to do just about anything without me holding its hand. but imo taste is still on the developer. while a model will reach for the average of good, the average of good will never beat the taste of great.
+
+I could be wrong, we'll see lol.
