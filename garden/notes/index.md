@@ -3,8 +3,6 @@ title: howdy!
 description: Isaac Chacko — a little hypertext garden.
 ---
 
-<island name="backdrop" load="eager"></island>
-
 i'm isaac. this is my little hypertext garden on the internet — make yourself at home!
 
 i study cs/math at [a&m](https://aggier.ing), am a founding engineer at [dryft](https://dryft.ai), and run hackathons at [tidal](https://tidaltamu.com). previously at [siso](https://siso-eng.com).

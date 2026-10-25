@@ -1,0 +1,50 @@
+---
+// Basalt's theme toggle, and beside it the garden's own: a wave that turns the
+// surf behind the page (islands/backdrop.ts) off and on. The choice is kept
+// in localStorage as "surf" and shown as html[data-surf="off"].
+import Darkmode from "@basalt/components/Darkmode.astro"
+---
+
+<Darkmode />
+<button class="surf-toggle" type="button" aria-label="the surf behind the page" aria-pressed="true">
+  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <title>The surf behind the page</title>
+    <path d="M2 9c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2"></path>
+    <path d="M2 15c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2"></path>
+  </svg>
+</button>
+
+<script>
+  const root = document.documentElement
+
+  function chosen(): "on" | "off" {
+    try {
+      return localStorage.getItem("surf") === "off" ? "off" : "on"
+    } catch {
+      return "on"
+    }
+  }
+
+  // the button says which it is; html[data-surf] is what the backdrop follows
+  function show(surf: "on" | "off", html: HTMLElement = root) {
+    if (surf === "off") html.dataset.surf = "off"
+    else delete html.dataset.surf
+    for (const button of document.querySelectorAll(".surf-toggle")) button.setAttribute("aria-pressed", String(surf === "on"))
+  }
+  show(chosen())
+
+  document.addEventListener("click", (e) => {
+    if (!(e.target as Element).closest?.(".surf-toggle")) return
+    const surf = root.dataset.surf === "off" ? "on" : "off"
+    try {
+      localStorage.setItem("surf", surf)
+    } catch {}
+    show(surf)
+  })
+
+  // the incoming page's <html> has none of its own
+  document.addEventListener("astro:before-swap", (e) => {
+    if (root.dataset.surf === "off") e.newDocument.documentElement.dataset.surf = "off"
+  })
+  document.addEventListener("astro:after-swap", () => show(chosen()))
+</script>

@@ -1,15 +1,19 @@
-// Breaking surf behind the page, dithered to dots of the garden's own colours:
-// <island name="backdrop"></island>, once, on the page that should have it.
+// Breaking surf behind every page, dithered to dots of the garden's own
+// colours. It's mounted from the footer (components/Footer.astro), so every
+// page has it, and it carries on from one page to the next: the canvas sits
+// outside <body>, which each navigation replaces, and a page that leaves hands
+// it to the page that arrives instead of stopping it.
 //
 // Every cell of the grid samples the clip at its centre and lights a dot when
 // that brightness clears the cell's spot in an 8×8 Bayer matrix (ordered
 // dithering, one dot per cell). By night the foam is the dots, pale on the
 // paper; by day it's the water, so the foam stays paper and the dots stay
-// faint. Behind the note's text the dots thin out, so the surf is mostly in
-// the margins. The colours are read from the theme, and follow it when it
+// faint. Behind the note's text, and the navbar while it's open, the dots thin
+// out, so the surf is mostly in the margins. The colours are read from the theme, and follow it when it
 // switches.
-// Reduced motion gets the first frame as a still; without WebGL there's no
-// backdrop at all.
+// The wave button beside the theme toggle (components/Darkmode.astro) turns it
+// off and on: html[data-surf="off"]. Reduced motion gets the first frame as a
+// still; without WebGL there's no backdrop at all.
 
 const VIDEO = "/assets/waves.mp4"
 
@@ -53,6 +57,8 @@ uniform vec3 u_dot;
 uniform float u_invert;
 // the text column's left and right edges in device px, and its fade's width
 uniform vec3 u_calm;
+// the open navbar's left and right edges (both 0 while it's folded)
+uniform vec2 u_calm_nav;
 
 // the 8×8 matrix built up from the 2×2 one, as thresholds in [0, 1)
 float bayer2(vec2 a) {
@@ -72,6 +78,7 @@ void main() {
   l = pow(clamp((l - u_levels.x) / (u_levels.y - u_levels.x), 0.0, 1.0), u_levels.z);
   l = mix(l, 1.0 - l, u_invert);
   float inside = smoothstep(u_calm.x - u_calm.z, u_calm.x, centre.x) * (1.0 - smoothstep(u_calm.y, u_calm.y + u_calm.z, centre.x));
+  inside = max(inside, smoothstep(u_calm_nav.x - u_calm.z, u_calm_nav.x, centre.x) * (1.0 - smoothstep(u_calm_nav.y, u_calm_nav.y + u_calm.z, centre.x)));
   l *= mix(1.0, ${CALM.toFixed(2)}, inside);
 
   float lit = step(bayer(cell) + 0.01, l);
@@ -97,7 +104,10 @@ function colour(name: string): number[] {
   return Array.from(probe.getImageData(0, 0, 1, 1).data.slice(0, 3), (c) => c / 255)
 }
 
-export function mount(_el: HTMLElement, { src = VIDEO }: { src?: string }) {
+const surfOff = () => document.documentElement.dataset.surf === "off"
+
+/** Starts the surf behind the page, returning how to stop it. */
+function start(src: string): () => void {
   const canvas = document.createElement("canvas")
   canvas.className = "backdrop"
   canvas.setAttribute("aria-hidden", "true")
@@ -107,11 +117,11 @@ export function mount(_el: HTMLElement, { src = VIDEO }: { src?: string }) {
   video.muted = true
   video.loop = true
   video.playsInline = true
-  video.preload = "auto"
+  // switched off, it doesn't fetch the clip until it's switched on
+  video.preload = surfOff() ? "none" : "auto"
   video.setAttribute("aria-hidden", "true")
-  // the page's own layers come and go with each navigation; this stays put
-  // behind them, so it lives outside the note
-  document.body.prepend(canvas, video)
+  // a navigation swaps <body> for the next page's, so this lives beside it
+  document.documentElement.append(canvas, video)
   const remove = () => {
     canvas.remove()
     video.remove()
@@ -177,6 +187,9 @@ export function mount(_el: HTMLElement, { src = VIDEO }: { src?: string }) {
     // the column moves when the navbar opens, so it's measured every time
     const text = document.querySelector(".center")?.getBoundingClientRect()
     gl.uniform3f(at("u_calm"), (text?.left ?? 0) * dpr, (text?.right ?? 0) * dpr, CALM_FEATHER_PX * dpr)
+    const nav = document.querySelector(".left.sidebar")
+    const open = nav?.matches(":hover, :focus-within") ? nav.getBoundingClientRect() : undefined
+    gl.uniform2f(at("u_calm_nav"), (open?.left ?? 0) * dpr, (open?.right ?? 0) * dpr)
   }
 
   // levels that stretch the clip to black and white and then take its average
@@ -223,21 +236,33 @@ export function mount(_el: HTMLElement, { src = VIDEO }: { src?: string }) {
     draw()
     frame = requestAnimationFrame(loop)
   }
-  frame = requestAnimationFrame(loop)
-  if (!still) {
-    video.play().catch(() => {
-      // autoplay refused (low power mode): the still frame stays up
-    })
+  // runs while it's switched on and the tab is showing; switched off, it fades
+  // away and stops
+  const follow = () => {
+    if (surfOff() || document.hidden) {
+      cancelAnimationFrame(frame)
+      frame = 0
+      video.pause()
+      if (surfOff()) canvas.dataset.on = "false"
+      return
+    }
+    if (frame) return
+    dirty = true
+    frame = requestAnimationFrame(loop)
+    if (still) video.preload = "auto"
+    else {
+      video.play().catch(() => {
+        // autoplay refused (low power mode): the still frame stays up
+      })
+    }
   }
-
-  // a hidden tab doesn't need the surf
-  const visibility = () => {
-    if (document.hidden) video.pause()
-    else if (!still) video.play().catch(() => {})
-  }
-  document.addEventListener("visibilitychange", visibility)
-  const themes = new MutationObserver(retheme)
-  themes.observe(document.documentElement, { attributes: true, attributeFilter: ["saved-theme"] })
+  follow()
+  document.addEventListener("visibilitychange", follow)
+  const watch = new MutationObserver(() => {
+    retheme()
+    follow()
+  })
+  watch.observe(document.documentElement, { attributes: true, attributeFilter: ["saved-theme", "data-surf"] })
   const ro = new ResizeObserver(() => {
     dirty = true
     draw()
@@ -247,9 +272,45 @@ export function mount(_el: HTMLElement, { src = VIDEO }: { src?: string }) {
   return () => {
     cancelAnimationFrame(frame)
     video.pause()
-    document.removeEventListener("visibilitychange", visibility)
-    themes.disconnect()
+    document.removeEventListener("visibilitychange", follow)
+    watch.disconnect()
     ro.disconnect()
     remove()
+  }
+}
+
+/** The running surf: its clip, how many pages hold it, and how to stop it. */
+type Live = { src: string; held: number; stop: () => void }
+// on window, so a hot-swapped copy of this module can stop the old one's
+const running = () => (window as { gardenBackdrop?: Live }).gardenBackdrop
+const setRunning = (live?: Live) => ((window as { gardenBackdrop?: Live }).gardenBackdrop = live)
+
+/** How long, in ms, a let-go backdrop waits for the next page before it stops. */
+const HANDOFF_MS = 10_000
+
+export function mount(_el: HTMLElement, { src = VIDEO }: { src?: string }) {
+  let live = running()
+  if (live?.src !== src) {
+    live?.stop()
+    live = { src, held: 0, stop: start(src) }
+    setRunning(live)
+  }
+  const mine = live
+  mine.held++
+  return () => {
+    mine.held--
+    // the page is leaving: the next one picks the surf up when it mounts its
+    // footer, and only if none does is it stopped
+    const settle = () => {
+      document.removeEventListener("astro:page-load", settle)
+      clearTimeout(timer)
+      // the arriving page's island mounts a moment after it loads
+      const coming = document.querySelector('.island[data-island="backdrop"]')
+      if (mine.held > 0 || coming || running() !== mine) return
+      mine.stop()
+      setRunning(undefined)
+    }
+    document.addEventListener("astro:page-load", settle)
+    const timer = setTimeout(settle, HANDOFF_MS)
   }
 }

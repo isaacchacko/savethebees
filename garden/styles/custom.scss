@@ -247,6 +247,55 @@ article .note-list li > a {
   display: none;
 }
 
+// its switch, beside the theme toggle (components/Darkmode.astro): Basalt's
+// ghost icon button, with the waves faded and struck through while it's off
+.surf-toggle {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--darkgray);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+
+  &:hover {
+    color: var(--dark);
+    background: var(--highlight);
+  }
+
+  &:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--tertiary) 55%, transparent);
+    outline-offset: 2px;
+  }
+
+  svg {
+    background: linear-gradient(to top right, transparent calc(50% - 1px), currentColor calc(50% - 1px), currentColor calc(50% + 1px), transparent calc(50% + 1px)) no-repeat;
+    background-size: 0% 0%;
+    background-position: 50% 50%;
+    transition: background-size 0.2s ease;
+  }
+
+  &[aria-pressed="false"] {
+    color: var(--gray);
+
+    svg {
+      background-size: 100% 100%;
+    }
+  }
+
+  .theme-switching & {
+    transition: none;
+  }
+}
+
 .copy-btn {
   padding: 0.05rem 0.5rem;
   border: 1px solid var(--lightgray);
