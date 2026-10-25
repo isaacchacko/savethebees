@@ -58,6 +58,7 @@
       "meta": "dated"
     },
     "explorer": {
+      "folderDefaultState": "open",
       "order": [
         "about",
         "now",

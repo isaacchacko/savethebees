@@ -283,6 +283,11 @@ article .shelf {
 }
 
 // the shelf's screenshot and now playing's track: shown in the secondary column
+// (a copy, without the attribute), never in the line they're about
+article [data-secondary] {
+  display: none;
+}
+
 .shelf-preview,
 .now-playing-card {
   display: block;
@@ -339,6 +344,17 @@ article .shelf {
 
   p {
     margin: 0.4rem 0;
+    color: var(--darkgray);
+  }
+
+  // the credit's links and the socials are links, as anywhere else on the page
+  a {
+    color: var(--secondary);
+    font-weight: 600;
+
+    &:hover {
+      color: var(--tertiary);
+    }
   }
 
   ul {
