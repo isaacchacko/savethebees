@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import Redis from 'ioredis';
 import { createLock } from '@microfleet/ioredis-lock';
+import { redis, requestTokens, storeTokens } from '@/lib/spotifyTokens';
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -20,12 +20,6 @@ function jsonWithCors(
     },
   });
 }
-
-const redis = new Redis({
-  host: process.env.REDIS_HOSTNAME,
-  port: parseInt(process.env.REDIS_PORT || '6379', 10),
-  password: process.env.REDIS_PASSWORD,
-});
 
 const lock = createLock(redis, {
   timeout: 200000, // Lock timeout in milliseconds
@@ -47,47 +41,12 @@ function notPlaying(context?: string, cause?: unknown) {
 }
 
 async function refreshAccessToken(refreshToken: string) {
-  const authHeader = Buffer.from(
-    `${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`
-  ).toString('base64');
-
-  const response = await fetch('https://accounts.spotify.com/api/token', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      Authorization: `Basic ${authHeader}`,
-    },
-    body: new URLSearchParams({
-      grant_type: 'refresh_token',
-      refresh_token: refreshToken,
-    }),
+  const tokens = await requestTokens({
+    grant_type: 'refresh_token',
+    refresh_token: refreshToken,
   });
-
-  if (!response.ok) {
-    // Spotify answers every refresh failure with 400, so the status alone
-    // cannot tell invalid_grant (dead refresh token) from invalid_client
-    // (bad id/secret). The body is the only thing that distinguishes them.
-    const body = await response.text();
-    let code = 'unknown';
-    try {
-      code = JSON.parse(body).error || code;
-    } catch {
-      // non-JSON body, so the raw text below is all there is to go on
-    }
-    throw new Error(`refresh rejected (${response.status} ${code}): ${body}`);
-  }
-
-  const { access_token, expires_in, refresh_token } = await response.json();
-
-  await redis.set('spotify_access_token', access_token);
-  await redis.set('spotify_expiry', String(Date.now() + expires_in * 1000));
-  // Spotify may hand back a rotated refresh token; dropping it would
-  // invalidate the stored one and break every later refresh.
-  if (refresh_token) {
-    await redis.set('spotify_refresh_token', refresh_token);
-  }
-
-  return access_token as string;
+  await storeTokens(tokens);
+  return tokens.access_token;
 }
 
 export async function OPTIONS() {
@@ -113,14 +72,14 @@ export async function GET() {
     const expiry = await redis.get('spotify_expiry');
 
     if (!accessToken || !refreshToken || !expiry) {
-      throw new Error('no tokens in Redis — the site has not been authorized');
+      throw new Error('no tokens in Redis — authorize at /api/spotify/auth');
     }
 
     if (Date.now() > parseInt(expiry, 10)) {
       accessToken = await refreshAccessToken(refreshToken);
     }
   } catch (err) {
-    return notPlaying('token unavailable', err);
+    return notPlaying('token unavailable (re-authorize at /api/spotify/auth)', err);
   } finally {
     // Released before the slow Spotify call so concurrent polls do not queue
     try {
@@ -155,7 +114,6 @@ export async function GET() {
         album: { name: string; uri: string; images: Array<{ url: string }> };
         duration_ms: number;
         explicit: boolean;
-        popularity: number;
         external_urls: { spotify: string };
       } | null;
     };
@@ -173,7 +131,6 @@ export async function GET() {
       progress: playback.progress_ms,
       duration: playback.item.duration_ms,
       explicit: playback.item.explicit,
-      popularity: playback.item.popularity,
       track_url: playback.item.external_urls.spotify,
       external_url: playback.item.external_urls.spotify,
     });
