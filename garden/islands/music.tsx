@@ -2,10 +2,10 @@
 // <island name="music" data="music.json" ssr></island>
 //
 // Rendered at build time, so the covers are there with no script. A cover
-// leans toward the pointer. Hovering one shows its album in the side content.
-// One with a `sound` plays it through Basalt's <sound> (a .sound with
-// data-clips: the same now playing card, one clip at a time); the rest open
-// their song on Spotify.
+// leans toward the pointer. Clicking one opens its card in the side content
+// (Basalt's data-secondary-open="click"): the album, its artist and year, the
+// song, a link to it on Spotify, and a ▶ row when it has a clip, which plays
+// through Basalt's <sound> (the cover holds a hidden .sound with its clip).
 
 type Sound = { src: string; label?: string; song?: string; spotify?: string }
 type Album = {
@@ -40,14 +40,23 @@ function Card({ a }: { a: Album }) {
   return (
     <span
       data-secondary="album"
+      data-secondary-open="click"
       data-secondary-key={`album:${a.album}`}
       data-secondary-title={a.album}
       hidden
     >
       {a.artist}
-      {a.year ? `, ${a.year}` : ""}
+      {a.year ? ` · ${a.year}` : ""}
       <br />
-      <em>{a.sound ? `▶ ${a.sound.label ?? a.sound.song ?? "a bit of it"}` : a.song}</em>
+      <em>{a.song}</em>
+      {a.sound ? (
+        <span class="music-play" data-sound-play={a.sound.src} role="button" tabIndex={0}>
+          ▶ {a.sound.label ?? a.sound.song ?? "a bit of it"}
+        </span>
+      ) : null}
+      <a class="music-spotify" href={a.sound?.spotify ?? a.spotify} target="_blank" rel="noopener noreferrer">
+        spotify ↗
+      </a>
     </span>
   )
 }
@@ -55,43 +64,42 @@ function Card({ a }: { a: Album }) {
 export default function Music({ data }: { data: { playlist?: string; albums: Album[] } }) {
   return (
     <div class="music-grid">
-      {data.albums.map((a) => {
-        const cover = <img src={a.cover} alt={`${a.album}, ${a.artist}`} loading="lazy" width={200} height={200} />
-        const common = { key: a.album, onPointerMove: lean, onPointerLeave: rest }
-        if (a.sound) {
-          const clip = {
-            src: a.sound.src,
-            label: a.sound.label,
-            track: {
-              title: a.sound.song ?? a.song,
-              artist: a.artist,
-              album: a.album,
-              year: a.year,
-              cover: a.cover,
-              url: a.sound.spotify ?? a.spotify,
-            },
-          }
-          return (
+      {data.albums.map((a) => (
+        <div
+          key={a.album}
+          role="button"
+          tabIndex={0}
+          class="music-tile"
+          aria-label={`${a.album}, ${a.artist}`}
+          onPointerMove={lean}
+          onPointerLeave={rest}
+        >
+          <img src={a.cover} alt="" loading="lazy" width={200} height={200} />
+          {a.sound ? (
+            // the clip, for the card's ▶ row: Basalt finds a clip's song by its .sound
             <span
-              {...common}
-              class="music-tile sound"
-              role="button"
-              tabIndex={0}
+              class="sound"
+              hidden
               data-sound={a.sound.src}
-              data-clips={JSON.stringify([clip])}
-            >
-              {cover}
-              <Card a={a} />
-            </span>
-          )
-        }
-        return (
-          <a {...common} class="music-tile" href={a.spotify} target="_blank" rel="noopener noreferrer">
-            {cover}
-            <Card a={a} />
-          </a>
-        )
-      })}
+              data-clips={JSON.stringify([
+                {
+                  src: a.sound.src,
+                  label: a.sound.label,
+                  track: {
+                    title: a.sound.song ?? a.song,
+                    artist: a.artist,
+                    album: a.album,
+                    year: a.year,
+                    cover: a.cover,
+                    url: a.sound.spotify ?? a.spotify,
+                  },
+                },
+              ])}
+            />
+          ) : null}
+          <Card a={a} />
+        </div>
+      ))}
     </div>
   )
 }

@@ -216,6 +216,24 @@ article .side-photo:not(:has(> a)) {
 
 // ---------- islands ----------
 
+// a cover's card in the side content: its ▶ row and its link to spotify
+.margin {
+  .music-play,
+  .music-spotify {
+    display: block;
+    margin-top: 0.35rem;
+  }
+
+  .music-play {
+    cursor: pointer;
+    color: var(--darkgray);
+
+    &.is-playing {
+      color: var(--tertiary);
+    }
+  }
+}
+
 // the album shelf (islands/music.tsx): square covers in a grid, each leaning
 // toward the pointer
 .music-grid {
@@ -257,29 +275,22 @@ article .side-photo:not(:has(> a)) {
     outline-offset: 2px;
   }
 
-  // a cover with a clip: Basalt's <sound>, without the word's ♪ and underline;
-  // a small ♪ in the corner instead, in the accent while it plays
-  &.sound {
-    text-decoration: none;
+  // a cover with a clip: a small ♪ in its corner, in the accent while it plays
+  &:has(.sound)::after {
+    content: "♪";
+    position: absolute;
+    right: 6px;
+    bottom: 4px;
+    padding: 0 5px;
+    border-radius: 3px;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: var(--light);
+    background: color-mix(in srgb, var(--dark) 55%, transparent);
+  }
 
-    &::after {
-      content: "♪";
-      position: absolute;
-      right: 6px;
-      bottom: 4px;
-      margin: 0;
-      padding: 0 5px;
-      border-radius: 3px;
-      font-size: 0.8rem;
-      line-height: 1.5;
-      vertical-align: 0;
-      color: var(--light);
-      background: color-mix(in srgb, var(--dark) 55%, transparent);
-    }
-
-    &[data-playing]::after {
-      background: var(--tertiary);
-    }
+  &:has(.sound[data-playing])::after {
+    background: var(--tertiary);
   }
 
   @media (prefers-reduced-motion: reduce) {
