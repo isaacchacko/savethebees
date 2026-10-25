@@ -435,6 +435,11 @@ article [data-secondary] {
   }
 }
 
+// room under the cover, so it doesn't sit on the card's edge
+.margin .now-playing-card {
+  padding-bottom: 0.75rem;
+}
+
 .shelf-shot {
   display: block;
   width: 100%;
