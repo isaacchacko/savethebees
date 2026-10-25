@@ -27,5 +27,6 @@
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  // garden/ is the Basalt site (Preact islands), built and checked by Basalt
+  "exclude": ["node_modules", "garden"]
 }
