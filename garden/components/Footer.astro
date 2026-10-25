@@ -29,56 +29,57 @@ const SOCIALS = [
 </footer>
 
 <script>
-  // A word with a sound (<span class="side-sound" data-sound="/assets/sound/….mp3">):
-  // click it, or Enter on it, to play its clip; again to stop. Its card in the
-  // margin has the player too. One sound at a time, here or in a card.
+  // A word or a card row with a sound (data-sound="/assets/sound/….mp3"): click
+  // it, or Enter on it, to play its clip; again to stop. Everything with that
+  // clip is marked .is-playing while it plays. One sound at a time. The margin's
+  // cards are copies made on hover, so this listens on the document, not on them.
+  const SOUND = "[data-sound]"
   const clips = new Map<string, HTMLAudioElement>()
 
-  function toggle(word: HTMLElement) {
-    const src = word.dataset.sound!
+  const mark = (src: string, playing: boolean) => {
+    for (const el of document.querySelectorAll(`[data-sound="${CSS.escape(src)}"]`)) el.classList.toggle("is-playing", playing)
+  }
+
+  function toggle(src: string) {
     let clip = clips.get(src)
     if (!clip) {
       clip = new Audio(src)
-      clip.addEventListener("play", () => word.classList.add("is-playing"))
-      for (const stop of ["pause", "ended"]) clip.addEventListener(stop, () => word.classList.remove("is-playing"))
+      clip.addEventListener("play", () => mark(src, true))
+      for (const stop of ["pause", "ended"]) clip.addEventListener(stop, () => mark(src, false))
       clips.set(src, clip)
     }
     if (clip.paused) {
-      stopAllBut(clip)
+      for (const other of clips.values()) if (other !== clip) other.pause()
       clip.currentTime = 0
       clip.play().catch(() => {})
     } else clip.pause()
   }
 
-  // a clip made with new Audio() isn't in the page, so its "play" never reaches
-  // the listener below: it stops the others itself
-  function stopAllBut(playing: EventTarget | null) {
-    for (const clip of [...clips.values(), ...document.querySelectorAll("audio")]) if (clip !== playing) clip.pause()
-  }
-
   function wire() {
-    for (const word of document.querySelectorAll<HTMLElement>(".side-sound:not([data-wired])")) {
-      word.dataset.wired = ""
+    for (const word of document.querySelectorAll<HTMLElement>(".side-sound:not([role])")) {
       word.tabIndex = 0
       word.setAttribute("role", "button")
     }
+    // a card shown again comes back as a fresh copy: show what's playing
+    for (const [src, clip] of clips) mark(src, !clip.paused)
   }
   wire()
   document.addEventListener("astro:page-load", wire)
+  new MutationObserver(() => {
+    for (const [src, clip] of clips) if (!clip.paused) mark(src, true)
+  }).observe(document.body, { childList: true, subtree: true })
 
   document.addEventListener("click", (e) => {
-    const word = (e.target as Element).closest?.<HTMLElement>(".side-sound")
-    if (!word || (e.target as Element).closest("a, audio")) return
-    toggle(word)
+    const el = (e.target as Element).closest?.<HTMLElement>(SOUND)
+    if (!el || (e.target as Element).closest("a")) return
+    toggle(el.dataset.sound!)
   })
   document.addEventListener("keydown", (e) => {
-    const word = (e.target as Element).closest?.<HTMLElement>(".side-sound")
-    if (!word || (e.key !== "Enter" && e.key !== " ")) return
+    const el = (e.target as Element).closest?.<HTMLElement>(SOUND)
+    if (!el || (e.key !== "Enter" && e.key !== " ")) return
     e.preventDefault()
-    toggle(word)
+    toggle(el.dataset.sound!)
   })
-  // a player in a card that starts stops the rest
-  document.addEventListener("play", (e) => stopAllBut(e.target), true)
   // leaving the page stops it
   document.addEventListener("astro:before-swap", () => clips.forEach((clip) => clip.pause()))
 </script>

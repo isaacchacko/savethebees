@@ -231,27 +231,40 @@ article .side-sound {
   }
 }
 
-// a sound's card in the margin: each clip's name over its player
+// a sound's card in the margin: a row per clip, ▶ and its name; click to play
 .margin .sound-row {
-  display: block;
-  margin-top: 0.5rem;
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+  margin-top: 0.4rem;
+  padding: 0.3rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: var(--darkgray);
+  cursor: pointer;
 
   &::before {
-    content: attr(data-label);
-    display: block;
-    margin-bottom: 0.2rem;
-    font-size: 0.85rem;
-    font-style: italic;
+    content: "▶";
+    font-size: 0.75em;
     color: var(--gray);
   }
 
-  // Basalt's own player, without its filename caption (the row's label names it)
-  figure {
-    margin: 0;
+  &::after {
+    content: attr(data-label);
   }
 
-  figcaption {
-    display: none;
+  &:hover,
+  &:focus-visible {
+    background: var(--highlight);
+  }
+
+  &.is-playing {
+    color: var(--tertiary);
+
+    &::before {
+      content: "❚❚";
+      color: var(--tertiary);
+    }
   }
 }
 
