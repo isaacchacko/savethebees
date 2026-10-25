@@ -1,6 +1,6 @@
 # about
 
-I'm an engineer from Texas A&M interested in making diegetic software experiences for both devs and users.
+I'm an engineer from Texas A&M interested in making diegetic software experiences[^diegetic] for both devs and users.
 
 My not-so-unique take: CS is the study of solving problems. SWE is the process of solving problems. Similar yet different.
 
@@ -11,3 +11,5 @@ To me, striving for the perfect abstraction is striving for elegant design, wher
 AI writes a lot of my code now, and eventually it'll be able to do just about anything without me holding its hand. But IMO taste is still on the developer. While a model will reach for the average of good, the average of good will never beat the taste of great.
 
 I could be wrong, we'll see lol.
+
+[^diegetic]: The way I use "diegetic" here is a bit unorthodox. I hear "diegetic experiences" most from videogames, where it's common for developers to use "yellow paint" to explicitly indicate to the player what to do, rather than having the game explain itself naturally. In the same vein, I like writing experiences that are intuitive to use, and systems that are intuitive to develop next to and on top of: self-commenting code, self-healing user experiences, breadcrumbing, etc. For example, a simple, concise feature vocabulary tends to lead to simple, concise features.
