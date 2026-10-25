@@ -3,16 +3,18 @@
 //
 // Rendered at build time, so the covers are there with no script. A cover
 // leans toward the pointer. Clicking one opens its card in the side content
-// (Basalt's data-secondary-open="click"): the album, its artist and year, the
-// song, a link to it on Spotify, and a ▶ row when it has a clip, which plays
-// through Basalt's <sound> (the cover holds a hidden .sound with its clip).
+// (Basalt's data-secondary-open="click"): an album's card is the album, its
+// artist and year, and a link to it on Spotify; a song's is the song, its artist,
+// year and album, and a link to the track. Either has a ▶ row when it has a clip,
+// which plays through Basalt's <sound> (the cover holds a hidden .sound with it).
 
 type Sound = { src: string; label?: string; song?: string; spotify?: string }
 type Album = {
+  kind: "album" | "song"
   album: string
   artist: string
   year?: string
-  song: string
+  song?: string
   spotify: string
   cover: string
   sound?: Sound
@@ -36,25 +38,32 @@ function rest(e: PointerEvent) {
   tile.style.removeProperty("--lean-y")
 }
 
+/** What the cover is called: a song by its song, an album by its album. */
+const nameOf = (a: Album) => (a.kind === "song" && a.song ? a.song : a.album)
+
 function Card({ a }: { a: Album }) {
   return (
     <span
-      data-secondary="album"
+      data-secondary={a.kind}
       data-secondary-open="click"
-      data-secondary-key={`album:${a.album}`}
-      data-secondary-title={a.album}
+      data-secondary-key={`${a.kind}:${a.cover}`}
+      data-secondary-title={nameOf(a)}
       hidden
     >
       {a.artist}
       {a.year ? ` · ${a.year}` : ""}
-      <br />
-      <em>{a.song}</em>
+      {a.kind === "song" ? (
+        <>
+          <br />
+          <em>{a.album}</em>
+        </>
+      ) : null}
       {a.sound ? (
         <span class="music-play" data-sound-play={a.sound.src} role="button" tabIndex={0}>
-          ▶ {a.sound.label ?? a.sound.song ?? "a bit of it"}
+          ▶ {a.sound.label ?? a.sound.song ?? nameOf(a)}
         </span>
       ) : null}
-      <a class="music-spotify" href={a.sound?.spotify ?? a.spotify} target="_blank" rel="noopener noreferrer">
+      <a class="music-spotify" href={a.spotify} target="_blank" rel="noopener noreferrer">
         spotify ↗
       </a>
     </span>
@@ -66,11 +75,11 @@ export default function Music({ data }: { data: { playlist?: string; albums: Alb
     <div class="music-grid">
       {data.albums.map((a) => (
         <div
-          key={a.album}
+          key={a.cover}
           role="button"
           tabIndex={0}
           class="music-tile"
-          aria-label={`${a.album}, ${a.artist}`}
+          aria-label={`${nameOf(a)}, ${a.artist}`}
           onPointerMove={lean}
           onPointerLeave={rest}
         >
@@ -86,7 +95,7 @@ export default function Music({ data }: { data: { playlist?: string; albums: Alb
                   src: a.sound.src,
                   label: a.sound.label,
                   track: {
-                    title: a.sound.song ?? a.song,
+                    title: a.sound.song ?? nameOf(a),
                     artist: a.artist,
                     album: a.album,
                     year: a.year,

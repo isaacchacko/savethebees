@@ -2,6 +2,7 @@
   "playlist": "https://open.spotify.com/playlist/4IlbP26s8HFFvcjoYW8oUD",
   "albums": [
     {
+      "kind": "song",
       "album": "This Is How Tomorrow Moves",
       "artist": "beabadoobee",
       "year": "2024",
@@ -10,30 +11,31 @@
       "cover": "/assets/music/01.jpg"
     },
     {
+      "kind": "album",
       "album": "HIT ME HARD AND SOFT",
       "artist": "Billie Eilish",
       "year": "2024",
-      "song": "WILDFLOWER",
-      "spotify": "https://open.spotify.com/track/3QaPy1KgI7nu9FJEQUgn6h",
+      "spotify": "https://open.spotify.com/album/7aJuG4TFXa2hmE4z1yxc3n",
       "cover": "/assets/music/02.jpg"
     },
     {
+      "kind": "album",
       "album": "Alter Ego",
       "artist": "LISA",
       "year": "2025",
-      "song": "Born Again (feat. Doja Cat & RAYE)",
-      "spotify": "https://open.spotify.com/track/7KNmIjcmGJIBrhP2s5Vioe",
+      "spotify": "https://open.spotify.com/album/5eoWRkeplmcCL97afSMJVm",
       "cover": "/assets/music/03.jpg"
     },
     {
+      "kind": "album",
       "album": "4eva Is A Mighty Long Time",
       "artist": "Big K.R.I.T.",
       "year": "2017",
-      "song": "Big Bank (feat. T.I.)",
-      "spotify": "https://open.spotify.com/track/6wScCdGt2OkrrOP5kINDDF",
+      "spotify": "https://open.spotify.com/album/4vPCCjXRWZsZaJXgwLoMBC",
       "cover": "/assets/music/04.jpg"
     },
     {
+      "kind": "song",
       "album": "Rockstar",
       "artist": "LISA",
       "year": "2024",
@@ -42,30 +44,32 @@
       "cover": "/assets/music/05.jpg"
     },
     {
+      "kind": "album",
       "album": "Around the Fur",
       "artist": "Deftones",
       "year": "1997",
-      "song": "Around the Fur",
-      "spotify": "https://open.spotify.com/track/3Fwe3XoPOiyWUPYdBKMTqV",
+      "spotify": "https://open.spotify.com/album/7o4UsmV37Sg5It2Eb7vHzu",
       "cover": "/assets/music/06.jpg"
     },
     {
+      "kind": "album",
       "album": "Melodrama",
       "artist": "Lorde",
       "year": "2017",
-      "song": "Green Light",
-      "spotify": "https://open.spotify.com/track/6ie2Bw3xLj2JcGowOlcMhb",
+      "spotify": "https://open.spotify.com/album/2B87zXm9bOWvAJdkJBTpzF",
       "cover": "/assets/music/07.jpg"
     },
     {
+      "kind": "song",
       "album": "Currents",
       "artist": "Tame Impala",
       "year": "2015",
-      "song": "The Less I Know The Better",
-      "spotify": "https://open.spotify.com/track/6K4t31amVTZDgR3sKmwUJJ",
+      "song": "New Person, Same Old Mistakes",
+      "spotify": "https://open.spotify.com/track/52ojopYMUzeNcudsoz7O9D",
       "cover": "/assets/music/08.jpg"
     },
     {
+      "kind": "song",
       "album": "IGOR",
       "artist": "Tyler, The Creator",
       "year": "2019",
@@ -74,6 +78,7 @@
       "cover": "/assets/music/09.jpg"
     },
     {
+      "kind": "song",
       "album": "BALLADS 1",
       "artist": "Joji",
       "year": "2018",
@@ -82,6 +87,7 @@
       "cover": "/assets/music/10.jpg"
     },
     {
+      "kind": "song",
       "album": "SOS",
       "artist": "SZA",
       "year": "2022",
@@ -90,30 +96,43 @@
       "cover": "/assets/music/11.jpg"
     },
     {
+      "kind": "song",
       "album": "MM..FOOD",
       "artist": "MF DOOM",
       "year": "2004",
-      "song": "Rapp Snitch Knishes",
-      "spotify": "https://open.spotify.com/track/5KUNwkaNf8l5A9sXZhiCgI",
-      "cover": "/assets/music/12.jpg"
+      "song": "One Beer",
+      "spotify": "https://open.spotify.com/track/4BnrGx9tWNF8aiXl1UhDBa",
+      "cover": "/assets/music/12.jpg",
+      "sound": {
+        "src": "/assets/sound/mf-doom-one-beer.mp3",
+        "song": "One Beer",
+        "spotify": "https://open.spotify.com/track/4BnrGx9tWNF8aiXl1UhDBa"
+      }
     },
     {
+      "kind": "album",
       "album": "Madvillainy",
       "artist": "Madvillain",
       "year": "2004",
-      "song": "All Caps",
-      "spotify": "https://open.spotify.com/track/21O0XXPEWPtePt5RMY93Ob",
+      "spotify": "https://open.spotify.com/album/19bQiwEKhXUBJWY6oV3KZk",
       "cover": "/assets/music/13.jpg"
     },
     {
+      "kind": "song",
       "album": "Who Really Cares",
       "artist": "TV Girl",
       "year": "2016",
       "song": "Taking What's Not Yours",
       "spotify": "https://open.spotify.com/track/53mChDyESfwn9Dz8poHRf6",
-      "cover": "/assets/music/14.jpg"
+      "cover": "/assets/music/14.jpg",
+      "sound": {
+        "src": "/assets/sound/tv-girl-taking-what-s-not-yours.mp3",
+        "song": "Taking What's Not Yours",
+        "spotify": "https://open.spotify.com/track/53mChDyESfwn9Dz8poHRf6"
+      }
     },
     {
+      "kind": "song",
       "album": "CHROMAKOPIA",
       "artist": "Tyler, The Creator",
       "year": "2024",
@@ -122,6 +141,7 @@
       "cover": "/assets/music/15.jpg"
     },
     {
+      "kind": "song",
       "album": "Demon Days",
       "artist": "Gorillaz",
       "year": "2005",
@@ -130,14 +150,20 @@
       "cover": "/assets/music/16.jpg"
     },
     {
+      "kind": "album",
       "album": "Discovery",
       "artist": "Daft Punk",
       "year": "2001",
-      "song": "One More Time",
-      "spotify": "https://open.spotify.com/track/0DiWol3AO6WpXZgp0goxAV",
-      "cover": "/assets/music/17.jpg"
+      "spotify": "https://open.spotify.com/album/2noRn2Aes5aoNVsU6iWThc",
+      "cover": "/assets/music/17.jpg",
+      "sound": {
+        "src": "/assets/sound/daft-punk-crescendolls.mp3",
+        "song": "Crescendolls",
+        "spotify": "https://open.spotify.com/track/6vuPZX9fWESg5js2JFTQRJ"
+      }
     },
     {
+      "kind": "song",
       "album": "STONE OCEAN",
       "artist": "ichigo from 岸田教団&THE明星ロケッツ",
       "year": "2021",
@@ -146,14 +172,7 @@
       "cover": "/assets/music/18.jpg"
     },
     {
-      "album": "Toys In The Attic",
-      "artist": "Aerosmith",
-      "year": "1975",
-      "song": "Toys In The Attic",
-      "spotify": "https://open.spotify.com/track/4pj8ElgSWmmy5LT9a7jb0s",
-      "cover": "/assets/music/19.jpg"
-    },
-    {
+      "kind": "song",
       "album": "ASHES OF GHOST$",
       "artist": "SAGEISKAMI",
       "year": "2021",
@@ -162,6 +181,7 @@
       "cover": "/assets/music/20.jpg"
     },
     {
+      "kind": "song",
       "album": "The Secret of Us (Deluxe)",
       "artist": "Gracie Abrams",
       "year": "2024",
@@ -170,14 +190,21 @@
       "cover": "/assets/music/21.jpg"
     },
     {
+      "kind": "song",
       "album": "Drama - The 4th Mini Album",
       "artist": "aespa",
       "year": "2023",
       "song": "Drama",
       "spotify": "https://open.spotify.com/track/5XWlyfo0kZ8LF7VSyfS4Ew",
-      "cover": "/assets/music/22.jpg"
+      "cover": "/assets/music/22.jpg",
+      "sound": {
+        "src": "/assets/sound/aespa-drama.mp3",
+        "song": "Drama",
+        "spotify": "https://open.spotify.com/track/5XWlyfo0kZ8LF7VSyfS4Ew"
+      }
     },
     {
+      "kind": "song",
       "album": "Requiem",
       "artist": "keshi",
       "year": "2024",
@@ -186,36 +213,49 @@
       "cover": "/assets/music/23.jpg"
     },
     {
+      "kind": "album",
       "album": "Bewitched",
       "artist": "Laufey",
       "year": "2023",
-      "song": "Nocturne (Interlude)",
-      "spotify": "https://open.spotify.com/track/2dcPutROdT0VLw2ajhBwTc",
+      "spotify": "https://open.spotify.com/album/1rpCHilZQkw84A3Y9czvMO",
       "cover": "/assets/music/24.jpg",
       "sound": {
         "src": "/assets/sound/promise.mp3",
-        "label": "promise",
         "song": "Promise",
-        "spotify": "https://open.spotify.com/track/08PdFBcXzpkn1cWNgmKqhn"
+        "spotify": "https://open.spotify.com/track/08PdFBcXzpkn1cWNgmKqhn",
+        "label": "promise"
       }
     },
     {
+      "kind": "song",
       "album": "Watermark",
       "artist": "Enya",
       "year": "1988",
       "song": "Orinoco Flow",
       "spotify": "https://open.spotify.com/track/14EUcXXpqrC03Dzzdj8bGr",
-      "cover": "/assets/music/25.jpg"
+      "cover": "/assets/music/25.jpg",
+      "sound": {
+        "src": "/assets/sound/enya-orinoco-flow.mp3",
+        "song": "Orinoco Flow",
+        "spotify": "https://open.spotify.com/track/14EUcXXpqrC03Dzzdj8bGr"
+      }
     },
     {
+      "kind": "song",
       "album": "CAN'T STOP NOW",
       "artist": "Joey Valence & Brae",
       "year": "2023",
       "song": "CAN'T STOP NOW",
       "spotify": "https://open.spotify.com/track/1YmLbryGwdP25VbPqzizbC",
-      "cover": "/assets/music/26.jpg"
+      "cover": "/assets/music/26.jpg",
+      "sound": {
+        "src": "/assets/sound/joey-valence-brae-can-t-stop-now.mp3",
+        "song": "CAN'T STOP NOW",
+        "spotify": "https://open.spotify.com/track/1YmLbryGwdP25VbPqzizbC"
+      }
     },
     {
+      "kind": "song",
       "album": "I feel",
       "artist": "i-dle",
       "year": "2023",
@@ -224,14 +264,15 @@
       "cover": "/assets/music/27.jpg"
     },
     {
+      "kind": "album",
       "album": "An Awesome Wave",
       "artist": "alt-J",
       "year": "2012",
-      "song": "Tessellate",
-      "spotify": "https://open.spotify.com/track/1o22EcqsCANhwYdaNOSdwS",
+      "spotify": "https://open.spotify.com/album/6k3vC8nep1BfqAIJ81L6OL",
       "cover": "/assets/music/28.jpg"
     },
     {
+      "kind": "song",
       "album": "lowkey",
       "artist": "NIKI",
       "year": "2019",
@@ -240,12 +281,277 @@
       "cover": "/assets/music/29.jpg"
     },
     {
+      "kind": "song",
       "album": "Illmatic",
       "artist": "Nas",
       "year": "1994",
       "song": "N.Y. State of Mind",
       "spotify": "https://open.spotify.com/track/0trHOzAhNpGCsGBEu7dOJo",
       "cover": "/assets/music/30.jpg"
+    },
+    {
+      "kind": "album",
+      "album": "Submarine",
+      "artist": "The Marías",
+      "year": "2024",
+      "spotify": "https://open.spotify.com/album/03guxdOi12XJbnvxvxbpwG",
+      "cover": "/assets/music/the-mari-as-submarine.jpg",
+      "sound": {
+        "src": "/assets/sound/the-marias-lejos-de-ti.mp3",
+        "song": "Lejos de Ti",
+        "spotify": "https://open.spotify.com/track/0phzfJn8NeT1LkbqfV2peI"
+      }
+    },
+    {
+      "kind": "album",
+      "album": "CINEMA",
+      "artist": "The Marías",
+      "year": "2021",
+      "spotify": "https://open.spotify.com/album/5TkaDC4mYSLBvdG6UrIB0v",
+      "cover": "/assets/music/the-mari-as-cinema.jpg",
+      "sound": {
+        "src": "/assets/sound/the-marias-just-a-feeling.mp3",
+        "song": "Just a Feeling",
+        "spotify": "https://open.spotify.com/track/0ZjTXCk5QKDR0wGGPgqSS3"
+      }
+    },
+    {
+      "kind": "album",
+      "album": "FIRESTARTER",
+      "artist": "K/DA & League of Legends Music",
+      "year": "2026",
+      "spotify": "https://open.spotify.com/album/1yz28fnKHjF4Yr06M6oCep",
+      "cover": "/assets/music/k-da-league-of-legends-music-firestarter-ep.jpg",
+      "sound": {
+        "src": "/assets/sound/k-da-league-of-legends-music-firestarter-feat-so.mp3",
+        "song": "FIRESTARTER (feat. Sophie Powers, MIYEON & SOYEON)",
+        "spotify": "https://open.spotify.com/track/6UeSC8jEhf9XmUL8EX2rni"
+      }
+    },
+    {
+      "kind": "album",
+      "album": "SaWaDiKa",
+      "artist": "LISA",
+      "year": "2026",
+      "spotify": "https://open.spotify.com/album/5WG9kRKPpHgnZ5pKku509O",
+      "cover": "/assets/music/lisa-sawadika-single.jpg",
+      "sound": {
+        "src": "/assets/sound/lisa-sawadika.mp3",
+        "song": "SaWaDiKa",
+        "spotify": "https://open.spotify.com/track/1VWiDyYTrqQhhmnWANWkFa"
+      }
+    },
+    {
+      "kind": "song",
+      "album": "Bauchnabelpiercing",
+      "artist": "LOKIMITDERMASKE",
+      "year": "2024",
+      "song": "Bauchnabelpiercing",
+      "spotify": "https://open.spotify.com/track/4ZKwUSQNvpU2XRIoYi4Bcg",
+      "cover": "/assets/music/lokimitdermaske-bauchnabelpiercing-single.jpg"
+    },
+    {
+      "kind": "album",
+      "album": "NewJeans 1st EP 'New Jeans'",
+      "artist": "NewJeans",
+      "year": "2022",
+      "spotify": "https://open.spotify.com/album/1HMLpmZAnNyl9pxvOnTovV",
+      "cover": "/assets/music/newjeans-newjeans-1st-ep-new-jeans.jpg"
+    },
+    {
+      "kind": "album",
+      "album": "Loveland",
+      "artist": "Suki Waterhouse",
+      "year": "2026",
+      "spotify": "https://open.spotify.com/album/3fnrOzZsn9MnYR5NMVyYv1",
+      "cover": "/assets/music/suki-waterhouse-loveland.jpg",
+      "sound": {
+        "src": "/assets/sound/suki-waterhouse-loveland.mp3",
+        "song": "Loveland",
+        "spotify": "https://open.spotify.com/track/0i0QWEnQAhJDSUP4p8CWHR"
+      }
+    },
+    {
+      "kind": "album",
+      "album": "LEMONADE - The 2nd Album (NINGNING Special Version)",
+      "artist": "aespa",
+      "year": "2026",
+      "spotify": "https://open.spotify.com/album/437o5FFGCf3CszTjO3wVAi",
+      "cover": "/assets/music/aespa-lemonade-the-2nd-album-ningning-special-version.jpg",
+      "sound": {
+        "src": "/assets/sound/aespa-lemonade.mp3",
+        "song": "LEMONADE",
+        "spotify": "https://open.spotify.com/track/1Hv8KIKhK6Dz02ROKT63lV"
+      }
+    },
+    {
+      "kind": "song",
+      "album": "You Are Special",
+      "artist": "Mister Rogers",
+      "year": "1992",
+      "song": "Won't You Be My Neighbor?",
+      "spotify": "https://open.spotify.com/track/4Bt5kj0gBsi8YIzoYTnt7E",
+      "cover": "/assets/music/mister-rogers-you-are-special.jpg",
+      "sound": {
+        "src": "/assets/sound/mister-rogers-won-t-you-be-my-neighbor.mp3",
+        "song": "Won't You Be My Neighbor?",
+        "spotify": "https://open.spotify.com/track/4Bt5kj0gBsi8YIzoYTnt7E"
+      }
+    },
+    {
+      "kind": "album",
+      "album": "LAB SONGS NG MGA TANGA",
+      "artist": "Janine Berdin",
+      "year": "2025",
+      "spotify": "https://open.spotify.com/album/3CvI8CDpDzz6Q2nDuXWKXs",
+      "cover": "/assets/music/janine-berdin-lab-songs-ng-mga-tanga.jpg",
+      "sound": {
+        "src": "/assets/sound/janine-berdin-tayo-lang-may-alam-feat-illest-mor.mp3",
+        "song": "tayo lang (may alam) [feat. Illest Morena & Fana] [Bonus Track]",
+        "spotify": "https://open.spotify.com/track/5I37IJm4uUoUOP3V09ry8X"
+      }
+    },
+    {
+      "kind": "album",
+      "album": "FILM NOIR",
+      "artist": "Faouzia",
+      "year": "2025",
+      "spotify": "https://open.spotify.com/album/0FffqcK2whBazSFcAIxebQ",
+      "cover": "/assets/music/faouzia-film-noir.jpg",
+      "sound": {
+        "src": "/assets/sound/faouzia-lost-my-mind-in-paris.mp3",
+        "song": "LOST MY MIND IN PARIS",
+        "spotify": "https://open.spotify.com/track/1p7HFcNMWbxEndrxP5sU1d"
+      }
+    },
+    {
+      "kind": "album",
+      "album": "WOR$T GIRL IN AMERICA",
+      "artist": "Slayyyter",
+      "year": "2025",
+      "spotify": "https://open.spotify.com/album/5siV9C6eK0NpAqER2FfCVA",
+      "cover": "/assets/music/slayyyter-wor-t-girl-in-america.jpg",
+      "sound": {
+        "src": "/assets/sound/slayyyter-dance.mp3",
+        "song": "DANCE...",
+        "spotify": "https://open.spotify.com/track/6Xp2Zm2sJLdODReZWBBifO"
+      }
+    },
+    {
+      "kind": "album",
+      "album": "SUPERLAME",
+      "artist": "INJI",
+      "year": "2025",
+      "spotify": "https://open.spotify.com/album/7E5My62HQLSG3cn6R2FnG9",
+      "cover": "/assets/music/inji-superlame.jpg"
+    },
+    {
+      "kind": "song",
+      "album": "Ruby",
+      "artist": "JENNIE",
+      "year": "2025",
+      "song": "like JENNIE",
+      "spotify": "https://open.spotify.com/track/0fK7ie6XwGxQTIkpFoWkd1",
+      "cover": "/assets/music/jennie-ruby.jpg",
+      "sound": {
+        "src": "/assets/sound/jennie-like-jennie.mp3",
+        "song": "like JENNIE",
+        "spotify": "https://open.spotify.com/track/0fK7ie6XwGxQTIkpFoWkd1"
+      }
+    },
+    {
+      "kind": "album",
+      "album": "Marathon (Original Soundtrack EP)",
+      "artist": "Ryan Lott",
+      "year": "2026",
+      "spotify": "https://open.spotify.com/album/4O2qtNr0ir4SGFloL0rxny",
+      "cover": "/assets/music/ryan-lott-marathon-original-soundtrack-ep.jpg",
+      "sound": {
+        "src": "/assets/sound/ryan-lott-rhythm-of-writhing-constellations.mp3",
+        "song": "Rhythm of Writhing Constellations",
+        "spotify": "https://open.spotify.com/track/01diEYaB9yNAwcegfBB5oF"
+      }
+    },
+    {
+      "kind": "album",
+      "album": "TRON: Legacy - The Complete Edition (Original Motion Picture Soundtrack)",
+      "artist": "Daft Punk",
+      "year": "2010",
+      "spotify": "https://open.spotify.com/album/3AMXFnwHWXCvNr5NCCpLZI",
+      "cover": "/assets/music/daft-punk-tron-legacy-the-complete-edition-original-motion-picture-sou.jpg",
+      "sound": {
+        "src": "/assets/sound/daft-punk-the-son-of-flynn.mp3",
+        "song": "The Son of Flynn",
+        "spotify": "https://open.spotify.com/track/3zL0LAsSh3dTO73dSOKWkr"
+      }
+    },
+    {
+      "kind": "album",
+      "album": "A Matter of Time (Standard Edition)",
+      "artist": "Laufey",
+      "year": "2025",
+      "spotify": "https://open.spotify.com/album/6XNo6YH5cqJOWRAhA8zw18",
+      "cover": "/assets/music/laufey-a-matter-of-time-standard-edition.jpg",
+      "sound": {
+        "src": "/assets/sound/laufey-sabotage.mp3",
+        "song": "Sabotage",
+        "spotify": "https://open.spotify.com/track/7L7C0iZgKCYJukDYtADSZ9"
+      }
+    },
+    {
+      "kind": "song",
+      "album": "Killshot (Slowed + Reverb)",
+      "artist": "Magdalena Bay",
+      "year": "2021",
+      "song": "Killshot (Slowed + Reverb)",
+      "spotify": "https://open.spotify.com/track/6pdyvJQkPkwo2WoDH7tFHO",
+      "cover": "/assets/music/magdalena-bay-killshot-slowed-reverb-single.jpg",
+      "sound": {
+        "src": "/assets/sound/magdalena-bay-killshot-slowed-reverb.mp3",
+        "song": "Killshot (Slowed + Reverb)",
+        "spotify": "https://open.spotify.com/track/6pdyvJQkPkwo2WoDH7tFHO"
+      }
+    },
+    {
+      "kind": "album",
+      "album": "NEON GENESIS EVANGELION (Original Series Soundtrack)",
+      "artist": "Shiro SAGISU",
+      "year": "1995",
+      "spotify": "https://open.spotify.com/album/4vwgTxjKwiSWfEoGOqhiWa",
+      "cover": "/assets/music/shiro-sagisu-neon-genesis-evangelion-original-series-soundtrack.jpg",
+      "sound": {
+        "src": "/assets/sound/shiro-sagisu-decisive-battle.mp3",
+        "song": "Decisive Battle",
+        "spotify": "https://open.spotify.com/track/0b4VXGGERGs9PyvIEJRDnI"
+      }
+    },
+    {
+      "kind": "song",
+      "album": "Romance (Deluxe Edition)",
+      "artist": "Fontaines D.C.",
+      "year": "2024",
+      "song": "Starburster",
+      "spotify": "https://open.spotify.com/track/0NIu0jXkwFLK5Y71xTP31V",
+      "cover": "/assets/music/fontaines-d-c-romance-deluxe-edition.jpg",
+      "sound": {
+        "src": "/assets/sound/fontaines-d-c-starburster.mp3",
+        "song": "Starburster",
+        "spotify": "https://open.spotify.com/track/0NIu0jXkwFLK5Y71xTP31V"
+      }
+    },
+    {
+      "kind": "song",
+      "album": "Metaphorical Music",
+      "artist": "Nujabes",
+      "year": "2003",
+      "song": "Lady Brown (feat. Cise Starr)",
+      "spotify": "https://open.spotify.com/track/0JL9TZip7mL7iwC5EOkALS",
+      "cover": "/assets/music/nujabes-metaphorical-music.jpg",
+      "sound": {
+        "src": "/assets/sound/nujabes-lady-brown-feat-cise-starr.mp3",
+        "song": "Lady Brown (feat. Cise Starr)",
+        "spotify": "https://open.spotify.com/track/0JL9TZip7mL7iwC5EOkALS"
+      }
     }
   ]
 }
