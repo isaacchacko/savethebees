@@ -64,10 +64,11 @@
       "folderDefaultState": "open",
       "order": [
         "about",
-        "music",
         "now",
         "blog",
-        "library",
+        "collections",
+        "collections/music",
+        "collections/websites",
         "running",
         "arch"
       ]

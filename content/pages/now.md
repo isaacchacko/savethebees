@@ -2,6 +2,13 @@
 
 this is a [now page](https://nownownow.com/about).
 
+### 10/25/2026
+
+- made this website with [basalt](https://basalt.isaacchacko.com)!
+- met up with an old friend from 8 years ago, how crazy is that
+- im going to die to marathon training
+- though i was never good at it, i miss competitive programming
+
 ### 08/18/2026
 
 - had my friends visit me in sf + went to muir woods!

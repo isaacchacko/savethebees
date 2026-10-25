@@ -1,5 +1,6 @@
 ---
-title: library
+title: websites
+aliases: [library]
 description: "the bookshelf: things i find and want to keep."
 ---
 

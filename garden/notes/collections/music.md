@@ -1,5 +1,6 @@
 ---
 title: music
+aliases: [music]
 description: favorite albums, as a wall of covers.
 ---
 
