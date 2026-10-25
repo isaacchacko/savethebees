@@ -56,6 +56,44 @@
     },
     "components": {
       "meta": "dated"
+    },
+    "explorer": {
+      "order": [
+        "about",
+        "now",
+        "blog",
+        "library",
+        "running",
+        "arch"
+      ]
+    },
+    "feed": {
+      "folders": [
+        "blog"
+      ]
     }
+  },
+  "strings": {
+    "explorer": "the garden",
+    "menu": "the garden",
+    "search": "search",
+    "searchPlaceholder": "search for something",
+    "tags": "tags",
+    "tag": "tagged {tag}",
+    "tagCount": "{n} tag in all|{n} tags in all",
+    "taggedCount": "{n} note with this tag|{n} notes with this tag",
+    "showingFirst": ", showing the first {n}",
+    "noTags": "no tags yet.",
+    "folderCount": "{n} item under this folder|{n} items under this folder",
+    "notFound": "not here",
+    "notFoundBody": "either this page is private or it doesn't exist.",
+    "backToStart": "back to the start.",
+    "madeWith": "made with",
+    "minRead": "{n} min read",
+    "contents": "contents",
+    "graph": "graph view",
+    "backlinks": "linked from",
+    "theme": "switch theme",
+    "feed": "the last {n} posts on {title}"
   }
 }

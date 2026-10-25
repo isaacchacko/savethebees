@@ -183,6 +183,11 @@ article {
   color: var(--dark);
 }
 
+// recent writing: a title's underline is as long as the title, not its row
+article .note-list li > a {
+  justify-self: start;
+}
+
 // the blog's folder page
 .page-listing ul.section-ul {
   border-top: 1px solid var(--lightgray);
