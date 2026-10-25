@@ -21,8 +21,9 @@ const left = [
   Component.PageTitle(),
   Component.Island({ name: "sf-clock", inline: false, fallback: "sf" }),
   Component.MobileOnly(Component.Spacer()),
-  Component.Flex({ components: [{ Component: Component.Darkmode() }] }),
   explorer,
+  // the bottom tray: the theme toggle
+  Component.Flex({ components: [{ Component: Component.Darkmode() }] }),
 ]
 
 export const sharedPageComponents: SharedLayout = {

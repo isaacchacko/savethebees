@@ -72,6 +72,8 @@ const config: QuartzConfig = {
       Plugin.CrawlLinks({ markdownLinkResolution: "shortest" }),
       Plugin.Embeds(),
       Plugin.Islands(),
+      // footnotes and asides in the margin, after Tufte
+      Plugin.MarginNotes(),
       Plugin.Description(),
       Plugin.Latex({ renderEngine: "katex" }),
     ],
