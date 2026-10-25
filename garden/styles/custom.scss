@@ -303,22 +303,6 @@ article .note-list li > a {
   }
 }
 
-.copy-btn {
-  padding: 0.05rem 0.5rem;
-  border: 1px solid var(--lightgray);
-  border-radius: 5px;
-  background: transparent;
-  color: var(--darkgray);
-  font: 500 0.8rem var(--bodyFont);
-  cursor: pointer;
-  vertical-align: 0.1em;
-
-  &:hover {
-    border-color: var(--tertiary);
-    color: var(--tertiary);
-  }
-}
-
 // now playing: a dot that breathes, and the track on hover
 .now-playing {
   min-height: 1.7em;

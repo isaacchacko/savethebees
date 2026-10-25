@@ -12,7 +12,7 @@ npm run garden              # build to garden/.basalt/public
 | `basalt.json` | where the notes come from: `notes/` here, plus `content/pages`, `content/dumps` (as `blog/`), `content/cool.json` and `public/`, which the chrome extension and the next.js site use. Nothing is copied, so the extension's edits show up on the next build |
 | `quartz.config.ts`, `quartz.layout.ts` | the site's Quartz config and layout: the garden's palette and fonts, explorer, search, and isaacchacko/graph's graph view |
 | `notes/` | the pages only the garden has: home, arch, library, the blog's index |
-| `islands/` | the interactive bits, in preact: the surf behind every page (a webgl dither of `notes/assets/waves.mp4` in the theme's colours), the time in sf (a line under the home page's title), now playing (from the live site's api), the copy button, and the library, which is rendered at build time from cool.json and gets a filter in the browser |
+| `islands/` | the interactive bits, in preact: the surf behind every page (a webgl dither of `notes/assets/waves.mp4` in the theme's colours), the time in sf (a line under the home page's title), now playing (from the live site's api), and the library, which is rendered at build time from cool.json and gets a filter in the browser |
 | `plugins/notes.ts` | a page's leading `# title` becomes its title; `private: true` keeps a dump off the site |
 | `styles/custom.scss` | the garden's colours in Basalt's look (Fraunces, hexagons, the arrival motion), on Quartz's markup |
 

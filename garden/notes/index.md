@@ -7,7 +7,7 @@ the time in san francisco is <island name="sf-clock" load="eager"></island>
 
 cs/math at [a&m](https://aggier.ing) + founding eng at [dryft](https://dryft.ai) + hackathons at [tidal](https://tidaltamu.com). previously at [siso](https://siso-eng.com).
 
-i love to yap! reach me at isaac.chacko05@gmail.com <island name="copy" value="isaac.chacko05@gmail.com" load="eager"></island>
+i love to yap! reach me at <copy>isaac.chacko05@gmail.com</copy>
 
 <island name="now-playing" load="eager"></island>
 
