@@ -207,65 +207,11 @@ article .note-list li > a {
 // the margin on hover: a faint dotted underline says there's something to see
 // (a link is underlined already)
 article span:is([title], [data-tip]):not(.copyable),
-article :is(.side-photo, .side-sound):not(:has(> a)) {
+article .side-photo:not(:has(> a)) {
   text-decoration: underline dotted color-mix(in srgb, var(--gray) 70%, transparent);
   text-decoration-thickness: 1.5px;
   text-underline-offset: 0.2em;
   cursor: help;
-}
-
-// a word with a sound plays it on click: a small ♪ after it, in the accent
-// while it plays
-article .side-sound {
-  &::after {
-    content: "♪";
-    margin-left: 0.12em;
-    font-size: 0.75em;
-    vertical-align: 0.3em;
-    color: var(--gray);
-  }
-
-  &.is-playing,
-  &.is-playing::after {
-    color: var(--tertiary);
-  }
-}
-
-// a sound's card in the margin: a row per clip, ▶ and its name; click to play
-.margin .sound-row {
-  display: flex;
-  gap: 0.5rem;
-  align-items: baseline;
-  margin-top: 0.4rem;
-  padding: 0.3rem 0.5rem;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  color: var(--darkgray);
-  cursor: pointer;
-
-  &::before {
-    content: "▶";
-    font-size: 0.75em;
-    color: var(--gray);
-  }
-
-  &::after {
-    content: attr(data-label);
-  }
-
-  &:hover,
-  &:focus-visible {
-    background: var(--highlight);
-  }
-
-  &.is-playing {
-    color: var(--tertiary);
-
-    &::before {
-      content: "❚❚";
-      color: var(--tertiary);
-    }
-  }
 }
 
 // ---------- islands ----------
@@ -437,9 +383,10 @@ article [data-secondary] {
   }
 }
 
-// room under the cover, so it doesn't sit on the card's edge
+// room under the cover, so it doesn't sit on the card's edge (with Basalt's
+// own 0.4rem under every card)
 .margin .spotify-card {
-  padding-bottom: 0.75rem;
+  padding-bottom: 0.35rem;
 }
 
 .shelf-shot {
