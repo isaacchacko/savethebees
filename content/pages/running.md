@@ -1,9 +1,9 @@
-# running
+# Running
 
-running is nice! wish i was faster so i could fit my runs in more.
+Running is nice! Wish I was faster so I could fit my runs in more.
 
-- 2022: sf half
-- 2023: aramco half
-- 2026: aramco half w/ my friends shoutout boping andrew akhila william ishaan
-- 2027: chevron full w/ boping
-- 2027: blue bell half w/ team
+- 2022: SF Half
+- 2023: Aramco Half
+- 2026: Aramco Half w/ my friends shoutout Boping Andrew Akhila William Ishaan
+- 2027: Chevron Full w/ Boping
+- 2027: Blue Bell Half w/ team

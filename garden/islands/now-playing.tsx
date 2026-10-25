@@ -47,7 +47,7 @@ export default function NowPlaying({ api = "https://isaacchacko.com/api/spotify/
       {" and "}
       <span class="spotify-trigger" tabIndex={0}>
         <span class="spotify-dot" />
-        i&rsquo;m listening to music rn!
+        I&rsquo;m listening to music rn!
         <span
           class="spotify-card"
           data-secondary="now playing"

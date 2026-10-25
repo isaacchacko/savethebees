@@ -1,37 +1,37 @@
 ---
-title: arch linux & ricing
-description: "my setup: arch, hyprland, kitty, lazyvim."
+title: Arch Linux & ricing
+description: "My setup: Arch, Hyprland, kitty, LazyVim."
 ---
 
-check out my setup!
+Check out my setup!
 
-![[rice.mp4|my rice, in motion]]
+![[rice.mp4|My rice, in motion]]
 
-### stack & workflow
+### Stack & workflow
 
-- os: [arch](https://archlinux.org/) with [hyprland](https://hypr.land/)
-- terminal: [kitty](https://sw.kovidgoyal.net/kitty/)
-- ide: [lazyvim](http://www.lazyvim.org/), a batteries-included neovim distribution
-- status bar: [waybar](https://waybar.org/)
+- OS: [Arch](https://archlinux.org/) with [Hyprland](https://hypr.land/)
+- Terminal: [kitty](https://sw.kovidgoyal.net/kitty/)
+- IDE: [LazyVim](http://www.lazyvim.org/), a batteries-included Neovim distribution
+- Status bar: [Waybar](https://waybar.org/)
 
-### tools worth naming
+### Tools worth naming
 
-- [yazi](https://yazi-rs.github.io/) for vim-style browsing in the terminal
+- [Yazi](https://yazi-rs.github.io/) for vim-style browsing in the terminal
 - [lsd](https://github.com/lsd-rs/lsd) for prettier ls output with colors and icons
 - [fastfetch](https://github.com/fastfetch-cli/fastfetch) to replace neofetch
 - [nsxiv](https://github.com/nsxiv/nsxiv) for my wallpaper selector
 - [pywal](https://github.com/dylanaraps/pywal) to generate color schemes
 
-### wallpapers & colors
+### Wallpapers & colors
 
-i pull wallpapers from [wallhaven.cc](https://wallhaven.cc) and sync palettes across apps.
+I pull wallpapers from [wallhaven.cc](https://wallhaven.cc) and sync palettes across apps.
 
-### more reading
+### More reading
 
-- curated setups and inspiration live on communities like [reddit](https://www.reddit.com/r/unixporn/)
-- nice nerd fonts and glyphs to choose from over at [nerdfonts.com](https://www.nerdfonts.com/#home)
-- nice neovim plugins and colorschemes at [nvim.store](https://nvim.store/)
+- Curated setups and inspiration live on communities like [Reddit](https://www.reddit.com/r/unixporn/)
+- Nice Nerd Fonts and glyphs to choose from over at [nerdfonts.com](https://www.nerdfonts.com/#home)
+- Nice Neovim plugins and colorschemes at [nvim.store](https://nvim.store/)
 
-### dotfiles?
+### Dotfiles?
 
-sorry for gatekeeping my configuration files! i've never gotten around to cleaning them up and uploading them, so they're on request for now.
+Sorry for gatekeeping my configuration files! I've never gotten around to cleaning them up and uploading them, so they're on request for now.

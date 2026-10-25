@@ -43,7 +43,7 @@ export default function Library({ data }: { data: { lists: List[] } }) {
             <h2 id={list.id}>{list.title}</h2>
             {list.description ? <p>{list.description}</p> : null}
             {items.length === 0 ? (
-              <p class="sidebar-empty">empty for now.</p>
+              <p class="sidebar-empty">Empty for now.</p>
             ) : (
               <ul class="shelf">
                 {items.map((item) => {

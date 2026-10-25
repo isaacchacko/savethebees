@@ -1,22 +1,22 @@
 ---
-title: howdy!
+title: Howdy!
 description: Isaac Chacko — a little hypertext garden.
 ---
 
-the time in <span title="where i live now">san francisco</span> is <island name="sf-clock" load="eager"></island><island name="now-playing" load="eager"></island>
+The time in <span title="Where I live now">San Francisco</span> is <island name="sf-clock" load="eager"></island><island name="now-playing" load="eager"></island>
 
-cs/math at [a&m](https://aggier.ing) + founding eng at <span class="side-photo">[dryft](https://dryft.ai)<span data-secondary="photo" data-secondary-key="dryft" data-secondary-title="dryft" hidden><img src="/assets/side/dryft.png" alt="dryft's logo"></span></span> + hackathons at [tidal](https://tidaltamu.com). previously at [siso](https://siso-eng.com).
+CS/math at [A&M](https://aggier.ing) + founding eng at <span class="side-photo">[Dryft](https://dryft.ai)<span data-secondary="photo" data-secondary-key="dryft" data-secondary-title="Dryft" hidden><img src="/assets/side/dryft.png" alt="Dryft's logo"></span></span> + hackathons at [TIDAL](https://tidaltamu.com). Previously at [SISO](https://siso-eng.com).
 
-i love to yap! reach me at <copy>isaac.chacko05@gmail.com</copy>
+I love to yap! Reach me at <copy>isaac.chacko05@gmail.com</copy>
 
-## recent writing
+## Recent writing
 
 <note-list folder="blog" limit="4"></note-list>
 
-## subdomains
+## Subdomains
 
-- [graph](https://graph.isaacchacko.com): pretty graphs, quickly
-- [jobless](https://jobless.isaacchacko.com): am i jobless or jobful?
-- [basalt](https://basalt.isaacchacko.com): better quartz
+- [Graph](https://graph.isaacchacko.com): pretty graphs, quickly
+- [Jobless](https://jobless.isaacchacko.com): am I jobless or jobful?
+- [Basalt](https://basalt.isaacchacko.com): better Quartz
 
-<p class="signoff">- isaac</p>
+<p class="signoff">- Isaac</p>

@@ -1,4 +1,4 @@
-# about
+# About
 
 I'm an engineer from Texas A&M interested in making diegetic software experiences[^diegetic] for both devs and users.
 
@@ -12,4 +12,4 @@ AI writes a lot of my code now, and eventually it'll be able to do just about an
 
 I could be wrong, we'll see lol.
 
-[^diegetic]: The way I use "diegetic" here is a bit unorthodox. I hear "diegetic experiences" most from videogames, where it's common for developers to use "yellow paint" to explicitly indicate to the player what to do, rather than having the game explain itself naturally. In the same vein, I like writing experiences that are intuitive to use, and systems that are intuitive to develop next to and on top of: self-commenting code, self-healing user experiences, breadcrumbing, etc. For example, a simple, concise feature vocabulary tends to lead to simple, concise features.
+[^diegetic]: The way I use "diegetic" here is a bit unorthodox. I hear "diegetic experiences" most from videogames, where it's common for developers to use too much "yellow paint" to explicitly indicate to the player what to do, rather than having the game explain itself naturally. In the same vein, I like writing experiences that are intuitive to use, and systems that are intuitive to develop next to and on top of: self-commenting code, self-healing user experiences, breadcrumbing, etc. For example, a simple, concise feature vocabulary tends to lead to simple, concise features.

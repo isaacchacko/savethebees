@@ -1,4 +1,4 @@
 ---
 title: Collections
-description: "things i like and keep: music and websites."
+description: "Things I like and keep: music and websites."
 ---

@@ -1,20 +1,20 @@
 ---
-title: new additions oct 2026
+title: New additions Oct 2026
 date: 2026-10-13
-description: graphing how jobless i am
+description: Graphing how jobless I am
 ---
 
-two new things to the isaacchacko subdomains
+Two new things to the isaacchacko subdomains
 
-# graph
-link: [graph.isaacchacko.com](https://graph.isaacchacko.com)
+# Graph
+Link: [graph.isaacchacko.com](https://graph.isaacchacko.com)
 ![graph's editor: the source on the left, the solar system it draws on the right](/images/new-additions-oct-2026-mv6yffwq.webp)
-its just a clean roomed version of obsidian's graph view with an added editor. made it because i like graphs and i could plausibly use it in future cs classes idk. shadcn is a big carry
+Its just a clean roomed version of Obsidian's graph view with an added editor. Made it because I like graphs and I could plausibly use it in future CS classes idk. shadcn is a big carry
 
 
-# jobless
-link: [jobless.isaacchacko.com](https://jobless.isaacchacko.com)
+# Jobless
+Link: [jobless.isaacchacko.com](https://jobless.isaacchacko.com)
 ![jobless: the application counts over a sankey of where every listing went](/images/new-additions-oct-2026-mv6ygwz6.webp)
-a website to sankey graph track my summer 2027 application cycle! 
+A website to Sankey graph track my summer 2027 application cycle! 
 
-i always get a good laugh from the posts online of "bro i swiped right on 5k people, had 100 first dates, 2 second dates, and all rejections". while i wont be posting my dating wr any time soon, internships are a tame yet fair compromise.
+I always get a good laugh from the posts online of "bro i swiped right on 5k people, had 100 first dates, 2 second dates, and all rejections". While I wont be posting my dating WR any time soon, internships are a tame yet fair compromise.

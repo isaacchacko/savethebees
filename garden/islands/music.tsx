@@ -63,7 +63,7 @@ function Card({ a }: { a: Album }) {
         </>
       ) : null}
       <a class="music-spotify" href={a.spotify} target="_blank" rel="noopener noreferrer">
-        spotify ↗
+        Spotify ↗
       </a>
     </span>
   )

@@ -2,15 +2,15 @@
   "lists": [
     {
       "id": "webrings",
-      "title": "cool webrings",
+      "title": "Cool webrings",
       "description": "",
       "items": [
         {
           "id": "10da608e-ffc5-434a-9fdd-544f2285511b",
           "title": "SE Webring",
-          "label": "waterloo se",
+          "label": "Waterloo SE",
           "url": "https://se-webring.xyz/",
-          "note": "my initial inspiration <3",
+          "note": "My initial inspiration <3",
           "added": "2026-09-22",
           "shot": "/cool-shots/10da608e-ffc5-434a-9fdd-544f2285511b.webp",
           "shotW": 640,
@@ -21,7 +21,7 @@
           "title": "aggier.ing",
           "label": "aggier.ing",
           "url": "https://www.aggier.ing/",
-          "note": "i wonder who made this",
+          "note": "I wonder who made this",
           "added": "2026-09-22",
           "shot": "/cool-shots/ddf2f2c8-390f-4a40-85cd-a733a69ade04.webp",
           "shotW": 640,
@@ -31,7 +31,7 @@
     },
     {
       "id": "websites",
-      "title": "cool personal sites",
+      "title": "Cool personal sites",
       "description": "",
       "items": [
         {
@@ -58,15 +58,15 @@
     },
     {
       "id": "technologies",
-      "title": "aesthetic websites",
+      "title": "Aesthetic websites",
       "description": "",
       "items": [
         {
           "id": "087c5e33-040e-4e73-97d9-36c5e9f34e93",
           "title": "Bindwell — Building new pesticides with AI",
-          "label": "bindwell",
+          "label": "Bindwell",
           "url": "https://bindwell.ai/en-us",
-          "note": "virtual scrolling",
+          "note": "Virtual scrolling",
           "added": "2026-09-22",
           "shot": "/cool-shots/087c5e33-040e-4e73-97d9-36c5e9f34e93.webp",
           "shotW": 640,
@@ -75,7 +75,7 @@
         {
           "id": "8f023001-4963-4032-a8c2-e57a253ecbce",
           "title": "Home - TypeSafe AI",
-          "label": "typesafe",
+          "label": "Typesafe",
           "url": "https://typesafe.ai/",
           "note": "",
           "added": "2026-09-22",
@@ -87,7 +87,7 @@
           "id": "f9c2cca3-3193-44e6-84ac-1c28ed3d00a6",
           "title": "vit",
           "url": "https://vit-editor.vercel.app/",
-          "note": "git for davinci resolve",
+          "note": "Git for DaVinci Resolve",
           "added": "2026-09-21",
           "shot": "/cool-shots/f9c2cca3-3193-44e6-84ac-1c28ed3d00a6.webp",
           "shotW": 640,
@@ -97,15 +97,15 @@
     },
     {
       "id": "cool-visualizations",
-      "title": "cool visualizations",
+      "title": "Cool visualizations",
       "description": "",
       "items": [
         {
           "id": "529b0ef3-23c2-4a8e-a25b-29f1dccc587b",
           "title": "dryft kernels postmortem",
-          "label": "dryft kernels statistics",
+          "label": "Dryft kernels statistics",
           "url": "https://temporary-prompt-bayou-17mcid6.vercel.app/",
-          "note": "if you're curious, the competition was held [here](https://htn.dryft.ai) (edit: deployment spun down, link dead :/  )",
+          "note": "If you're curious, the competition was held [here](https://htn.dryft.ai) (edit: deployment spun down, link dead :/  )",
           "added": "2026-09-22",
           "shot": "/cool-shots/529b0ef3-23c2-4a8e-a25b-29f1dccc587b.webp",
           "shotW": 640,
@@ -115,14 +115,14 @@
     },
     {
       "id": "friends-websites",
-      "title": "friends' websites",
+      "title": "Friends' websites",
       "description": "",
       "items": [
         {
           "id": "274ad224-30f6-492b-a2d8-4cd083334388",
           "title": "Boping Li",
           "url": "https://bopingli.github.io/",
-          "note": "what a specimen",
+          "note": "What a specimen",
           "added": "2026-10-13",
           "shot": "/cool-shots/274ad224-30f6-492b-a2d8-4cd083334388.webp",
           "shotW": 640,

@@ -55,7 +55,7 @@
   },
   "layout": {
     "breadcrumbs": {
-      "rootName": "home"
+      "rootName": "Home"
     },
     "components": {
       "meta": "dated"
@@ -83,26 +83,26 @@
     }
   },
   "strings": {
-    "explorer": "the garden",
-    "menu": "the garden",
-    "search": "search",
-    "searchPlaceholder": "search for something",
-    "tags": "tags",
-    "tag": "tagged {tag}",
+    "explorer": "The garden",
+    "menu": "The garden",
+    "search": "Search",
+    "searchPlaceholder": "Search for something",
+    "tags": "Tags",
+    "tag": "Tagged {tag}",
     "tagCount": "{n} tag in all|{n} tags in all",
     "taggedCount": "{n} note with this tag|{n} notes with this tag",
     "showingFirst": ", showing the first {n}",
-    "noTags": "no tags yet.",
+    "noTags": "No tags yet.",
     "folderCount": "{n} item under this folder|{n} items under this folder",
-    "notFound": "not here",
-    "notFoundBody": "either this page is private or it doesn't exist.",
-    "backToStart": "back to the start.",
-    "madeWith": "made with",
+    "notFound": "Not here",
+    "notFoundBody": "Either this page is private or it doesn't exist.",
+    "backToStart": "Back to the start.",
+    "madeWith": "Made with",
     "minRead": "{n} min read",
-    "contents": "contents",
-    "graph": "graph view",
-    "backlinks": "linked from",
-    "theme": "switch theme",
-    "feed": "the last {n} posts on {title}"
+    "contents": "Contents",
+    "graph": "Graph view",
+    "backlinks": "Linked from",
+    "theme": "Switch theme",
+    "feed": "The last {n} posts on {title}"
   }
 }

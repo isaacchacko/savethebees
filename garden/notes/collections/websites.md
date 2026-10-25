@@ -1,9 +1,9 @@
 ---
-title: websites
+title: Websites
 aliases: [library]
-description: "the bookshelf: things i find and want to keep."
+description: "The bookshelf: things I find and want to keep."
 ---
 
-things i find and want to keep. i add them from chrome as i run into them, so this grows on its own.
+Things I find and want to keep. I add them from Chrome as I run into them, so this grows on its own.
 
 <island name="library" data="cool.json" ssr load="idle"></island>
