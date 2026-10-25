@@ -62,6 +62,16 @@
       "description": "",
       "items": [
         {
+          "id": "5592c324-d4cd-4995-b121-4ffac9c1a45e",
+          "title": "Inspora",
+          "url": "https://www.inspora.design/",
+          "note": "",
+          "added": "2026-10-25",
+          "shot": "/cool-shots/5592c324-d4cd-4995-b121-4ffac9c1a45e.webp",
+          "shotW": 640,
+          "shotH": 396
+        },
+        {
           "id": "087c5e33-040e-4e73-97d9-36c5e9f34e93",
           "title": "Bindwell — Building new pesticides with AI",
           "label": "bindwell",
