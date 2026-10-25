@@ -1,5 +1,6 @@
 import { QuartzConfig } from "@basalt/cfg"
 import * as Plugin from "@basalt/plugins"
+import { BASALT_TYPOGRAPHY } from "@basalt/util/theme"
 import { KeepPrivate, LeadingTitle } from "./plugins/notes"
 
 /**
@@ -25,12 +26,8 @@ const config: QuartzConfig = {
     theme: {
       fontOrigin: "googleFonts",
       cdnCaching: true,
-      typography: {
-        title: "DM Serif Display",
-        header: "DM Serif Display",
-        body: "Bricolage Grotesque",
-        code: "JetBrains Mono",
-      },
+      // Basalt's type: Fraunces over Instrument Sans
+      typography: BASALT_TYPOGRAPHY,
       // cream paper, ink-blue text, a terracotta accent: the garden redesign's palette
       colors: {
         lightMode: {

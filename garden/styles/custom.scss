@@ -1,8 +1,9 @@
 @use "styles/base.scss";
+@use "styles/basalt.scss";
 
-// isaacchacko.com on Basalt: the garden redesign's look (cream paper, ink-blue
-// text, a terracotta accent, DM Serif Display over Bricolage Grotesque) on top
-// of Quartz's own layout. The colours and fonts come from quartz.config.ts.
+// isaacchacko.com on Basalt: the garden redesign's cream paper, ink-blue text
+// and terracotta accent, in Basalt's type and motion (styles/basalt.scss in
+// ~/Programs/basalt), on Quartz's layout. Colours come from quartz.config.ts.
 
 ::selection {
   background: color-mix(in srgb, var(--tertiary) 60%, transparent);
@@ -38,25 +39,20 @@ article a.internal,
 // ---------- left sidebar ----------
 
 .page-title {
-  font-family: var(--titleFont);
   font-size: 1.75rem;
-  font-weight: 400;
   line-height: 1.1;
   margin: 0;
 
   a {
     color: var(--dark);
-    font-weight: 400;
+    font-weight: inherit;
   }
 }
 
 .island-sf-clock {
-  margin-top: -0.6rem;
-  font-family: var(--codeFont);
-  font-size: 0.75rem;
+  margin-top: -0.7rem;
+  font-size: 0.9rem;
   color: var(--gray);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
   min-height: 1.2em;
 }
 
@@ -69,11 +65,6 @@ article a.internal,
 .sidebar h2:not(.page-title),
 .sidebar h3,
 .explorer .title-button h2 {
-  font-family: var(--bodyFont);
-  font-size: 0.8rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
   color: var(--gray);
 }
 
@@ -107,10 +98,7 @@ article a.internal,
 }
 
 h1.article-title {
-  font-family: var(--titleFont);
-  font-size: 2.6rem;
-  font-weight: 400;
-  line-height: 1.1;
+  font-size: 2.8rem;
   color: var(--dark);
   text-wrap: balance;
   margin: 1rem 0 0.5rem;
@@ -131,8 +119,6 @@ article {
   h2,
   h3,
   h4 {
-    font-family: var(--headerFont);
-    font-weight: 400;
     color: var(--dark);
     line-height: 1.25;
   }
@@ -202,26 +188,6 @@ article {
   color: var(--dark);
 }
 
-// the home page's "recent writing", and Basalt's note lists in general: a
-// date column, then the title
-article .note-list {
-  padding: 0;
-  list-style: none;
-
-  li {
-    display: grid;
-    grid-template-columns: 7.5em minmax(0, 1fr);
-    gap: 0.5rem;
-    margin: 0.25rem 0;
-  }
-}
-
-.note-list-date {
-  color: var(--gray);
-  font-size: 0.95rem;
-  font-variant-numeric: tabular-nums;
-}
-
 // the blog's folder page
 .page-listing ul.section-ul {
   border-top: 1px solid var(--lightgray);
@@ -233,7 +199,7 @@ article .note-list {
 
   .section h3 a {
     font-family: var(--headerFont);
-    font-weight: 400;
+    font-weight: 550;
     font-size: 1.2rem;
   }
 
@@ -250,7 +216,7 @@ article .note-list {
   border-radius: 5px;
   background: transparent;
   color: var(--darkgray);
-  font: 500 0.75rem var(--codeFont);
+  font: 500 0.8rem var(--bodyFont);
   cursor: pointer;
   vertical-align: 0.1em;
 
@@ -399,8 +365,9 @@ article .shelf {
 .shelf-host {
   display: block;
   margin-top: 0.4rem;
-  font-family: var(--codeFont);
-  font-size: 0.75rem;
+  font-family: var(--titleFont);
+  font-style: italic;
+  font-size: 0.85rem;
   color: var(--gray);
 }
 
@@ -458,4 +425,10 @@ article .shelf {
   h1.article-title {
     font-size: 2.1rem;
   }
+}
+
+// the site speaks in lowercase, Quartz's own labels included
+.toc .toc-header h3,
+.backlinks > h3 {
+  text-transform: lowercase;
 }

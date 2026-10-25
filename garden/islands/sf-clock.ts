@@ -1,4 +1,4 @@
-// The time in SF, with its offset from utc: "sf 9:41 pm utc−7".
+// The time in SF, with its offset from utc: "sf · 9:41 pm, utc−7".
 const TZ = "America/Los_Angeles"
 
 function format(now: Date): string {
@@ -9,7 +9,7 @@ function format(now: Date): string {
     new Intl.DateTimeFormat("en-US", { timeZone: TZ, timeZoneName: "shortOffset" })
       .formatToParts(now)
       .find((p) => p.type === "timeZoneName")?.value ?? ""
-  return `sf ${time} ${offset.replace("GMT", "utc").replace("-", "−")}`
+  return `sf · ${time}, ${offset.replace("GMT", "utc").replace("-", "−")}`
 }
 
 export function mount(el: HTMLElement) {

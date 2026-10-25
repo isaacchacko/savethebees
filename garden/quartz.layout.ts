@@ -28,7 +28,8 @@ const left = [
 export const sharedPageComponents: SharedLayout = {
   head: Component.Head(),
   header: [],
-  afterBody: [],
+  // Basalt's arrival: the title sets, the note rises into place
+  afterBody: [Component.Motion()],
   footer: Footer(),
 }
 
