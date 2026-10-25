@@ -248,7 +248,7 @@ article .note-list li > a {
 }
 
 // its switch, beside the theme toggle (components/Darkmode.astro): Basalt's
-// ghost icon button, with the waves faded and struck through while it's off
+// ghost icon button, holding a 🌊 that greys out while it's off
 .surf-toggle {
   display: grid;
   place-items: center;
@@ -276,19 +276,16 @@ article .note-list li > a {
     outline-offset: 2px;
   }
 
-  svg {
-    background: linear-gradient(to top right, transparent calc(50% - 1px), currentColor calc(50% - 1px), currentColor calc(50% + 1px), transparent calc(50% + 1px)) no-repeat;
-    background-size: 0% 0%;
-    background-position: 50% 50%;
-    transition: background-size 0.2s ease;
+  .surf-glyph {
+    font: 18px/1 "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+    transition:
+      filter 0.2s ease,
+      opacity 0.2s ease;
   }
 
-  &[aria-pressed="false"] {
-    color: var(--gray);
-
-    svg {
-      background-size: 100% 100%;
-    }
+  &[aria-pressed="false"] .surf-glyph {
+    filter: grayscale(1);
+    opacity: 0.45;
   }
 
   .theme-switching & {

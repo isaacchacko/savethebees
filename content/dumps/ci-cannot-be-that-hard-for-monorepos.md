@@ -16,7 +16,17 @@ i couldn't find a good pre-built solution for what we were struggling with, so i
 skip the vocab lesson if you'd like.
 
 # enrichment: vocab lesson for github actions
-![example diagram of vocab hierarchy](/images/ci-cannot-be-that-hard-for-monorepos-mv6ziu0k.webp)
+
+> [!aside]
+> ```graph title="the vocab, as a graph"
+> workflow {gold 3} -> run 1 {tomato 2}, run 2 {tomato 2}
+> run 1 -> job A {dodgerblue 1.5}, job B {dodgerblue 1.5}
+> job B -(needs)-> job A
+> job A -> step 1 {mediumseagreen}, step 2 {mediumseagreen}
+> step 1 -(uses)-> action {orchid}
+> step 2 -(run)-> shell command {silver}
+> ```
+
 - workflows: the list of items you see on the Actions tab in github. a workflow is just a static definition of CI, while the rest of the vocab below is related to the process of actually running CI
 - run: one execution of a workflow
 - job: a workflow defines a list of jobs, each with an optional pre-requisite `needs` parameter pointing to another job in the workflow. with `needs`, gha calculates the DAG and then is able to run independent jobs concurrently while those with `needs` block
