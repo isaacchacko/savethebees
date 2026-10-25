@@ -111,6 +111,8 @@ article {
     text-wrap: pretty;
   }
 
+  // a post's sections are often # headings: they wrap as tightly as the rest
+  h1,
   h2,
   h3,
   h4 {
