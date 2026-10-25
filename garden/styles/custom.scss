@@ -51,7 +51,6 @@ article a.internal:not(.tag-link, .transclude-src),
   }
 }
 
-
 .sidebar h2:not(.page-title),
 .sidebar h3,
 .explorer .title-button h2 {
@@ -343,7 +342,6 @@ article .side-photo:not(:has(> a)) {
   }
 }
 
-
 // the surf behind the home page (islands/backdrop.ts): fixed under everything,
 // fading in once it has a frame
 .backdrop {
@@ -595,8 +593,3 @@ article [data-secondary] {
   }
 }
 
-// the site speaks in lowercase, Basalt's own labels included
-.toc .toc-header h3,
-.backlinks > h3 {
-  text-transform: lowercase;
-}
