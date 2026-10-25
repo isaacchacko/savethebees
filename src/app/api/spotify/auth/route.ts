@@ -1,11 +1,18 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { randomBytes } from 'crypto';
 import { SCOPES } from '@/lib/spotifyTokens';
 
 // Spotify refresh tokens die six months after consent, so this is the door
 // back in: visiting it walks the owner through consent and the callback
 // stores fresh tokens.
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // The state cookie must live on the host Spotify sends the owner back to,
+  // which is not necessarily the one this was opened on
+  const callbackOrigin = new URL(process.env.SPOTIFY_REDIRECT_URI!).origin;
+  if (request.nextUrl.origin !== callbackOrigin) {
+    return NextResponse.redirect(`${callbackOrigin}/api/spotify/auth`);
+  }
+
   const state = randomBytes(16).toString('hex');
   const params = new URLSearchParams({
     response_type: 'code',
