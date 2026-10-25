@@ -214,6 +214,49 @@ article .side-photo:not(:has(> a)) {
   cursor: help;
 }
 
+// the reduction drawn in the about page's card: a flow network in the ink, the
+// matching in the accent
+.reduction-figure {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0.3rem 0 0.4rem;
+
+  .rd-flow,
+  .rd-edge {
+    stroke: color-mix(in srgb, var(--darkgray) 45%, transparent);
+    stroke-width: 1.4;
+  }
+
+  .rd-match {
+    stroke: var(--tertiary);
+    stroke-width: 2.4;
+  }
+
+  .rd-node {
+    fill: var(--light);
+    stroke: var(--darkgray);
+    stroke-width: 1.6;
+  }
+
+  .rd-end {
+    fill: var(--darkgray);
+  }
+
+  .rd-label {
+    fill: var(--light);
+    font: italic 600 10px var(--bodyFont);
+    text-anchor: middle;
+  }
+}
+
+.reduction-caption {
+  display: block;
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--gray);
+}
+
 // ---------- islands ----------
 
 // a cover's card in the side content: its link to spotify on a line of its own
