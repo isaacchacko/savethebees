@@ -1,0 +1,1 @@
+isaacchacko.com is a Basalt site: `garden/`, with notes also from `content/` (`garden/basalt.json` says which). `npm run garden` serves it on :4322. `npm run garden -- help agents` says how to work on it, and `npm run garden -- help editing` how to help someone edit a page.
