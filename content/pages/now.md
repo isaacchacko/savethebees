@@ -4,7 +4,7 @@ this is a [now page](https://nownownow.com/about).
 
 ### 08/18/2026
 
-- had my friends visit me in sf + went to <span title="old-growth redwoods, just north of the golden gate">muir woods</span>!
+- had my friends visit me in sf + went to muir woods!
 - another onsite soon
 - officially started my marathon training yesterday!
 
@@ -12,7 +12,7 @@ this is a [now page](https://nownownow.com/about).
 
 - dryft is most if not all of my time commitment. prepping for a customer onsite soon!
 - going to suki's concert at <span title="free summer concerts in a eucalyptus grove in sf">stern grove</span> soon!
-- <span title="christopher nolan's the odyssey">odyssey</span> was so good. watched on 70mm
+- odyssey was so good. watched on 70mm
 
 ### 03/31/2026
 

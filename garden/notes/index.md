@@ -5,7 +5,7 @@ description: Isaac Chacko — a little hypertext garden.
 
 the time in <span title="where i live now">san francisco</span> is <island name="sf-clock" load="eager"></island><island name="now-playing" load="eager"></island>
 
-<span title="at texas a&m, in college station">cs/math</span> at [a&m](https://aggier.ing) + <span title="dryft builds ai that runs manufacturing operations">founding eng</span> at [dryft](https://dryft.ai) + <span title="tidal is texas a&m's ai/ml org: weekly workshops, and tidalhack">hackathons</span> at [tidal](https://tidaltamu.com). previously at [siso](https://siso-eng.com).
+cs/math at [a&m](https://aggier.ing) + founding eng at [dryft](https://dryft.ai) + hackathons at [tidal](https://tidaltamu.com). previously at [siso](https://siso-eng.com).
 
 i love to yap! reach me at <copy>isaac.chacko05@gmail.com</copy>
 
