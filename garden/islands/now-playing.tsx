@@ -24,7 +24,7 @@ export default function NowPlaying({ api = "https://isaacchacko.com/api/spotify/
     const load = async () => {
       try {
         const res = await fetch(api, { cache: "no-store" })
-        if (res.ok && live) setPlayback(await res.json())
+        if (live) setPlayback(res.ok ? await res.json() : null)
       } catch {
         if (live) setPlayback(null)
       }
@@ -37,19 +37,19 @@ export default function NowPlaying({ api = "https://isaacchacko.com/api/spotify/
     }
   }, [api])
 
-  if (playback === undefined) return <span class="now-playing" />
+  if (playback === undefined) return <span class="spotify" />
   const playing = playback?.is_playing && playback.track ? playback : null
-  if (!playing) return <span class="now-playing">.</span>
+  if (!playing) return <span class="spotify">.</span>
   const artist = Array.isArray(playing.artist) ? playing.artist.join(", ") : playing.artist
 
   return (
-    <span class="now-playing">
+    <span class="spotify">
       {" and "}
-      <span class="now-playing-trigger" tabIndex={0}>
-        <span class="now-playing-dot" />
+      <span class="spotify-trigger" tabIndex={0}>
+        <span class="spotify-dot" />
         i&rsquo;m listening to music rn!
         <span
-          class="now-playing-card"
+          class="spotify-card"
           data-secondary="now playing"
           data-secondary-title={playing.track}
           data-secondary-key="now-playing"

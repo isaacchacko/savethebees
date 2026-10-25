@@ -373,8 +373,10 @@ article .side-sound {
   }
 }
 
-// now playing: a dot that breathes, and the track on hover
-.now-playing-dot {
+// now playing on spotify (islands/now-playing.tsx): a dot that breathes, and the
+// track on hover. Its classes say "spotify", so Basalt's own .now-playing card
+// (its <sound>) doesn't restyle them
+.spotify-dot {
   display: inline-block;
   width: 7px;
   height: 7px;
@@ -420,11 +422,11 @@ article [data-secondary] {
 }
 
 .shelf-preview,
-.now-playing-card {
+.spotify-card {
   display: block;
 }
 
-.now-playing-card {
+.spotify-card {
   display: flex;
   gap: 0.8rem;
   align-items: flex-start;
@@ -436,7 +438,7 @@ article [data-secondary] {
 }
 
 // room under the cover, so it doesn't sit on the card's edge
-.margin .now-playing-card {
+.margin .spotify-card {
   padding-bottom: 0.75rem;
 }
 
