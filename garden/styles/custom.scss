@@ -203,9 +203,11 @@ article .note-list li > a {
   }
 }
 
-// a word with a remark (<span title="…">, shown in the margin on hover): a
-// faint dotted underline says there's something to see
-article span:is([title], [data-tip]):not(.copyable) {
+// a word with a remark (<span title="…">) or a photo (.side-photo), shown in
+// the margin on hover: a faint dotted underline says there's something to see
+// (a link is underlined already)
+article span:is([title], [data-tip]):not(.copyable),
+article .side-photo:not(:has(> a)) {
   text-decoration: underline dotted color-mix(in srgb, var(--gray) 70%, transparent);
   text-decoration-thickness: 1.5px;
   text-underline-offset: 0.2em;
