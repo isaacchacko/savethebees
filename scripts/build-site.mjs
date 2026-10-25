@@ -4,8 +4,8 @@
 // next.config.ts's fallback rewrites answer /<slug> with. The Next.js app keeps
 // what the garden doesn't have: /api (spotify, the private library) and /play.
 //
-// `npm run build` runs it before `next build`. Basalt is
-// github.com/isaacchacko/basalt at BASALT_SHA, cloned and installed into
+// `npm run build` runs it before `next build`. Basalt is @isaacchacko/basalt at
+// BASALT_VERSION from npm, installed apart from Next's dependencies into
 // node_modules/.cache/basalt, or the checkout at $BASALT when that's set.
 //
 // The copy into public/ happens on Vercel (or with --into-public): locally the
@@ -16,8 +16,7 @@ import fs from "fs"
 import path from "path"
 import { fileURLToPath } from "url"
 
-const BASALT_SHA = "26a63a402d2cd921f8f1d8cf0a2925300f6ba16d"
-const BASALT_REPO = "https://github.com/isaacchacko/basalt.git"
+const BASALT_VERSION = "0.1.0"
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..")
 const garden = path.join(root, "garden")
@@ -25,23 +24,21 @@ const run = (cmd, args, cwd) => execFileSync(cmd, args, { cwd, stdio: "inherit" 
 
 function basalt() {
   if (process.env.BASALT) return process.env.BASALT
-  const dir = path.join(root, "node_modules", ".cache", "basalt")
+  const prefix = path.join(root, "node_modules", ".cache", "basalt")
+  const pkg = path.join(prefix, "node_modules", "@isaacchacko", "basalt")
   const at = () => {
     try {
-      return execFileSync("git", ["rev-parse", "HEAD"], { cwd: dir, encoding: "utf8" }).trim()
+      return JSON.parse(fs.readFileSync(path.join(pkg, "package.json"), "utf8")).version
     } catch {
       return null
     }
   }
-  if (at() !== BASALT_SHA) {
-    fs.rmSync(dir, { recursive: true, force: true })
-    fs.mkdirSync(dir, { recursive: true })
-    run("git", ["init", "-q"], dir)
-    run("git", ["fetch", "-q", "--depth", "1", BASALT_REPO, BASALT_SHA], dir)
-    run("git", ["checkout", "-q", "FETCH_HEAD"], dir)
-    run("npm", ["ci", "--no-audit", "--no-fund"], dir)
+  if (at() !== BASALT_VERSION) {
+    fs.rmSync(prefix, { recursive: true, force: true })
+    fs.mkdirSync(prefix, { recursive: true })
+    run("npm", ["install", "--prefix", prefix, "--no-save", "--no-audit", "--no-fund", `@isaacchacko/basalt@${BASALT_VERSION}`], root)
   }
-  return dir
+  return pkg
 }
 
 const cli = path.join(basalt(), "bin", "basalt.mjs")
