@@ -1,0 +1,9 @@
+---
+// Basalt's explorer, with the sf clock over it: the navbar reads the site's
+// title, the time in sf, then the rooms (quartz.layout.ts has the same for the
+// Quartz build). The clock is islands/sf-clock.ts; "sf" holds its place until it ticks.
+import Explorer from "@basalt/components/Explorer.astro"
+---
+
+<div class="island island-sf-clock" data-island="sf-clock" data-island-load="eager" data-island-props="{}">sf</div>
+<Explorer {...Astro.props} />
