@@ -49,7 +49,8 @@
         "highlight": "#e0552f24",
         "textHighlight": "#c9542f55"
       }
-    }
+    },
+    "bullets": "hexagon"
   },
   "layout": {
     "breadcrumbs": {
