@@ -50,7 +50,8 @@
         "textHighlight": "#c9542f55"
       }
     },
-    "bullets": "hexagon"
+    "bullets": "hexagon",
+    "nowPlaying": "screen"
   },
   "layout": {
     "breadcrumbs": {
