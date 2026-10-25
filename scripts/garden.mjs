@@ -4,6 +4,8 @@
 //   npm run garden                     serve it, live, on http://localhost:4322
 //   npm run garden -- build            build it to garden/.basalt/astro/dist
 //   npm run garden -- check            build it and list what's broken
+//   npm run garden -- edit <file>      serve it, and say where <file>'s page is and what edits it
+//   npm run garden -- help [topic]     Basalt's docs ("agents", "editing", ...)
 //
 // Basalt is a checkout of its own, at $BASALT or ~/Programs/basalt-astro.
 import { spawnSync } from "child_process"
@@ -20,6 +22,6 @@ if (!fs.existsSync(cli)) {
   process.exit(1)
 }
 const [command = "dev", ...rest] = process.argv.slice(2)
-const args = command === "dev" && !rest.includes("--port") ? ["--port", "4322", ...rest] : rest
-const { status } = spawnSync(process.execPath, [cli, command, site, ...args], { stdio: "inherit" })
+const args = ["dev", "edit"].includes(command) && !rest.includes("--port") ? ["--port", "4322", ...rest] : rest
+const { status } = spawnSync(process.execPath, [cli, command, ...(command === "help" ? [] : [site]), ...args], { stdio: "inherit" })
 process.exit(status ?? 1)
