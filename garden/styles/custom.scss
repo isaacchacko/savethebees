@@ -309,15 +309,11 @@ article .note-list li > a {
 }
 
 // now playing: a dot that breathes, and the track on hover
-.now-playing {
-  min-height: 1.7em;
-}
-
 .now-playing-dot {
   display: inline-block;
-  width: 8px;
-  height: 8px;
-  margin-right: 10px;
+  width: 7px;
+  height: 7px;
+  margin: 0 6px 0 2px;
   border-radius: 50%;
   vertical-align: middle;
   background: var(--tertiary);

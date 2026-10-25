@@ -11,10 +11,13 @@ type Playback = {
 
 /**
  * What's playing on Isaac's spotify, from the live site's api (it answers any
- * origin). Nothing at all when nothing's playing, or the api can't be reached.
+ * origin), as the end of the home page's sentence about the time in sf:
+ * "… is 9:41pm and i'm listening to music rn!", or just "." when nothing's
+ * playing or the api can't be reached. Nothing until the first answer, so the
+ * sentence doesn't end twice.
  */
 export default function NowPlaying({ api = "https://isaacchacko.com/api/spotify/now-playing" }: { api?: string }) {
-  const [playback, setPlayback] = useState<Playback | null>(null)
+  const [playback, setPlayback] = useState<Playback | null | undefined>(undefined)
 
   useEffect(() => {
     let live = true
@@ -34,12 +37,14 @@ export default function NowPlaying({ api = "https://isaacchacko.com/api/spotify/
     }
   }, [api])
 
+  if (playback === undefined) return <span class="now-playing" />
   const playing = playback?.is_playing && playback.track ? playback : null
-  if (!playing) return <div class="now-playing" />
+  if (!playing) return <span class="now-playing">.</span>
   const artist = Array.isArray(playing.artist) ? playing.artist.join(", ") : playing.artist
 
   return (
-    <div class="now-playing">
+    <span class="now-playing">
+      {" and "}
       <span class="now-playing-trigger" tabIndex={0}>
         <span class="now-playing-dot" />
         i&rsquo;m listening to music rn!
@@ -63,6 +68,6 @@ export default function NowPlaying({ api = "https://isaacchacko.com/api/spotify/
           </span>
         </span>
       </span>
-    </div>
+    </span>
   )
 }

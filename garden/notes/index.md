@@ -3,13 +3,11 @@ title: howdy!
 description: Isaac Chacko — a little hypertext garden.
 ---
 
-the time in san francisco is <island name="sf-clock" load="eager"></island>
+the time in san francisco is <island name="sf-clock" load="eager"></island><island name="now-playing" load="eager"></island>
 
 cs/math at [a&m](https://aggier.ing) + founding eng at [dryft](https://dryft.ai) + hackathons at [tidal](https://tidaltamu.com). previously at [siso](https://siso-eng.com).
 
 i love to yap! reach me at <copy>isaac.chacko05@gmail.com</copy>
-
-<island name="now-playing" load="eager"></island>
 
 ## recent writing
 
