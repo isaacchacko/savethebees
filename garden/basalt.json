@@ -1,6 +1,7 @@
 {
   "title": "isaacchacko.com",
   "baseUrl": "isaacchacko.com",
+  "icon": "assets/icon.svg",
   "locale": "en-US",
   "content": [
     {
