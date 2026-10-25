@@ -1,5 +1,3 @@
-import { useState } from "preact/hooks"
-
 type Item = { id: string; title: string; label?: string; url: string; note: string; shot?: string }
 type List = { id: string; title: string; description: string; items: Item[] }
 
@@ -32,27 +30,14 @@ function Note({ text }: { text: string }) {
 
 /**
  * The bookshelf, from content/cool.json (which the chrome extension writes).
- * Rendered at build time, so it's all there with no script; the script adds a
- * filter. Hovering an entry shows the screenshot taken when it was saved.
+ * Rendered at build time, so it's all there with no script. Hovering an entry
+ * shows the screenshot taken when it was saved.
  */
 export default function Library({ data }: { data: { lists: List[] } }) {
-  const [query, setQuery] = useState("")
-  const q = query.trim().toLowerCase()
-  const match = (i: Item) =>
-    !q || [i.title, i.label, i.note, i.url].some((s) => s?.toLowerCase().includes(q))
-
   return (
     <div class="library">
-      <input
-        class="library-filter"
-        type="search"
-        placeholder="filter the shelf"
-        value={query}
-        onInput={(e) => setQuery((e.target as HTMLInputElement).value)}
-      />
       {data.lists.map((list) => {
-        const items = list.items.filter(match)
-        if (q && items.length === 0) return null
+        const items = list.items
         return (
           <section key={list.id}>
             <h2 id={list.id}>{list.title}</h2>
