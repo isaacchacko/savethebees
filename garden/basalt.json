@@ -71,6 +71,9 @@
         "collections/websites",
         "running",
         "arch"
+      ],
+      "byDate": [
+        "blog"
       ]
     },
     "feed": {
