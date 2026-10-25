@@ -212,6 +212,41 @@ article .note-list li > a {
 
 // ---------- islands ----------
 
+// the surf behind the home page (islands/backdrop.ts): fixed under everything,
+// fading in once it has a frame
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.9s cubic-bezier(0.32, 0.72, 0, 1);
+
+  &[data-on="true"] {
+    opacity: 1;
+  }
+
+  .theme-switching & {
+    transition: none;
+  }
+}
+
+// the clip only feeds the canvas, but stays laid out so every browser keeps
+// decoding it
+.backdrop-source {
+  position: fixed;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.island[data-island="backdrop"] {
+  display: none;
+}
+
 .copy-btn {
   padding: 0.05rem 0.5rem;
   border: 1px solid var(--lightgray);
