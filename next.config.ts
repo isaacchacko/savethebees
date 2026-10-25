@@ -26,6 +26,17 @@ const nextConfig: NextConfig = {
       { source: '/graph/:path*', destination: 'https://graph.isaacchacko.com/:path*', permanent: false },
     ];
   },
+  // the site is the Basalt garden, built into public/ by scripts/build-site.mjs:
+  // a page is /<slug>/index.html, so whatever no route or file answers is
+  // looked for there
+  async rewrites() {
+    return {
+      fallback: [
+        { source: '/', destination: '/index.html' },
+        { source: '/:path+', destination: '/:path+/index.html' },
+      ],
+    };
+  },
 };
 
 export default nextConfig;
