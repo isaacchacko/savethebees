@@ -87,6 +87,8 @@ const config: QuartzConfig = {
       Plugin.ContentIndex({ enableSiteMap: true, enableRSS: true }),
       Plugin.Assets(),
       Plugin.IslandBundles(),
+      // pdf.js, for the pdf viewer
+      Plugin.PdfAssets(),
       Plugin.Static(),
       Plugin.Favicon(),
       Plugin.NotFoundPage(),

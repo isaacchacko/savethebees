@@ -1,9 +1,61 @@
 {
+  "title": "isaacchacko.com",
+  "baseUrl": "isaacchacko.com",
+  "locale": "en-US",
   "content": [
-    { "from": "notes", "to": "" },
-    { "from": "../content/pages", "to": "" },
-    { "from": "../content/dumps", "to": "blog" },
-    { "from": "../content/cool.json", "to": "cool.json" },
-    { "from": "../public", "to": "" }
-  ]
+    {
+      "from": "notes",
+      "to": ""
+    },
+    {
+      "from": "../content/pages",
+      "to": ""
+    },
+    {
+      "from": "../content/dumps",
+      "to": "blog"
+    },
+    {
+      "from": "../content/cool.json",
+      "to": "cool.json"
+    },
+    {
+      "from": "../public",
+      "to": ""
+    }
+  ],
+  "theme": {
+    "colors": {
+      "lightMode": {
+        "light": "#f5eedd",
+        "lightgray": "#e3d9c0",
+        "gray": "#9a8e76",
+        "darkgray": "#2d4673",
+        "dark": "#16294e",
+        "secondary": "#284d78",
+        "tertiary": "#c8482b",
+        "highlight": "#c8482b1a",
+        "textHighlight": "#f4c84b88"
+      },
+      "darkMode": {
+        "light": "#06182f",
+        "lightgray": "#122845",
+        "gray": "#7191b8",
+        "darkgray": "#caddf4",
+        "dark": "#eef4fc",
+        "secondary": "#8fb9de",
+        "tertiary": "#e0552f",
+        "highlight": "#e0552f24",
+        "textHighlight": "#c9542f55"
+      }
+    }
+  },
+  "layout": {
+    "breadcrumbs": {
+      "rootName": "home"
+    },
+    "components": {
+      "meta": "dated"
+    }
+  }
 }
