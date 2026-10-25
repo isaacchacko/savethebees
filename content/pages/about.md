@@ -1,15 +1,11 @@
 # about
 
-**i like**
+I'm an engineer from Texas A&M interested in making diegetic software experiences for both devs and users.
 
-- running (training for chevron shoutout boping)
-- shopping at <span class="side-photo">[amoeba](https://www.amoeba.com/)<span data-secondary="photo" data-secondary-key="amoeba" data-secondary-title="amoeba music, haight st" hidden><img src="/assets/side/amoeba.jpg" alt="amoeba music's storefront on haight street"></span></span> and going to concerts (shoutout <sound src="/assets/sound/promise.mp3" spotify="https://open.spotify.com/track/08PdFBcXzpkn1cWNgmKqhn" label="promise">laufey<span data-secondary="photo" data-secondary-key="promise" data-secondary-title="icelandic biodigital jazz, man · photo tomzorz, cc by-sa 4.0" hidden><img src="/assets/side/laufey.jpg" alt="laufey singing at the wiener stadthalle, 2026"></span></sound> <sound src="/assets/sound/teenangst.mp3" spotify="https://open.spotify.com/track/0dTCt5uYN6YgWokNdFqwwU" label="teen angst, the chorus">inji<span data-secondary="photo" data-secondary-key="inji" data-secondary-title="inji · photo justin higuchi, cc by 2.0" hidden><img src="/assets/side/inji.jpg" alt="inji on stage at the el rey, 2024"></span></sound> <sound src="/assets/sound/totk.mp3" title="Tears of the Kingdom: Main Theme" artist="Nintendo" album="The Legend of Zelda: Tears of the Kingdom" cover="/assets/side/totk.jpg" label="main theme, the swell">6th street trio</sound> <sound src="/assets/sound/dreamwoman.mp3" spotify="https://open.spotify.com/track/5R6hCi9TVatMsM0UNqhZKA" label="dream woman, the chorus">suki<span data-secondary="photo" data-secondary-key="suki" data-secondary-title="suki waterhouse · photo lucafazphoto, cc by-sa 4.0" hidden><img src="/assets/side/suki.jpg" alt="suki waterhouse at the venice film festival"></span></sound>)
-- updating my [dotfiles](/arch)
-- my family
-- drinking water at dolores
+My not-so-unique take: cs is the study of solving problems. swe is the process of solving problems. similar yet different.
 
-**i dislike**
+in cs, solving a problem you can't solve means reducing it to a problem you can with formal proof. in swe, real-life reductions like these are inevitably lossy, meaning that there are always tradeoffs to your abstraction, no matter how you slice or reduce your problem. that's why choosing your abstraction is the most pivotal moment in a problem/problem solver's relationship, and where i derive the most joy.
 
-- streaming services
-- wet socks
-- chapped lips
+to me, striving for the perfect abstraction is striving for elegant design, where succeeding is evidence that you understood the whole problem, from the minutiae to the big picture. experience in trying and failing to achieve elegant design is taste.
+
+ai writes a lot of my code now, and eventually it'll be able to do just about anything without me holding its hand. but imo taste is still on the developer. while a model will reach for the average of good, the average of good will never beat the taste of great.
