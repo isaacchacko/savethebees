@@ -57,8 +57,8 @@ uniform vec3 u_dot;
 uniform float u_invert;
 // the text column's left and right edges in device px, and its fade's width
 uniform vec3 u_calm;
-// the open navbar's left and right edges (both 0 while it's folded)
-uniform vec2 u_calm_nav;
+// the navbar's left and right edges, and how far open it is (0 folded, 1 open)
+uniform vec3 u_calm_nav;
 
 // the 8×8 matrix built up from the 2×2 one, as thresholds in [0, 1)
 float bayer2(vec2 a) {
@@ -78,7 +78,7 @@ void main() {
   l = pow(clamp((l - u_levels.x) / (u_levels.y - u_levels.x), 0.0, 1.0), u_levels.z);
   l = mix(l, 1.0 - l, u_invert);
   float inside = smoothstep(u_calm.x - u_calm.z, u_calm.x, centre.x) * (1.0 - smoothstep(u_calm.y, u_calm.y + u_calm.z, centre.x));
-  inside = max(inside, smoothstep(u_calm_nav.x - u_calm.z, u_calm_nav.x, centre.x) * (1.0 - smoothstep(u_calm_nav.y, u_calm_nav.y + u_calm.z, centre.x)));
+  inside = max(inside, u_calm_nav.z * smoothstep(u_calm_nav.x - u_calm.z, u_calm_nav.x, centre.x) * (1.0 - smoothstep(u_calm_nav.y, u_calm_nav.y + u_calm.z, centre.x)));
   l *= mix(1.0, ${CALM.toFixed(2)}, inside);
 
   float lit = step(bayer(cell) + 0.01, l);
@@ -184,12 +184,27 @@ function start(src: string): () => void {
     const sy = view < clip ? 1 : clip / view
     gl.uniform2f(at("u_scale"), sx, sy)
     gl.uniform2f(at("u_offset"), (1 - sx) / 2, (1 - sy) / 2)
-    // the column moves when the navbar opens, so it's measured every time
+    const [textLeft, textRight, navLeft, navRight, navOpen] = calm
+    gl.uniform3f(at("u_calm"), textLeft * dpr, textRight * dpr, CALM_FEATHER_PX * dpr)
+    gl.uniform3f(at("u_calm_nav"), navLeft * dpr, navRight * dpr, navOpen)
+  }
+
+  // where the text and the navbar are, and how far open the navbar is (its
+  // contents' fade), measured every frame: both move as the navbar opens, and
+  // the calm behind them follows along rather than waiting for the clip's
+  // next frame
+  let calm = [0, 0, 0, 0, 0]
+  const measureCalm = () => {
     const text = document.querySelector(".center")?.getBoundingClientRect()
-    gl.uniform3f(at("u_calm"), (text?.left ?? 0) * dpr, (text?.right ?? 0) * dpr, CALM_FEATHER_PX * dpr)
     const nav = document.querySelector(".left.sidebar")
-    const open = nav?.matches(":hover, :focus-within") ? nav.getBoundingClientRect() : undefined
-    gl.uniform2f(at("u_calm_nav"), (open?.left ?? 0) * dpr, (open?.right ?? 0) * dpr)
+    const rect = nav?.getBoundingClientRect()
+    const contents = nav?.querySelector(":scope > :not(.nav-rail)")
+    const open = contents ? Number(getComputedStyle(contents).opacity) : 0
+    const next = [text?.left ?? 0, text?.right ?? 0, rect?.left ?? 0, rect?.right ?? 0, open]
+    if (next.some((v, i) => Math.abs(v - calm[i]) > 0.01)) {
+      calm = next
+      dirty = true
+    }
   }
 
   // levels that stretch the clip to black and white and then take its average
@@ -220,6 +235,7 @@ function start(src: string): () => void {
   let shown = -1
   const draw = () => {
     if (video.readyState < video.HAVE_CURRENT_DATA) return
+    measureCalm()
     // only a new frame of the clip, or new colours, are worth a redraw
     if (!dirty && video.currentTime === shown) return
     shown = video.currentTime
