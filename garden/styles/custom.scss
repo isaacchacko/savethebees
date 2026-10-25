@@ -2,8 +2,8 @@
 @use "styles/basalt.scss";
 
 // isaacchacko.com on Basalt: the garden redesign's cream paper, ink-blue text
-// and terracotta accent, in Basalt's type and motion (styles/basalt.scss in
-// ~/Programs/basalt), on Quartz's layout. Colours come from quartz.config.ts.
+// and terracotta accent, in Basalt's type and motion (its styles/basalt.scss).
+// Colours come from basalt.json's theme.
 
 ::selection {
   background: color-mix(in srgb, var(--tertiary) 60%, transparent);
@@ -457,7 +457,7 @@ article [data-secondary] {
   }
 }
 
-// the site speaks in lowercase, Quartz's own labels included
+// the site speaks in lowercase, Basalt's own labels included
 .toc .toc-header h3,
 .backlinks > h3 {
   text-transform: lowercase;

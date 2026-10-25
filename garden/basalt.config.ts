@@ -1,6 +1,5 @@
-// The garden's own additions to Basalt on Astro (quartz.config.ts is the
-// Quartz build's, kept until the move is done). `private: true` needs nothing
-// here: Basalt leaves private notes unpublished.
+// The garden's own additions to Basalt. `private: true` needs nothing here:
+// Basalt leaves private notes unpublished.
 
 import type { Root } from "mdast"
 import { toString } from "mdast-util-to-string"
