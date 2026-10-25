@@ -2,8 +2,7 @@
 // The garden's foot, in place of Basalt's: the credit in the site's own words,
 // and the resume and the socials.
 // Every page has a footer, so the surf behind the page (islands/backdrop.ts)
-// is mounted from here, and so, while serving locally, is the tab's "wq"
-// (islands/dev-icon.ts).
+// is mounted from here.
 const SOCIALS = [
   { href: "/Isaac_Chacko.pdf", label: "Resume" },
   { href: "https://www.github.com/isaacchacko", label: "GitHub" },
@@ -12,7 +11,6 @@ const SOCIALS = [
 ---
 
 <div class="island" data-island="backdrop" data-island-load="eager"></div>
-{import.meta.env.DEV && <div class="island" data-island="dev-icon" data-island-load="eager"></div>}
 <footer class="garden-footer">
   <p>
     Made with <a href="https://basalt.isaacchacko.com" target="_blank" rel="noopener noreferrer">Basalt</a>
