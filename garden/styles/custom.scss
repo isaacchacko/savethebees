@@ -203,6 +203,15 @@ article .note-list li > a {
   }
 }
 
+// a word with a remark (<span title="…">, shown in the margin on hover): a
+// faint dotted underline says there's something to see
+article span:is([title], [data-tip]):not(.copyable) {
+  text-decoration: underline dotted color-mix(in srgb, var(--gray) 70%, transparent);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 0.2em;
+  cursor: help;
+}
+
 // ---------- islands ----------
 
 // the surf behind the home page (islands/backdrop.ts): fixed under everything,
