@@ -1,0 +1,251 @@
+{
+  "playlist": "https://open.spotify.com/playlist/4IlbP26s8HFFvcjoYW8oUD",
+  "albums": [
+    {
+      "album": "This Is How Tomorrow Moves",
+      "artist": "beabadoobee",
+      "year": "2024",
+      "song": "Take A Bite",
+      "spotify": "https://open.spotify.com/track/1GClDyMiSLrpzjzwIfWRIa",
+      "cover": "/assets/music/01.jpg"
+    },
+    {
+      "album": "HIT ME HARD AND SOFT",
+      "artist": "Billie Eilish",
+      "year": "2024",
+      "song": "WILDFLOWER",
+      "spotify": "https://open.spotify.com/track/3QaPy1KgI7nu9FJEQUgn6h",
+      "cover": "/assets/music/02.jpg"
+    },
+    {
+      "album": "Alter Ego",
+      "artist": "LISA",
+      "year": "2025",
+      "song": "Born Again (feat. Doja Cat & RAYE)",
+      "spotify": "https://open.spotify.com/track/7KNmIjcmGJIBrhP2s5Vioe",
+      "cover": "/assets/music/03.jpg"
+    },
+    {
+      "album": "4eva Is A Mighty Long Time",
+      "artist": "Big K.R.I.T.",
+      "year": "2017",
+      "song": "Big Bank (feat. T.I.)",
+      "spotify": "https://open.spotify.com/track/6wScCdGt2OkrrOP5kINDDF",
+      "cover": "/assets/music/04.jpg"
+    },
+    {
+      "album": "Rockstar",
+      "artist": "LISA",
+      "year": "2024",
+      "song": "Rockstar",
+      "spotify": "https://open.spotify.com/track/6vvPecFTmWxDfEJ6cYT1wa",
+      "cover": "/assets/music/05.jpg"
+    },
+    {
+      "album": "Around the Fur",
+      "artist": "Deftones",
+      "year": "1997",
+      "song": "Around the Fur",
+      "spotify": "https://open.spotify.com/track/3Fwe3XoPOiyWUPYdBKMTqV",
+      "cover": "/assets/music/06.jpg"
+    },
+    {
+      "album": "Melodrama",
+      "artist": "Lorde",
+      "year": "2017",
+      "song": "Green Light",
+      "spotify": "https://open.spotify.com/track/6ie2Bw3xLj2JcGowOlcMhb",
+      "cover": "/assets/music/07.jpg"
+    },
+    {
+      "album": "Currents",
+      "artist": "Tame Impala",
+      "year": "2015",
+      "song": "The Less I Know The Better",
+      "spotify": "https://open.spotify.com/track/6K4t31amVTZDgR3sKmwUJJ",
+      "cover": "/assets/music/08.jpg"
+    },
+    {
+      "album": "IGOR",
+      "artist": "Tyler, The Creator",
+      "year": "2019",
+      "song": "EARFQUAKE",
+      "spotify": "https://open.spotify.com/track/5hVghJ4KaYES3BFUATCYn0",
+      "cover": "/assets/music/09.jpg"
+    },
+    {
+      "album": "BALLADS 1",
+      "artist": "Joji",
+      "year": "2018",
+      "song": "SLOW DANCING IN THE DARK",
+      "spotify": "https://open.spotify.com/track/0rKtyWc8bvkriBthvHKY8d",
+      "cover": "/assets/music/10.jpg"
+    },
+    {
+      "album": "SOS",
+      "artist": "SZA",
+      "year": "2022",
+      "song": "Kill Bill",
+      "spotify": "https://open.spotify.com/track/3OHfY25tqY28d16oZczHc8",
+      "cover": "/assets/music/11.jpg"
+    },
+    {
+      "album": "MM..FOOD",
+      "artist": "MF DOOM",
+      "year": "2004",
+      "song": "Rapp Snitch Knishes",
+      "spotify": "https://open.spotify.com/track/5KUNwkaNf8l5A9sXZhiCgI",
+      "cover": "/assets/music/12.jpg"
+    },
+    {
+      "album": "Madvillainy",
+      "artist": "Madvillain",
+      "year": "2004",
+      "song": "All Caps",
+      "spotify": "https://open.spotify.com/track/21O0XXPEWPtePt5RMY93Ob",
+      "cover": "/assets/music/13.jpg"
+    },
+    {
+      "album": "Who Really Cares",
+      "artist": "TV Girl",
+      "year": "2016",
+      "song": "Taking What's Not Yours",
+      "spotify": "https://open.spotify.com/track/53mChDyESfwn9Dz8poHRf6",
+      "cover": "/assets/music/14.jpg"
+    },
+    {
+      "album": "CHROMAKOPIA",
+      "artist": "Tyler, The Creator",
+      "year": "2024",
+      "song": "Sticky (feat. GloRilla, Sexyy Red & Lil Wayne)",
+      "spotify": "https://open.spotify.com/track/3tFed7YsjGnIfxeLEQwx3R",
+      "cover": "/assets/music/15.jpg"
+    },
+    {
+      "album": "Demon Days",
+      "artist": "Gorillaz",
+      "year": "2005",
+      "song": "Feel Good Inc.",
+      "spotify": "https://open.spotify.com/track/0d28khcov6AiegSCpG5TuT",
+      "cover": "/assets/music/16.jpg"
+    },
+    {
+      "album": "Discovery",
+      "artist": "Daft Punk",
+      "year": "2001",
+      "song": "One More Time",
+      "spotify": "https://open.spotify.com/track/0DiWol3AO6WpXZgp0goxAV",
+      "cover": "/assets/music/17.jpg"
+    },
+    {
+      "album": "STONE OCEAN",
+      "artist": "ichigo from 岸田教団&THE明星ロケッツ",
+      "year": "2021",
+      "song": "STONE OCEAN",
+      "spotify": "https://open.spotify.com/track/0H6YIWFAP26G4b5Zj0lhAE",
+      "cover": "/assets/music/18.jpg"
+    },
+    {
+      "album": "Toys In The Attic",
+      "artist": "Aerosmith",
+      "year": "1975",
+      "song": "Toys In The Attic",
+      "spotify": "https://open.spotify.com/track/4pj8ElgSWmmy5LT9a7jb0s",
+      "cover": "/assets/music/19.jpg"
+    },
+    {
+      "album": "ASHES OF GHOST$",
+      "artist": "SAGEISKAMI",
+      "year": "2021",
+      "song": "1 LAST KI$$",
+      "spotify": "https://open.spotify.com/track/1SQlPrt31nvKHvPVi13kUn",
+      "cover": "/assets/music/20.jpg"
+    },
+    {
+      "album": "The Secret of Us (Deluxe)",
+      "artist": "Gracie Abrams",
+      "year": "2024",
+      "song": "That’s So True",
+      "spotify": "https://open.spotify.com/track/7ne4VBA60CxGM75vw0EYad",
+      "cover": "/assets/music/21.jpg"
+    },
+    {
+      "album": "Drama - The 4th Mini Album",
+      "artist": "aespa",
+      "year": "2023",
+      "song": "Drama",
+      "spotify": "https://open.spotify.com/track/5XWlyfo0kZ8LF7VSyfS4Ew",
+      "cover": "/assets/music/22.jpg"
+    },
+    {
+      "album": "Requiem",
+      "artist": "keshi",
+      "year": "2024",
+      "song": "Say",
+      "spotify": "https://open.spotify.com/track/49PPH7Kji3bCyKKNx78SxS",
+      "cover": "/assets/music/23.jpg"
+    },
+    {
+      "album": "Bewitched",
+      "artist": "Laufey",
+      "year": "2023",
+      "song": "Nocturne (Interlude)",
+      "spotify": "https://open.spotify.com/track/2dcPutROdT0VLw2ajhBwTc",
+      "cover": "/assets/music/24.jpg",
+      "sound": {
+        "src": "/assets/sound/promise.mp3",
+        "label": "promise",
+        "song": "Promise",
+        "spotify": "https://open.spotify.com/track/08PdFBcXzpkn1cWNgmKqhn"
+      }
+    },
+    {
+      "album": "Watermark",
+      "artist": "Enya",
+      "year": "1988",
+      "song": "Orinoco Flow",
+      "spotify": "https://open.spotify.com/track/14EUcXXpqrC03Dzzdj8bGr",
+      "cover": "/assets/music/25.jpg"
+    },
+    {
+      "album": "CAN'T STOP NOW",
+      "artist": "Joey Valence & Brae",
+      "year": "2023",
+      "song": "CAN'T STOP NOW",
+      "spotify": "https://open.spotify.com/track/1YmLbryGwdP25VbPqzizbC",
+      "cover": "/assets/music/26.jpg"
+    },
+    {
+      "album": "I feel",
+      "artist": "i-dle",
+      "year": "2023",
+      "song": "Queencard",
+      "spotify": "https://open.spotify.com/track/4uOBL4DDWWVx4RhYKlPbPC",
+      "cover": "/assets/music/27.jpg"
+    },
+    {
+      "album": "An Awesome Wave",
+      "artist": "alt-J",
+      "year": "2012",
+      "song": "Tessellate",
+      "spotify": "https://open.spotify.com/track/1o22EcqsCANhwYdaNOSdwS",
+      "cover": "/assets/music/28.jpg"
+    },
+    {
+      "album": "lowkey",
+      "artist": "NIKI",
+      "year": "2019",
+      "song": "lowkey",
+      "spotify": "https://open.spotify.com/track/7ipqVwkp2MhZv0Ojzqy1NV",
+      "cover": "/assets/music/29.jpg"
+    },
+    {
+      "album": "Illmatic",
+      "artist": "Nas",
+      "year": "1994",
+      "song": "N.Y. State of Mind",
+      "spotify": "https://open.spotify.com/track/0trHOzAhNpGCsGBEu7dOJo",
+      "cover": "/assets/music/30.jpg"
+    }
+  ]
+}

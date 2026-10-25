@@ -216,6 +216,78 @@ article .side-photo:not(:has(> a)) {
 
 // ---------- islands ----------
 
+// the album shelf (islands/music.tsx): square covers in a grid, each leaning
+// toward the pointer
+.music-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 0.45rem;
+  margin: 1.2rem 0 1.6rem;
+  perspective: 700px;
+}
+
+.music-tile {
+  display: block;
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 4px;
+  background: none !important;
+  transform: rotateX(var(--lean-x, 0deg)) rotateY(var(--lean-y, 0deg));
+  transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1), box-shadow 0.35s ease;
+  cursor: pointer;
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    margin: 0 !important;
+    object-fit: cover;
+    border-radius: 4px;
+  }
+
+  &:hover,
+  &:focus-visible {
+    z-index: 1;
+    box-shadow: 0 10px 24px -12px color-mix(in srgb, var(--dark) 55%, transparent);
+    transition: transform 0.08s linear, box-shadow 0.35s ease;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--tertiary);
+    outline-offset: 2px;
+  }
+
+  // a cover with a clip: Basalt's <sound>, without the word's ♪ and underline;
+  // a small ♪ in the corner instead, in the accent while it plays
+  &.sound {
+    text-decoration: none;
+
+    &::after {
+      content: "♪";
+      position: absolute;
+      right: 6px;
+      bottom: 4px;
+      margin: 0;
+      padding: 0 5px;
+      border-radius: 3px;
+      font-size: 0.8rem;
+      line-height: 1.5;
+      vertical-align: 0;
+      color: var(--light);
+      background: color-mix(in srgb, var(--dark) 55%, transparent);
+    }
+
+    &[data-playing]::after {
+      background: var(--tertiary);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transform: none;
+  }
+}
+
+
 // the surf behind the home page (islands/backdrop.ts): fixed under everything,
 // fading in once it has a frame
 .backdrop {
