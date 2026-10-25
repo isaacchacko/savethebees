@@ -43,7 +43,12 @@ export default function NowPlaying({ api = "https://isaacchacko.com/api/spotify/
       <span class="now-playing-trigger" tabIndex={0}>
         <span class="now-playing-dot" />
         i&rsquo;m listening to music rn!
-        <span class="now-playing-card" role="tooltip">
+        <span
+          class="now-playing-card"
+          data-secondary="now playing"
+          data-secondary-title={playing.track}
+          data-secondary-key="now-playing"
+        >
           {playing.image ? <img src={playing.image} alt={playing.album ?? playing.track} width={96} height={96} /> : null}
           <span>
             <strong>{playing.track}</strong>

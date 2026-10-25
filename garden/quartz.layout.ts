@@ -16,6 +16,8 @@ const explorer = Component.Explorer({
 })
 
 const left = [
+  // Basalt's navbar: a rail of the mark, search and the theme until it's reached for
+  Component.Nav(),
   Component.PageTitle(),
   Component.Island({ name: "sf-clock", inline: false, fallback: "sf" }),
   Component.MobileOnly(Component.Spacer()),
@@ -48,15 +50,21 @@ export const defaultContentPageLayout: PageLayout = {
     Component.TagList(),
   ],
   left,
+  // Basalt's secondary column: one thing at a time, from what you hover, pin
+  // or have in view; the graph, contents and backlinks when nothing else is
   right: [
-    Component.GraphView({ title: "graph view" }),
-    Component.DesktopOnly(Component.TableOfContents()),
-    Component.Backlinks(),
+    Component.Secondary({
+      components: [
+        Component.GraphView({ title: "graph view" }),
+        Component.DesktopOnly(Component.TableOfContents()),
+        Component.Backlinks(),
+      ],
+    }),
   ],
 }
 
 export const defaultListPageLayout: PageLayout = {
   beforeBody: [Component.Breadcrumbs({ rootName: "home" }), Component.ArticleTitle()],
   left,
-  right: [Component.GraphView({ title: "graph view" })],
+  right: [Component.Secondary({ components: [Component.GraphView({ title: "graph view" })] })],
 }

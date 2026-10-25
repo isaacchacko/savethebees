@@ -231,18 +231,6 @@ article {
   min-height: 1.7em;
 }
 
-.now-playing-trigger {
-  position: relative;
-  cursor: default;
-
-  &:hover .now-playing-card,
-  &:focus .now-playing-card {
-    opacity: 1;
-    visibility: visible;
-    transform: none;
-  }
-}
-
 .now-playing-dot {
   display: inline-block;
   width: 8px;
@@ -257,36 +245,6 @@ article {
 @keyframes breathe {
   50% {
     opacity: 0.35;
-  }
-}
-
-.now-playing-card {
-  position: absolute;
-  left: 0;
-  top: 1.8em;
-  z-index: 10;
-  display: flex;
-  gap: 1rem;
-  width: max-content;
-  max-width: 24rem;
-  padding: 0.8rem;
-  border: 1px solid var(--lightgray);
-  border-radius: 6px;
-  background: var(--light);
-  box-shadow: 0 8px 24px rgb(0 0 0 / 0.12);
-  font-size: 0.9rem;
-  line-height: 1.4;
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(4px);
-  transition:
-    opacity 0.2s ease,
-    transform 0.2s ease,
-    visibility 0.2s;
-
-  img {
-    margin: 0;
-    border-radius: 3px;
   }
 }
 
@@ -324,35 +282,21 @@ article .shelf {
   border-radius: 3px;
 }
 
-.shelf-entry {
-  position: relative;
-
-  &:hover .shelf-preview {
-    opacity: 1;
-    visibility: visible;
-    transform: none;
-  }
+// the shelf's screenshot and now playing's track: shown in the secondary column
+.shelf-preview,
+.now-playing-card {
+  display: block;
 }
 
-.shelf-preview {
-  position: absolute;
-  left: 0;
-  top: 1.7em;
-  z-index: 10;
-  width: 20rem;
-  padding: 0.5rem;
-  border: 1px solid var(--lightgray);
-  border-radius: 6px;
-  background: var(--light);
-  box-shadow: 0 8px 24px rgb(0 0 0 / 0.12);
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(4px);
-  transition:
-    opacity 0.2s ease,
-    transform 0.2s ease,
-    visibility 0.2s;
-  pointer-events: none;
+.now-playing-card {
+  display: flex;
+  gap: 0.8rem;
+  align-items: flex-start;
+
+  img {
+    margin: 0;
+    border-radius: 4px;
+  }
 }
 
 .shelf-shot {

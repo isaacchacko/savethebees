@@ -74,8 +74,14 @@ export default function Library({ data }: { data: { lists: List[] } }) {
                           {item.label || item.title}
                         </a>
                         {item.shot ? (
-                          <span class="shelf-preview" aria-hidden="true">
-                            <img class="shelf-shot" src={item.shot} alt="" loading="lazy" />
+                          // shown in the secondary column while the entry is hovered
+                          <span
+                            class="shelf-preview"
+                            data-secondary="site"
+                            data-secondary-title={item.label || item.title}
+                            data-secondary-key={item.id}
+                          >
+                            <img class="shelf-shot" src={item.shot} alt={`a screenshot of ${h}`} />
                             <span class="shelf-host">{h}</span>
                           </span>
                         ) : null}

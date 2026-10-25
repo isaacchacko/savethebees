@@ -17,7 +17,8 @@ const config: QuartzConfig = {
     pageTitle: "isaacchacko.com",
     pageTitleSuffix: " — isaacchacko.com",
     enableSPA: true,
-    enablePopovers: true,
+    // previews go to Basalt's secondary column, not popovers
+    enablePopovers: false,
     analytics: null,
     locale: "en-US",
     baseUrl: "isaacchacko.com",
