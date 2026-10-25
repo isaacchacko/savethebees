@@ -17,15 +17,14 @@ skip the vocab lesson if you'd like.
 
 # enrichment: vocab lesson for github actions
 
-> [!aside]
-> ```graph title="the vocab, as a graph"
-> workflow {gold 3} -> run 1 {tomato 2}, run 2 {tomato 2}
-> run 1 -> job A {dodgerblue 1.5}, job B {dodgerblue 1.5}
-> job B -(needs)-> job A
-> job A -> step 1 {mediumseagreen}, step 2 {mediumseagreen}
-> step 1 -(uses)-> action {orchid}
-> step 2 -(run)-> shell command {silver}
-> ```
+```graph title="the vocab, as a graph"
+workflow {gold 3} -> run 1 {tomato 2}, run 2 {tomato 2}
+run 1 -> job A {dodgerblue 1.5}, job B {dodgerblue 1.5}
+job B -(needs)-> job A
+job A -> step 1 {mediumseagreen}, step 2 {mediumseagreen}
+step 1 -(uses)-> action {orchid}
+step 2 -(run)-> shell command {silver}
+```
 
 - workflows: the list of items you see on the Actions tab in github. a workflow is just a static definition of CI, while the rest of the vocab below is related to the process of actually running CI
 - run: one execution of a workflow
