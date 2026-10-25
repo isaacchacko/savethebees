@@ -49,13 +49,6 @@ article a.internal,
   }
 }
 
-.island-sf-clock {
-  margin-top: -0.7rem;
-  font-size: 0.9rem;
-  color: var(--gray);
-  min-height: 1.2em;
-}
-
 
 .sidebar h2:not(.page-title),
 .sidebar h3,
@@ -451,12 +444,7 @@ article [data-secondary] {
 
 // ---------- phones ----------
 
-// the left sidebar becomes one row up top: no room for the clock there
 @media all and (max-width: 800px) {
-  .island-sf-clock {
-    display: none;
-  }
-
   .page-title {
     font-size: 1.35rem;
   }
