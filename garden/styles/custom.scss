@@ -240,6 +240,23 @@ article .note-list li > a {
   display: none;
 }
 
+// the theme toggle shows emoji too, to match the surf's 🌊: ☀️ by day, 🌙 by
+// night (Basalt's own glyphs are hidden, its button and script are kept)
+.darkmode {
+  > svg {
+    display: none !important;
+  }
+
+  &::before {
+    content: "☀️";
+    font: 18px/1 "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+  }
+
+  :root[saved-theme="dark"] &::before {
+    content: "🌙";
+  }
+}
+
 // its switch, beside the theme toggle (components/Darkmode.astro): Basalt's
 // ghost icon button, holding a 🌊 that greys out while it's off
 .surf-toggle {
