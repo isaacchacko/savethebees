@@ -207,11 +207,52 @@ article .note-list li > a {
 // the margin on hover: a faint dotted underline says there's something to see
 // (a link is underlined already)
 article span:is([title], [data-tip]):not(.copyable),
-article .side-photo:not(:has(> a)) {
+article :is(.side-photo, .side-sound):not(:has(> a)) {
   text-decoration: underline dotted color-mix(in srgb, var(--gray) 70%, transparent);
   text-decoration-thickness: 1.5px;
   text-underline-offset: 0.2em;
   cursor: help;
+}
+
+// a word with a sound plays it on click: a small ♪ after it, in the accent
+// while it plays
+article .side-sound {
+  &::after {
+    content: "♪";
+    margin-left: 0.12em;
+    font-size: 0.75em;
+    vertical-align: 0.3em;
+    color: var(--gray);
+  }
+
+  &.is-playing,
+  &.is-playing::after {
+    color: var(--tertiary);
+  }
+}
+
+// a sound's card in the margin: each clip's name over its player
+.margin .sound-row {
+  display: block;
+  margin-top: 0.5rem;
+
+  &::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 0.2rem;
+    font-size: 0.85rem;
+    font-style: italic;
+    color: var(--gray);
+  }
+
+  // Basalt's own player, without its filename caption (the row's label names it)
+  figure {
+    margin: 0;
+  }
+
+  figcaption {
+    display: none;
+  }
 }
 
 // ---------- islands ----------

@@ -2,7 +2,7 @@
 // The garden's foot, in place of Basalt's: the credit in the site's own words,
 // and the resume and the socials.
 // Every page has a footer, so the surf behind the page (islands/backdrop.ts)
-// is mounted from here.
+// is mounted from here, and the script that plays a word's sound (.side-sound).
 const SOCIALS = [
   { href: "/Isaac_Chacko.pdf", label: "resume" },
   { href: "https://www.github.com/isaacchacko", label: "github" },
@@ -27,3 +27,58 @@ const SOCIALS = [
     }
   </ul>
 </footer>
+
+<script>
+  // A word with a sound (<span class="side-sound" data-sound="/assets/sound/….mp3">):
+  // click it, or Enter on it, to play its clip; again to stop. Its card in the
+  // margin has the player too. One sound at a time, here or in a card.
+  const clips = new Map<string, HTMLAudioElement>()
+
+  function toggle(word: HTMLElement) {
+    const src = word.dataset.sound!
+    let clip = clips.get(src)
+    if (!clip) {
+      clip = new Audio(src)
+      clip.addEventListener("play", () => word.classList.add("is-playing"))
+      for (const stop of ["pause", "ended"]) clip.addEventListener(stop, () => word.classList.remove("is-playing"))
+      clips.set(src, clip)
+    }
+    if (clip.paused) {
+      stopAllBut(clip)
+      clip.currentTime = 0
+      clip.play().catch(() => {})
+    } else clip.pause()
+  }
+
+  // a clip made with new Audio() isn't in the page, so its "play" never reaches
+  // the listener below: it stops the others itself
+  function stopAllBut(playing: EventTarget | null) {
+    for (const clip of [...clips.values(), ...document.querySelectorAll("audio")]) if (clip !== playing) clip.pause()
+  }
+
+  function wire() {
+    for (const word of document.querySelectorAll<HTMLElement>(".side-sound:not([data-wired])")) {
+      word.dataset.wired = ""
+      word.tabIndex = 0
+      word.setAttribute("role", "button")
+    }
+  }
+  wire()
+  document.addEventListener("astro:page-load", wire)
+
+  document.addEventListener("click", (e) => {
+    const word = (e.target as Element).closest?.<HTMLElement>(".side-sound")
+    if (!word || (e.target as Element).closest("a, audio")) return
+    toggle(word)
+  })
+  document.addEventListener("keydown", (e) => {
+    const word = (e.target as Element).closest?.<HTMLElement>(".side-sound")
+    if (!word || (e.key !== "Enter" && e.key !== " ")) return
+    e.preventDefault()
+    toggle(word)
+  })
+  // a player in a card that starts stops the rest
+  document.addEventListener("play", (e) => stopAllBut(e.target), true)
+  // leaving the page stops it
+  document.addEventListener("astro:before-swap", () => clips.forEach((clip) => clip.pause()))
+</script>
