@@ -44,3 +44,4 @@ next-env.d.ts
 
 # Local originals (e.g. pre-crop assets)
 .images/
+/garden/.basalt/

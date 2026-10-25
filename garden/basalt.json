@@ -1,0 +1,9 @@
+{
+  "content": [
+    { "from": "notes", "to": "" },
+    { "from": "../content/pages", "to": "" },
+    { "from": "../content/dumps", "to": "blog" },
+    { "from": "../content/cool.json", "to": "cool.json" },
+    { "from": "../public", "to": "" }
+  ]
+}

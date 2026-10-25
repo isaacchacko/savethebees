@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "test": "node extension/store.test.mjs && node --test src/lib/map/*.test.ts",
-    "build:editor": "node scripts/build-editor.mjs"
+    "build:editor": "node scripts/build-editor.mjs",
+    "garden": "node scripts/garden.mjs"
   },
   "dependencies": {
     "@microfleet/ioredis-lock": "^6.0.1",
