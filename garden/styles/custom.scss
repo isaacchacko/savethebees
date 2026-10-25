@@ -25,7 +25,9 @@ a {
   }
 }
 
-article a.internal,
+// the garden's own underline, always there, in place of Basalt's that draws in
+// on hover (the same selector as Basalt's, so this one wins)
+article a.internal:not(.tag-link, .transclude-src),
 .popover a.internal {
   background: none;
   padding: 0;
