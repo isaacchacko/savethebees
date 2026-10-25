@@ -21,15 +21,14 @@ const left = [
   Component.PageTitle(),
   Component.Island({ name: "sf-clock", inline: false, fallback: "sf" }),
   Component.MobileOnly(Component.Spacer()),
-  Component.Flex({
-    components: [{ Component: Component.Search(), grow: true }, { Component: Component.Darkmode() }],
-  }),
+  Component.Flex({ components: [{ Component: Component.Darkmode() }] }),
   explorer,
 ]
 
 export const sharedPageComponents: SharedLayout = {
   head: Component.Head(),
-  header: [],
+  // search is ⌘F; its button only shows on a phone
+  header: [Component.Search({ findShortcut: true, button: "mobile" })],
   // Basalt's arrival: the title sets, the note rises into place
   afterBody: [Component.Motion()],
   footer: Footer(),
