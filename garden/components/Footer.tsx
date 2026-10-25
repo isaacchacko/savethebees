@@ -10,15 +10,10 @@ export default (() => {
   const Footer: QuartzComponent = () => (
     <footer class="garden-footer">
       <p>
-        grown by isaac with basalt, a fork of{" "}
-        <a href="https://quartz.jzhao.xyz" target="_blank" rel="noopener noreferrer">
-          quartz
+        made with{" "}
+        <a href="https://basalt.isaacchacko.com" target="_blank" rel="noopener noreferrer">
+          basalt
         </a>
-        , with a nod to{" "}
-        <a href="https://jzhao.xyz" target="_blank" rel="noopener noreferrer">
-          jzhao.xyz
-        </a>{" "}
-        © {new Date().getFullYear()}
       </p>
       <ul>
         {SOCIALS.map((s) => (
