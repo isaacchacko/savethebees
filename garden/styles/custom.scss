@@ -445,26 +445,6 @@ article .side-photo:not(:has(> a)) {
   }
 }
 
-// now playing on spotify (islands/now-playing.tsx): a dot that breathes, and the
-// track on hover. Its classes say "spotify", so Basalt's own .now-playing card
-// (its <sound>) doesn't restyle them
-.spotify-dot {
-  display: inline-block;
-  width: 7px;
-  height: 7px;
-  margin: 0 6px 0 2px;
-  border-radius: 50%;
-  vertical-align: middle;
-  background: var(--tertiary);
-  animation: breathe 2s ease-in-out infinite;
-}
-
-@keyframes breathe {
-  50% {
-    opacity: 0.35;
-  }
-}
-
 // the library
 article .shelf {
   padding: 0;
@@ -498,6 +478,8 @@ article [data-secondary] {
   display: block;
 }
 
+// now playing on spotify (islands/now-playing.tsx): its classes say "spotify",
+// so Basalt's own .now-playing card (its <sound>) doesn't restyle them
 .spotify-card {
   display: flex;
   gap: 0.8rem;
