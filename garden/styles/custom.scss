@@ -575,3 +575,103 @@ article [data-secondary] {
   }
 }
 
+
+// the guestbook (islands/guestbook.tsx): a form in the note's own type, then
+// the signatures, each a message over its name and day
+.guestbook-form {
+  display: grid;
+  gap: 0.8rem;
+  margin: 1.5rem 0 2rem;
+
+  label {
+    display: grid;
+    gap: 0.25rem;
+    font-style: italic;
+    color: var(--darkgray);
+  }
+
+  input,
+  textarea {
+    font: inherit;
+    font-style: normal;
+    color: var(--dark);
+    background: transparent;
+    border: 1px solid var(--lightgray);
+    border-radius: 6px;
+    padding: 0.4rem 0.6rem;
+    resize: vertical;
+
+    &:focus-visible {
+      outline: 2px solid color-mix(in srgb, var(--tertiary) 55%, transparent);
+      outline-offset: 1px;
+    }
+  }
+
+  button {
+    font: inherit;
+    color: var(--light);
+    background: var(--dark);
+    border: none;
+    border-radius: 6px;
+    padding: 0.35rem 1.1rem;
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: progress;
+    }
+
+    &:focus-visible {
+      outline: 2px solid color-mix(in srgb, var(--tertiary) 55%, transparent);
+      outline-offset: 2px;
+    }
+  }
+}
+
+// a field only a bot fills in
+.guestbook-trap {
+  position: absolute;
+  left: -9999px;
+}
+
+.guestbook-send {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.guestbook-error {
+  color: var(--tertiary);
+  font-style: italic;
+}
+
+.guestbook-quiet {
+  color: var(--gray);
+  font-style: italic;
+}
+
+.guestbook-entries {
+  padding: 0;
+  list-style: none;
+
+  li {
+    padding: 0.8rem 0;
+    border-top: 1px solid var(--lightgray);
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+.guestbook-message {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.guestbook-signed {
+  margin-top: 0.2rem !important;
+  color: var(--gray);
+  font-style: italic;
+  font-size: 0.9em;
+}
