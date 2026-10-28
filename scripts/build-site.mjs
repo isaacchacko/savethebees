@@ -16,7 +16,7 @@ import fs from "fs"
 import path from "path"
 import { fileURLToPath } from "url"
 
-const BASALT_VERSION = "0.1.10"
+const BASALT_VERSION = "0.1.11"
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..")
 const garden = path.join(root, "garden")
