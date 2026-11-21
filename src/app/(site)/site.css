@@ -434,7 +434,6 @@ ul {
   z-index: 1;
   margin: 0;
   pointer-events: none;
-  view-transition-name: city;
 }
 
 .city svg {
@@ -507,15 +506,22 @@ ul {
   }
 }
 
-/* Moving between pages. Both pages opt in; parts with the same name on both travel between their
-   places, so a row becomes the page it opens and the page becomes its row again. */
+/* Moving between pages (public/page-morph.js decides which kind and where the row is). Opening, the
+   page grows out of the row it was opened from, an opaque sheet with the map on it: it starts clipped
+   to the row and opens to cover the whole screen while the old page holds still. Going back, the
+   page closes into its row over the page underneath, thinning out as it goes. Titles with the same
+   name on both pages travel between their places above it all. Without a kind, pages crossfade. */
 
 @view-transition {
   navigation: auto;
 }
 
+:root {
+  --morph-dur: 260ms;
+}
+
 ::view-transition-group(*) {
-  animation-duration: 280ms;
+  animation-duration: var(--morph-dur);
   animation-timing-function: var(--ease);
 }
 
@@ -524,8 +530,55 @@ ul {
   animation-duration: 180ms;
 }
 
-::view-transition-group(city) {
+:root:active-view-transition-type(grow)::view-transition-old(root) {
   animation: none;
+}
+
+:root:active-view-transition-type(grow)::view-transition-new(root) {
+  animation:
+    morph-open var(--morph-dur) var(--ease) both,
+    morph-in calc(var(--morph-dur) * 0.5) linear both;
+}
+
+:root:active-view-transition-type(collapse)::view-transition-new(root) {
+  animation: none;
+}
+
+:root:active-view-transition-type(collapse)::view-transition-old(root) {
+  z-index: 1;
+  animation:
+    morph-close var(--morph-dur) var(--ease) both,
+    morph-out calc(var(--morph-dur) * 0.4) linear calc(var(--morph-dur) * 0.6) both;
+}
+
+@keyframes morph-open {
+  from {
+    clip-path: inset(var(--morph-top) var(--morph-right) var(--morph-bottom) var(--morph-left) round var(--radius));
+  }
+  to {
+    clip-path: inset(0 round var(--radius));
+  }
+}
+
+@keyframes morph-close {
+  from {
+    clip-path: inset(0 round var(--radius));
+  }
+  to {
+    clip-path: inset(var(--morph-top) var(--morph-right) var(--morph-bottom) var(--morph-left) round var(--radius));
+  }
+}
+
+@keyframes morph-in {
+  from {
+    opacity: 0.2;
+  }
+}
+
+@keyframes morph-out {
+  to {
+    opacity: 0;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

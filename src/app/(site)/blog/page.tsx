@@ -10,8 +10,8 @@ export const metadata = {
   description: "Writing by Isaac Chacko.",
 };
 
-// The list carries the name the home page's Blog row has, so that row grows into it; its heading
-// carries the row title's name, so the word Blog travels from the row to the top of the page.
+// The page grows out of the home page's Blog row; its heading carries that row title's name, so the
+// word Blog travels from the row to the top of the page.
 export default function Blog() {
   const posts = getAllDumps();
   return (
@@ -23,7 +23,7 @@ export default function Blog() {
             Blog
           </h1>
         </header>
-        <ul className="rows" style={{ viewTransitionName: "blog" } as CSSProperties}>
+        <ul className="rows">
           {posts.map((post) => (
             <Row key={post.slug} href={`/blog/${post.slug}`} meta={formatDate(post.date)} morph={`post-${post.slug}`}>
               {post.title}

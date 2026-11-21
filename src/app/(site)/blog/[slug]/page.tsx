@@ -17,8 +17,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return post ? { title: `${post.title} · Isaac Chacko`, description: post.description } : {};
 }
 
-// The post carries the name its row on the blog list has, so the row grows into the post and the
-// post shrinks back into its row; the title travels between the two the same way.
+// The post grows out of its row on the blog list and shrinks back into it; the title travels between
+// the row and the heading.
 export default async function Post({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const post = getDump(slug);
@@ -33,7 +33,7 @@ export default async function Post({ params }: { params: Promise<{ slug: string 
           </h1>
           <p className="subtitle">{formatDate(post.date)}</p>
         </header>
-        <article style={{ viewTransitionName: `post-${slug}` } as CSSProperties}>
+        <article>
           <Prose content={post.content} />
         </article>
       </main>
