@@ -1,6 +1,21 @@
-import { redirect } from "next/navigation";
+import Crumb from "@/components/site/Crumb";
+import { sans } from "./fonts/sans";
+import "./(site)/site.css";
 
-// a page nothing answers gets the garden's own 404 page (built into public/)
+export const metadata = { title: "Not here · Isaac Chacko" };
+
 export default function NotFound() {
-  redirect("/404.html");
+  return (
+    <div className={`site ${sans.variable}`}>
+      <div className="page">
+        <main>
+          <header className="heading">
+            <Crumb href="/">Home</Crumb>
+            <h1 className="title">Not here</h1>
+          </header>
+          <p>Either this page is private or it doesn&apos;t exist.</p>
+        </main>
+      </div>
+    </div>
+  );
 }

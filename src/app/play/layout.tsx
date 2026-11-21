@@ -1,3 +1,4 @@
+import "../globals.css";
 import Card from "@/components/Card";
 import { PrivateLibraryProvider } from "@/components/PrivateLibrary";
 import Stage from "@/components/Stage";
