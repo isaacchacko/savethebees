@@ -507,14 +507,12 @@ ul {
   }
 }
 
-/* Moving between pages. Both pages opt in. The panel keeps its place and changes width, its old and new
+/* Moving between pages. The panel keeps its place and changes width, its old and new
    contents crossfading at their own size rather than stretched to the panel's; headings with the same
    name on both pages travel between their places. The map sits below the panel (z-index), so its
    layer is drawn under it. */
 
-@view-transition {
-  navigation: auto;
-}
+/* the opt-in itself, `@view-transition { navigation: auto }`, is inline in the root layout's head */
 
 ::view-transition-group(*) {
   animation-duration: 300ms;

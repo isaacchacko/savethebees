@@ -21,6 +21,10 @@ export const viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={mono.variable}>
+      <head>
+        {/* inline, so the opt-in to page transitions is in place the moment a page is shown */}
+        <style>{"@view-transition { navigation: auto; }"}</style>
+      </head>
       <body>
         {children}
         <Analytics />
