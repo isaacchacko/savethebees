@@ -1,23 +1,32 @@
 import fs from "fs";
 import path from "path";
+import matter from "gray-matter";
 
 const PAGES_DIR = path.join(process.cwd(), "content/pages");
 
-/** The pages the extension's admin view is allowed to edit. */
-export const EDITABLE_PAGES = ["about", "now", "running"] as const;
+export type Page = { slug: string; title: string; content: string };
 
-export type PageSlug = (typeof EDITABLE_PAGES)[number];
+/** A page has no frontmatter; its title is its leading `# heading`, which the body then leaves out. */
+function read(slug: string): Page | null {
+  const filePath = path.join(PAGES_DIR, `${slug}.md`);
+  if (!fs.existsSync(filePath)) return null;
+  const { data, content } = matter(fs.readFileSync(filePath, "utf8"));
+  const heading = content.match(/^\s*#\s+(.+)\n/);
+  return {
+    slug,
+    title: typeof data.title === "string" ? data.title : heading?.[1].trim() ?? slug,
+    content: heading ? content.slice(heading[0].length) : content,
+  };
+}
 
-/**
- * The prose for a page, as markdown. These used to be hardcoded JSX; they live
- * in content/ so they can be edited without touching code — a typo is then a
- * typo rather than a broken build.
- */
-export function getPage(slug: PageSlug): string {
-  const file = path.join(PAGES_DIR, `${slug}.md`);
-  if (!fs.existsSync(file)) {
-    console.error(`content/pages/${slug}.md is missing`);
-    return "";
-  }
-  return fs.readFileSync(file, "utf8");
+export function getPageSlugs(): string[] {
+  if (!fs.existsSync(PAGES_DIR)) return [];
+  return fs
+    .readdirSync(PAGES_DIR)
+    .filter((f) => f.endsWith(".md"))
+    .map((f) => f.replace(/\.md$/, ""));
+}
+
+export function getPage(slug: string): Page | null {
+  return getPageSlugs().includes(slug) ? read(slug) : null;
 }

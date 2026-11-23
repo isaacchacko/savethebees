@@ -1,7 +1,6 @@
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { JetBrains_Mono } from "next/font/google";
-import "./globals.css";
 
 const mono = JetBrains_Mono({
   subsets: ["latin"],
@@ -19,11 +18,13 @@ export const viewport = {
   themeColor: "#a3c585",
 };
 
-// the site itself is the Basalt garden in public/ (scripts/build-site.mjs);
-// what Next still renders is /play, which has its own layout, and the 404
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={mono.variable}>
+      <head>
+        {/* inline, so the opt-in to page transitions is in place the moment a page is shown */}
+        <style>{"@view-transition { navigation: auto; }"}</style>
+      </head>
       <body>
         {children}
         <Analytics />
