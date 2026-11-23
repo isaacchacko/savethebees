@@ -19,7 +19,7 @@ export default async function StandalonePage({ params }: { params: Promise<{ pag
   const page = getPage((await params).page);
   if (!page) notFound();
   return (
-    <div className="page reading">
+    <div className="page">
       <main>
         <header className="heading">
           <Crumb href="/">Home</Crumb>

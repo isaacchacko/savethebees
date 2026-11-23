@@ -17,14 +17,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return post ? { title: `${post.title} · Isaac Chacko`, description: post.description } : {};
 }
 
-// The post grows out of its row on the blog list and shrinks back into it; the title travels between
-// the row and the heading.
+// The title travels between its row on the blog list and this heading.
 export default async function Post({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const post = getDump(slug);
   if (!post) notFound();
   return (
-    <div className="page reading">
+    <div className="page">
       <main>
         <header className="heading">
           <Crumb href="/blog">Blog</Crumb>

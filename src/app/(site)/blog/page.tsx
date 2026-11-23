@@ -10,8 +10,8 @@ export const metadata = {
   description: "Writing by Isaac Chacko.",
 };
 
-// The page grows out of the home page's Blog row; its heading carries that row title's name, so the
-// word Blog travels from the row to the top of the page.
+// The heading carries the name the home page's Blog row title has, so the word Blog travels from the
+// row to the top of the page.
 export default function Blog() {
   const posts = getAllDumps();
   return (

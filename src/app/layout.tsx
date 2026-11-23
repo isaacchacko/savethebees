@@ -21,11 +21,6 @@ export const viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={mono.variable}>
-      <head>
-        {/* has to run before the first frame, where a page learns how it was arrived at */}
-        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
-        <script src="/page-morph.js" />
-      </head>
       <body>
         {children}
         <Analytics />

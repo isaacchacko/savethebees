@@ -1,9 +1,10 @@
-/* The site: a column of text on the left, a city drawn from above on the right. Pages move between each
-   other as one object: a row grows into the page it opens, and the page shrinks back into its row. */
+/* The site: a panel of text on the left, over a city drawn from above. The panel is as wide as what it
+   holds, up to a limit, and changes width as you move between pages. */
 
 :root {
   color-scheme: light dark;
-  --paper: light-dark(oklch(0.965 0.003 250), oklch(0.2 0.004 250));
+  --paper: light-dark(oklch(0.95 0.004 250), oklch(0.18 0.004 250));
+  --panel: light-dark(oklch(0.975 0.003 250), oklch(0.205 0.004 250));
   --card: light-dark(oklch(0.995 0.002 250), oklch(0.245 0.005 250));
   --hover: light-dark(oklch(0.9 0.005 250), oklch(0.3 0.006 250));
   --press: light-dark(oklch(0.865 0.006 250), oklch(0.355 0.006 250));
@@ -13,8 +14,8 @@
   --focus: light-dark(oklch(0.55 0.18 255), oklch(0.74 0.13 255));
 
   --edge: clamp(1.5rem, 9vw, 10rem);
-  --column: 26rem;
-  --gap: 3rem;
+  --start: max(var(--edge), calc((100vw - 100rem) / 2 + var(--edge)));
+  --content-max: 40rem;
   --row: 2.75rem;
   --radius: 3px;
   --ease: cubic-bezier(0.2, 0, 0, 1);
@@ -38,6 +39,7 @@
 html {
   background: var(--paper);
   -webkit-text-size-adjust: 100%;
+  interpolate-size: allow-keywords;
 }
 
 body {
@@ -71,19 +73,22 @@ ul {
 
 /* Layout */
 
+/* The panel: from the left edge to just past its content, never wider than the limit, with the map
+   showing to its right. It shares one name across pages, so moving between them animates its width. */
 .page {
   position: relative;
   z-index: 2;
   display: flex;
   flex-direction: column;
-  width: min(var(--column), 100%);
+  width: fit-content;
+  min-width: min(100%, calc(var(--start) + 24rem + 3rem));
+  max-width: min(100%, calc(var(--start) + var(--content-max) + 3rem));
   min-height: 100svh;
-  margin-inline-start: max(var(--edge), calc((100vw - 100rem) / 2 + var(--edge)));
-  padding-block: 7rem 1.5rem;
-}
-
-.page.reading {
-  --column: 40rem;
+  padding: 7rem 3rem 1.5rem var(--start);
+  border-inline-end: 1px solid var(--rule);
+  background: var(--panel);
+  transition: width 300ms var(--ease);
+  view-transition-name: panel;
 }
 
 .page > main {
@@ -430,17 +435,18 @@ ul {
 
 .city {
   position: fixed;
-  inset: 0 0 0 calc(max(var(--edge), (100vw - 100rem) / 2 + var(--edge)) + var(--column) + var(--gap));
+  inset: 0;
   z-index: 1;
   margin: 0;
   pointer-events: none;
+  view-transition-name: city;
 }
 
 .city svg {
   display: block;
   width: 100%;
   height: 100%;
-  mask-image: linear-gradient(to right, transparent, #000 22%, #000 88%, transparent),
+  mask-image: linear-gradient(to right, #000 88%, transparent),
     linear-gradient(to bottom, transparent, #000 14%, #000 86%, transparent);
   mask-composite: intersect;
 }
@@ -491,11 +497,6 @@ ul {
   text-decoration: underline;
 }
 
-.page.reading ~ .city {
-  --column: 40rem;
-  opacity: 0.6;
-}
-
 @media (max-width: 56.25em) {
   .page {
     padding-block-start: 4rem;
@@ -506,79 +507,42 @@ ul {
   }
 }
 
-/* Moving between pages (public/page-morph.js decides which kind and where the row is). Opening, the
-   page grows out of the row it was opened from, an opaque sheet with the map on it: it starts clipped
-   to the row and opens to cover the whole screen while the old page holds still. Going back, the
-   page closes into its row over the page underneath, thinning out as it goes. Titles with the same
-   name on both pages travel between their places above it all. Without a kind, pages crossfade. */
+/* Moving between pages. Both pages opt in. The panel keeps its place and changes width, its old and new
+   contents crossfading at their own size rather than stretched to the panel's; headings with the same
+   name on both pages travel between their places. The map sits below the panel (z-index), so its
+   layer is drawn under it. */
 
 @view-transition {
   navigation: auto;
 }
 
-:root {
-  --morph-dur: 260ms;
-}
-
 ::view-transition-group(*) {
-  animation-duration: var(--morph-dur);
+  animation-duration: 300ms;
   animation-timing-function: var(--ease);
 }
 
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation-duration: 180ms;
+::view-transition-group(panel) {
+  overflow: clip;
 }
 
-:root:active-view-transition-type(grow)::view-transition-old(root) {
+/* The next page draws its map only after it loads, so through the transition the map is the one being
+   left, held still under the panel. */
+::view-transition-group(city),
+::view-transition-old(city) {
   animation: none;
 }
 
-:root:active-view-transition-type(grow)::view-transition-new(root) {
-  animation:
-    morph-open var(--morph-dur) var(--ease) both,
-    morph-in calc(var(--morph-dur) * 0.5) linear both;
-}
-
-:root:active-view-transition-type(collapse)::view-transition-new(root) {
+::view-transition-new(city) {
   animation: none;
+  opacity: 0;
 }
 
-:root:active-view-transition-type(collapse)::view-transition-old(root) {
-  z-index: 1;
-  animation:
-    morph-close var(--morph-dur) var(--ease) both,
-    morph-out calc(var(--morph-dur) * 0.4) linear calc(var(--morph-dur) * 0.6) both;
-}
-
-@keyframes morph-open {
-  from {
-    clip-path: inset(var(--morph-top) var(--morph-right) var(--morph-bottom) var(--morph-left) round var(--radius));
-  }
-  to {
-    clip-path: inset(0 round var(--radius));
-  }
-}
-
-@keyframes morph-close {
-  from {
-    clip-path: inset(0 round var(--radius));
-  }
-  to {
-    clip-path: inset(var(--morph-top) var(--morph-right) var(--morph-bottom) var(--morph-left) round var(--radius));
-  }
-}
-
-@keyframes morph-in {
-  from {
-    opacity: 0.2;
-  }
-}
-
-@keyframes morph-out {
-  to {
-    opacity: 0;
-  }
+::view-transition-old(panel),
+::view-transition-new(panel) {
+  inline-size: auto;
+  block-size: auto;
+  object-fit: none;
+  object-position: left top;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -588,7 +552,8 @@ ul {
     animation: none !important;
   }
 
-  .pane {
+  .pane,
+  .page {
     transition: none;
   }
 }

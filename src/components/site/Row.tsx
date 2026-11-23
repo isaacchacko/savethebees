@@ -26,10 +26,9 @@ export function BackIcon() {
 }
 
 /**
- * A `morph` row opens a page that grows out of it, and that page shrinks back into it on the way
- * back (public/page-morph.js). Its title carries `<morph>-title`, the name the page's heading has, so
- * the words travel between the two. Internal links are plain anchors: each one is a real navigation
- * the browser can animate.
+ * A `morph` row's title carries `<morph>-title`, the name the heading of the page it opens has, so the
+ * words travel between the two. Internal links are plain anchors: each one is a real navigation the
+ * browser can animate.
  */
 export default function Row({
   href,
@@ -49,7 +48,6 @@ export default function Row({
       <a
         href={href}
         className="row"
-        data-morph-row={morph ? "" : undefined}
         {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
       >
         <span style={titleStyle}>{children}</span>
